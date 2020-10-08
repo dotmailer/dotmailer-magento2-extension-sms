@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Dotdigitalgroup\Sms\Api\SmsOrderRepositoryInterface" type="Dotdigitalgroup\Sms\Model\SmsOrderRepository" />
+    <preference for="Dotdigitalgroup\Sms\Api\Data\SmsOrderInterface" type="Dotdigitalgroup\Sms\Model\SmsOrder" />
+    <type name="Magento\Shipping\Controller\Adminhtml\Order\Shipment\Save">
+        <plugin name="ddg_new_shipment_plugin" type="Dotdigitalgroup\Sms\Plugin\Order\Shipment\NewShipmentPlugin" sortOrder="1"/>
+    </type>
+    <type name="Magento\Shipping\Controller\Adminhtml\Order\Shipment\AddTrack">
+        <plugin name="ddg_update_shipment_plugin" type="Dotdigitalgroup\Sms\Plugin\Order\Shipment\ShipmentUpdatePlugin" sortOrder="3"/>
+    </type>
+</config>

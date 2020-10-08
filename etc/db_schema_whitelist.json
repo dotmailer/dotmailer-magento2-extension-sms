@@ -1,0 +1,28 @@
+{
+    "email_sms_order_queue": {
+        "column": {
+            "id": true,
+            "website_id": true,
+            "store_id": true,
+            "type_id": true,
+            "status": true,
+            "order_id": true,
+            "phone_number": true,
+            "message": true,
+            "message_id": true,
+            "sent_at": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "EMAIL_SMS_ORDER_QUEUE_WEBSITE_ID": true,
+            "EMAIL_SMS_ORDER_QUEUE_STORE_ID": true,
+            "EMAIL_SMS_ORDER_QUEUE_ORDER_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "EMAIL_SMS_ORDER_QUEUE_WEBSITE_ID_STORE_WEBSITE_WEBSITE_ID": true,
+            "EMAIL_SMS_ORDER_QUEUE_STORE_ID_STORE_STORE_ID": true
+        }
+    }
+}

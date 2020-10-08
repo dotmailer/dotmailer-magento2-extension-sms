@@ -30,9 +30,13 @@ class RemainingSmsMessage extends \Magento\Config\Block\System\Config\Form\Field
      */
     public function render(AbstractElement $element)
     {
+        $availableSms = 0;
         $client = $this->helper->getWebsiteApiClient($this->helper->getWebsiteForSelectedScopeInAdmin());
         $accountInfo = $client->getAccountInfo();
-        $availableSms = $this->getAvailableSms($accountInfo->properties) ?? 'no';
+
+        if (!isset($accountInfo->message)) {
+            $availableSms = $this->getAvailableSms($accountInfo->properties);
+        }
 
         return sprintf(
             '<div><p>%s</p></div>',
