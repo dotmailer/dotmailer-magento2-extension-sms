@@ -67,7 +67,6 @@ class OrderItemNotificationEnqueuer
             return;
         }
 
-        $addressData = $order->getBillingAddress()->getData();
         $orderId = (int) $order->getRealOrderId();
 
         $smsOrder = $this->smsOrderInterface
@@ -77,7 +76,7 @@ class OrderItemNotificationEnqueuer
             ->setWebsiteId($this->storeManager->getWebsite()->getId())
             ->setTypeId($smsType)
             ->setStatus(0)
-            ->setPhoneNumber($addressData['telephone']);
+            ->setPhoneNumber($order->getShippingAddress()->getTelephone());
 
         $this->smsOrderRepositoryInterface
             ->save($smsOrder);
