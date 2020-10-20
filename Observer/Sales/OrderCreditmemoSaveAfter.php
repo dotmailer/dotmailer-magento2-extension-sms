@@ -31,6 +31,7 @@ class OrderCreditmemoSaveAfter implements \Magento\Framework\Event\ObserverInter
         $order = $creditmemo->getOrder();
 
         $this->newCreditMemo
-            ->queue($order);
+            ->buildAdditionalData($order, $creditmemo)
+            ->queue();
     }
 }

@@ -2,8 +2,9 @@
 
 namespace Dotdigitalgroup\Sms\Observer\Sales;
 
-use Magento\Framework\Event\Observer;
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\UpdateOrder;
+use Dotdigitalgroup\Sms\Model\Queue\OrderItem\NewOrder;
+use Magento\Framework\Event\Observer;
 
 class OrderSaveAfter implements \Magento\Framework\Event\ObserverInterface
 {
@@ -13,13 +14,21 @@ class OrderSaveAfter implements \Magento\Framework\Event\ObserverInterface
     private $updateOrder;
 
     /**
+     * @var NewOrder
+     */
+    private $newOrder;
+
+    /**
      * OrderSaveAfter constructor.
      * @param UpdateOrder $updateOrder
+     * @param NewOrder $newOrder
      */
     public function __construct(
-        UpdateOrder $updateOrder
+        UpdateOrder $updateOrder,
+        NewOrder $newOrder
     ) {
         $this->updateOrder = $updateOrder;
+        $this->newOrder = $newOrder;
     }
 
     /**
@@ -30,7 +39,35 @@ class OrderSaveAfter implements \Magento\Framework\Event\ObserverInterface
     public function execute(Observer $observer)
     {
         $order = $observer->getEvent()->getOrder();
-        $this->updateOrder
-            ->queue($order);
+
+        if ($this->isCanceledOrHolded($order)) {
+            $this->updateOrder
+                ->buildAdditionalData($order)
+                ->queue($order);
+        }
+
+        if ($this->isNewOrder($order)) {
+            $this->newOrder
+                ->buildAdditionalData($order)
+                ->queue();
+        }
+    }
+
+    /**
+     * @param $order
+     * @return bool
+     */
+    private function isCanceledOrHolded($order)
+    {
+        return $order->getStatus() === 'canceled' || $order->getStatus() === 'holded';
+    }
+
+    /**
+     * @param $order
+     * @return bool
+     */
+    private function isNewOrder($order)
+    {
+        return $order->getCreatedAt() === $order->getUpdatedAt();
     }
 }

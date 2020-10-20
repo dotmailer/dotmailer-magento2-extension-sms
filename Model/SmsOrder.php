@@ -76,7 +76,7 @@ class SmsOrder extends AbstractExtensibleModel implements SmsOrderInterface
      */
     public function getMessage()
     {
-        $this->getData(self::MESSAGE);
+        return $this->getData(self::MESSAGE);
     }
 
     /**
@@ -84,7 +84,15 @@ class SmsOrder extends AbstractExtensibleModel implements SmsOrderInterface
      */
     public function getMessageId()
     {
-        $this->getData(self::MESSAGE_ID);
+        return $this->getData(self::MESSAGE_ID);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getAdditionalData()
+    {
+        return $this->getData(self::ADDITIONAL_DATA);
     }
 
     /**
@@ -164,6 +172,16 @@ class SmsOrder extends AbstractExtensibleModel implements SmsOrderInterface
     public function setMessageId($messageId)
     {
         $this->setData(self::MESSAGE_ID, $messageId);
+        return $this;
+    }
+
+    /**
+     * @param $data
+     * @return SmsOrder
+     */
+    public function setAdditionalData($data)
+    {
+        $this->setData(self::ADDITIONAL_DATA, $data);
         return $this;
     }
 }

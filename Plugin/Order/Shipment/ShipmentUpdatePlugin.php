@@ -24,6 +24,12 @@ class ShipmentUpdatePlugin
      */
     private $shipmentRepository;
 
+    /**
+     * ShipmentUpdatePlugin constructor.
+     * @param OrderRepositoryInterface $orderRepository
+     * @param UpdateShipment $updateShipment
+     * @param ShipmentRepositoryInterface $shipmentRepository
+     */
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         UpdateShipment $updateShipment,
@@ -44,8 +50,8 @@ class ShipmentUpdatePlugin
     ) {
         $shipment = $this->shipmentRepository->get(
             $subject
-            ->getRequest()
-            ->getParam('shipment_id')
+                ->getRequest()
+                ->getParam('shipment_id')
         );
 
         $orderId = $shipment->getOrderId();
@@ -55,7 +61,11 @@ class ShipmentUpdatePlugin
         );
 
         $this->updateShipment
-            ->queue($order);
+            ->buildAdditionalData(
+                $order,
+                $subject->getRequest()->getParam('number'),
+                $subject->getRequest()->getParam('carrier')
+            )->queue();
 
         return $result;
     }

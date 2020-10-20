@@ -13,7 +13,7 @@ use Magento\Store\Api\Data\WebsiteInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use PHPUnit\Framework\TestCase;
 
-class TestOrderNotificationEnqueuer extends TestCase
+class OrderNotificationEnqueuerTest extends TestCase
 {
     /**
      * @var OrderInterface|\PHPUnit\Framework\MockObject\MockObject
@@ -62,9 +62,10 @@ class TestOrderNotificationEnqueuer extends TestCase
 
     protected function setUp(): void
     {
+        $assignedMethods = ['getId','getData','getShippingAddress', 'getTelephone'];
         $this->orderInterfaceMock = $this->getMockBuilder(OrderInterface::class)
             ->disableOriginalConstructor()
-            ->setMethods(array_merge(get_class_methods(OrderInterface::class), ['getRealOrderId','getData']))
+            ->setMethods(array_merge(get_class_methods(OrderInterface::class), $assignedMethods))
             ->getMock();
 
         $this->smsOrderInterfaceFactoryMock = $this->createMock(SmsOrderInterfaceFactory::class);
@@ -104,15 +105,19 @@ class TestOrderNotificationEnqueuer extends TestCase
             ->willReturn(true);
 
         $this->orderInterfaceMock->expects($this->once())
-            ->method('getBillingAddress')
+            ->method('getShippingAddress')
             ->willReturn($this->orderInterfaceMock);
 
         $this->orderInterfaceMock->expects($this->once())
-            ->method('getData')
-            ->willReturn($telephone = ['telephone' => '+4400000000000']);
+            ->method('getShippingAddress')
+            ->willReturn($this->orderInterfaceMock);
 
         $this->orderInterfaceMock->expects($this->once())
-            ->method('getRealOrderId')
+            ->method('getTelephone')
+            ->willReturn($telephone = '+4407400000000');
+
+        $this->orderInterfaceMock->expects($this->once())
+            ->method('getId')
             ->willReturn($orderId = 1);
 
         $this->storeManagerInterfaceMock->expects($this->once())
@@ -153,7 +158,12 @@ class TestOrderNotificationEnqueuer extends TestCase
 
         $this->smsOrderInterfaceMock->expects($this->once())
             ->method('setPhoneNumber')
-            ->with($telephone['telephone'])
+            ->with($telephone)
+            ->willReturn($this->smsOrderInterfaceMock);
+
+        $this->smsOrderInterfaceMock->expects($this->once())
+            ->method('setAdditionalData')
+            ->with('{order_status:pending}')
             ->willReturn($this->smsOrderInterfaceMock);
 
         $this->smsOrderRepositoryInterfaceMock
@@ -163,6 +173,7 @@ class TestOrderNotificationEnqueuer extends TestCase
 
         $this->smsOrderNotificationEnqueuer->queue(
             $this->orderInterfaceMock,
+            '{order_status:pending}',
             'chazPath',
             'chazType'
         );
@@ -187,13 +198,13 @@ class TestOrderNotificationEnqueuer extends TestCase
             ->method('isSmsTypeEnabled');
 
         $this->orderInterfaceMock->expects($this->never())
-            ->method('getBillingAddress');
+            ->method('getShippingAddress');
 
         $this->orderInterfaceMock->expects($this->never())
             ->method('getData');
 
         $this->orderInterfaceMock->expects($this->never())
-            ->method('getRealOrderId');
+            ->method('getId');
 
         $this->storeManagerInterfaceMock->expects($this->never())
             ->method('getWebsite');
@@ -228,6 +239,7 @@ class TestOrderNotificationEnqueuer extends TestCase
 
         $this->smsOrderNotificationEnqueuer->queue(
             $this->orderInterfaceMock,
+            '',
             'chazPath',
             'chazType'
         );

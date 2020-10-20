@@ -10,7 +10,7 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Shipping\Controller\Adminhtml\Order\Shipment\Save as NewShipmentAction;
 use PHPUnit\Framework\TestCase;
 
-class TestNewShipmentPlugin extends TestCase
+class NewShipmentPluginTest extends TestCase
 {
     /**
      * @var OrderRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject
@@ -56,18 +56,27 @@ class TestNewShipmentPlugin extends TestCase
         );
     }
 
-    public function testAfterExecuteMethod()
+    public function testAfterExecuteMethodIfTrackingDefined()
     {
         $this->newShipmentActionMock
-           ->expects($this->once())
+           ->expects($this->exactly(2))
            ->method('getRequest')
            ->willReturn($this->requestInterfaceMock);
 
         $this->requestInterfaceMock
-           ->expects($this->once())
+           ->expects($this->at(0))
            ->method('getParam')
            ->with('order_id')
            ->willReturn($orderId = 1);
+
+        $this->requestInterfaceMock
+            ->expects($this->at(1))
+            ->method('getParam')
+            ->with('tracking')
+            ->willReturn($tracking = [[
+                'number' => 35589,
+                'carrier_code' => 'Chaz'
+            ]]);
 
         $this->orderRepositoryInterfaceMock
            ->expects($this->once())
@@ -76,9 +85,54 @@ class TestNewShipmentPlugin extends TestCase
            ->willReturn($this->orderInterfaceMock);
 
         $this->newShipmentMock
+            ->expects($this->once())
+            ->method('buildAdditionalData')
+            ->with(
+                $this->orderInterfaceMock,
+                $tracking[0]['number'],
+                $tracking[0]['carrier_code']
+            )
+            ->willReturn($this->newShipmentMock);
+
+        $this->newShipmentMock
            ->expects($this->once())
-           ->method('queue')
-           ->with($this->orderInterfaceMock);
+           ->method('queue');
+
+        $this->plugin->afterExecute($this->newShipmentActionMock, []);
+    }
+
+    public function testAfterExecuteMethodIfTrackingDidntDefined()
+    {
+        $this->newShipmentActionMock
+            ->expects($this->exactly(2))
+            ->method('getRequest')
+            ->willReturn($this->requestInterfaceMock);
+
+        $this->requestInterfaceMock
+            ->expects($this->at(0))
+            ->method('getParam')
+            ->with('order_id')
+            ->willReturn($orderId = 1);
+
+        $this->requestInterfaceMock
+            ->expects($this->at(1))
+            ->method('getParam')
+            ->with('tracking')
+            ->willReturn($tracking = null);
+
+        $this->orderRepositoryInterfaceMock
+            ->expects($this->once())
+            ->method('get')
+            ->with($orderId)
+            ->willReturn($this->orderInterfaceMock);
+
+        $this->newShipmentMock
+            ->expects($this->never())
+            ->method('buildAdditionalData');
+
+        $this->newShipmentMock
+            ->expects($this->never())
+            ->method('queue');
 
         $this->plugin->afterExecute($this->newShipmentActionMock, []);
     }

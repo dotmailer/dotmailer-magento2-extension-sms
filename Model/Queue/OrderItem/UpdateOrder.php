@@ -18,22 +18,12 @@ class UpdateOrder extends AbstractOrderItem
 
     /**
      * @param $order
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return $this
      */
-    public function queue($order)
+    public function buildAdditionalData($order)
     {
-        if ($this->isCanceledOrHolded($order)) {
-            parent::queue($order);
-        }
-    }
-
-    /**
-     * @param $order
-     * @return bool
-     */
-    private function isCanceledOrHolded($order)
-    {
-        return $order->getStatus() === 'canceled' || $order->getStatus() === 'holded';
+        $this->order = $order;
+        $this->additionalData->orderStatus = $order->getStatus();
+        return $this;
     }
 }

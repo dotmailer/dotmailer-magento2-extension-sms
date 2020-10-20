@@ -2,9 +2,9 @@
 
 namespace Dotdigitalgroup\Sms\Plugin\Order\Shipment;
 
+use Dotdigitalgroup\Sms\Model\Queue\OrderItem\NewShipment;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Shipping\Controller\Adminhtml\Order\Shipment\Save as NewShipmentAction;
-use Dotdigitalgroup\Sms\Model\Queue\OrderItem\NewShipment;
 
 class NewShipmentPlugin
 {
@@ -18,6 +18,11 @@ class NewShipmentPlugin
      */
     private $newShipment;
 
+    /**
+     * NewShipmentPlugin constructor.
+     * @param OrderRepositoryInterface $orderRepository
+     * @param NewShipment $newShipment
+     */
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         NewShipment $newShipment
@@ -40,8 +45,20 @@ class NewShipmentPlugin
                 ->getParam('order_id')
         );
 
-        $this->newShipment
-            ->queue($order);
+        $trackings = $subject
+            ->getRequest()
+            ->getParam('tracking');
+
+        if (is_array($trackings)) {
+            foreach ($trackings as $tracking) {
+                $this->newShipment
+                    ->buildAdditionalData(
+                        $order,
+                        $tracking['number'],
+                        $tracking['carrier_code']
+                    )->queue();
+            }
+        }
 
         return $result;
     }

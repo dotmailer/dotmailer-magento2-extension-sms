@@ -12,7 +12,7 @@ use Magento\Sales\Api\ShipmentRepositoryInterface;
 use Magento\Shipping\Controller\Adminhtml\Order\Shipment\AddTrack as UpdateShipmentAction;
 use PHPUnit\Framework\TestCase;
 
-class TestShipmentUpdatePlugin extends TestCase
+class ShipmentUpdatePluginTest extends TestCase
 {
     /**
      * @var UpdateShipment|\PHPUnit\Framework\MockObject\MockObject
@@ -74,15 +74,27 @@ class TestShipmentUpdatePlugin extends TestCase
     public function testAfterExecuteMethod()
     {
         $this->updateShipmentActionMock
-            ->expects($this->once())
+            ->expects($this->atLeastOnce())
             ->method('getRequest')
             ->willReturn($this->requestInterfaceMock);
 
         $this->requestInterfaceMock
-            ->expects($this->once())
+            ->expects($this->at(0))
             ->method('getParam')
             ->with('shipment_id')
             ->willReturn($shipmentId = 1);
+
+        $this->requestInterfaceMock
+            ->expects($this->at(1))
+            ->method('getParam')
+            ->with('number')
+            ->willReturn($trackingNumber = 12345);
+
+        $this->requestInterfaceMock
+            ->expects($this->at(2))
+            ->method('getParam')
+            ->with('carrier')
+            ->willReturn($trackingCode = 'Chaz');
 
         $this->shipmentRepositoryInterfaceMock
             ->expects($this->once())
@@ -103,8 +115,16 @@ class TestShipmentUpdatePlugin extends TestCase
 
         $this->updateShipmentMock
             ->expects($this->once())
-            ->method('queue')
-            ->with($this->orderInterfaceMock);
+            ->method('buildAdditionalData')
+            ->with(
+                $this->orderInterfaceMock,
+                $trackingNumber,
+                $trackingCode
+            )->willReturn($this->updateShipmentMock);
+
+        $this->updateShipmentMock
+            ->expects($this->once())
+            ->method('queue');
 
         $this->plugin->afterExecute(
             $this->updateShipmentActionMock,

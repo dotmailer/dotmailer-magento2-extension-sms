@@ -53,12 +53,13 @@ class OrderItemNotificationEnqueuer
 
     /**
      * @param $order
+     * @param $additionalData
      * @param $smsConfigPath
      * @param $smsType
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function queue($order, $smsConfigPath, $smsType)
+    public function queue($order, $additionalData, $smsConfigPath, $smsType)
     {
         $storeId = $this->storeManager->getStore()->getId();
 
@@ -67,7 +68,7 @@ class OrderItemNotificationEnqueuer
             return;
         }
 
-        $orderId = (int) $order->getRealOrderId();
+        $orderId = (int) $order->getId();
 
         $smsOrder = $this->smsOrderInterface
             ->create()
@@ -76,7 +77,8 @@ class OrderItemNotificationEnqueuer
             ->setWebsiteId($this->storeManager->getWebsite()->getId())
             ->setTypeId($smsType)
             ->setStatus(0)
-            ->setPhoneNumber($order->getShippingAddress()->getTelephone());
+            ->setPhoneNumber($order->getShippingAddress()->getTelephone())
+            ->setAdditionalData($additionalData);
 
         $this->smsOrderRepositoryInterface
             ->save($smsOrder);

@@ -15,4 +15,20 @@ class NewShipment extends AbstractOrderItem
      * @var int
      */
     protected $smsType = ConfigInterface::SMS_TYPE_NEW_SHIPMENT;
+
+    /**
+     * @param $order
+     * @param $trackingNumber
+     * @param $carrierCode
+     */
+    public function buildAdditionalData($order, $trackingNumber, $carrierCode)
+    {
+        $this->order = $order;
+
+        $this->additionalData->orderStatus = $order->getStatus();
+        $this->additionalData->trackingNumber = $trackingNumber;
+        $this->additionalData->trackingCarrier = $carrierCode;
+
+        return $this;
+    }
 }

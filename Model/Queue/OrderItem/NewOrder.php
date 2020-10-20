@@ -12,7 +12,17 @@ class NewOrder extends AbstractOrderItem
     protected $smsType = ConfigInterface::SMS_TYPE_NEW_ORDER;
 
     /**
-     * @var int
+     * @var string
      */
     protected $smsConfigPath  = ConfigInterface::XML_PATH_SMS_NEW_ORDER_ENABLED;
+
+    /**
+     * @param $order
+     */
+    public function buildAdditionalData($order)
+    {
+        $this->order = $order;
+        $this->additionalData->orderStatus = $order->getStatus();
+        return $this;
+    }
 }
