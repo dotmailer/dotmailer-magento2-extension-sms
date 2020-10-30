@@ -49,4 +49,16 @@ class TransactionalSms
             $storeId
         );
     }
+
+    /**
+     * Can be overridden via config.xml
+     *
+     * @return string
+     */
+    public function getBatchSize()
+    {
+        return $this->scopeConfig->getValue(
+            ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_BATCH_SIZE
+        );
+    }
 }

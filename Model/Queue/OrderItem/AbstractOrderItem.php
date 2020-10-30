@@ -5,6 +5,7 @@ namespace Dotdigitalgroup\Sms\Model\Queue\OrderItem;
 use Dotdigitalgroup\Email\Logger\Logger;
 use Magento\Framework\Serialize\SerializerInterface;
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\Data\OrderData;
+use Magento\Sales\Api\Data\OrderInterface;
 
 abstract class AbstractOrderItem
 {
@@ -18,8 +19,14 @@ abstract class AbstractOrderItem
      */
     protected $smsType;
 
+    /**
+     * @var OrderInterface
+     */
     protected $order;
 
+    /**
+     * @var OrderData
+     */
     protected $additionalData;
 
     /**

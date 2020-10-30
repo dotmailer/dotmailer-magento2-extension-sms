@@ -58,6 +58,12 @@ interface SmsOrderInterface
     /**
      * @return string
      */
+    public function getSentAt();
+
+    /**
+     * @return string
+     */
+
     public function getAdditionalData();
 
     /**
@@ -107,6 +113,12 @@ interface SmsOrderInterface
      * @return $this
      */
     public function setMessageId($messageId);
+
+    /**
+     * @param $sentAt
+     * @return $this
+     */
+    public function setSentAt($sentAt);
 
     /**
      * @param $data

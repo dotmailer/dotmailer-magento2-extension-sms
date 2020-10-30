@@ -8,6 +8,7 @@ interface ConfigInterface
      * Config paths for SMS config fields
      */
     const XML_PATH_TRANSACTIONAL_SMS_ENABLED = 'transactional_sms/sms_settings/enabled';
+    const XML_PATH_TRANSACTIONAL_SMS_BATCH_SIZE = 'transactional_sms/sms_settings/batch_size';
 
     const XML_PATH_SMS_NEW_ORDER_ENABLED = 'transactional_sms/sms_templates/new_order_confirmation_enabled';
     const XML_PATH_SMS_NEW_ORDER_MESSAGE = 'transactional_sms/sms_templates/new_order_confirmation_message';

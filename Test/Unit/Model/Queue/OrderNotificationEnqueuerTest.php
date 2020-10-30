@@ -166,6 +166,11 @@ class OrderNotificationEnqueuerTest extends TestCase
             ->with('{order_status:pending}')
             ->willReturn($this->smsOrderInterfaceMock);
 
+        $this->smsOrderInterfaceMock->expects($this->once())
+            ->method('setAdditionalData')
+            ->with('{order_status:pending}')
+            ->willReturn($this->smsOrderInterfaceMock);
+
         $this->smsOrderRepositoryInterfaceMock
             ->expects($this->once())
             ->method('save')

@@ -8,4 +8,10 @@
     <type name="Magento\Shipping\Controller\Adminhtml\Order\Shipment\AddTrack">
         <plugin name="ddg_update_shipment_plugin" type="Dotdigitalgroup\Sms\Plugin\Order\Shipment\ShipmentUpdatePlugin" sortOrder="3"/>
     </type>
+    <type name="Dotdigitalgroup\Email\Model\Cron\Cleaner">
+        <plugin name="ddg_sms_cron_cleaner_plugin" type="Dotdigitalgroup\Sms\Plugin\CronCleanerPlugin"/>
+    </type>
+    <type name="Dotdigitalgroup\Email\Console\Command\Provider\TaskProvider">
+        <plugin name="ddg_sms_task_provider_plugin" type="Dotdigitalgroup\Sms\Plugin\TaskProviderPlugin"/>
+    </type>
 </config>

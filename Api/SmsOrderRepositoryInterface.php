@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Dotdigitalgroup\Sms\Api;
 
 use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterface;
@@ -16,6 +15,7 @@ interface SmsOrderRepositoryInterface
     /**
      * @param $id
      * @return SmsOrderInterface
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getById($id);
 

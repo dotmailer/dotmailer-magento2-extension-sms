@@ -96,6 +96,14 @@ class SmsOrder extends AbstractExtensibleModel implements SmsOrderInterface
     }
 
     /**
+     * @return string|null
+     */
+    public function getSentAt()
+    {
+        return $this->getData(self::SENT_AT);
+    }
+
+    /**
      * @param $websiteId
      * @return SmsOrder
      */
@@ -182,6 +190,16 @@ class SmsOrder extends AbstractExtensibleModel implements SmsOrderInterface
     public function setAdditionalData($data)
     {
         $this->setData(self::ADDITIONAL_DATA, $data);
+        return $this;
+    }
+
+    /**
+     * @param $sentAt
+     * @return $this|SmsOrder
+     */
+    public function setSentAt($sentAt)
+    {
+        $this->setData(self::SENT_AT);
         return $this;
     }
 }

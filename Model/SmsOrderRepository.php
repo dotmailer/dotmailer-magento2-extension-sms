@@ -8,6 +8,7 @@ use Dotdigitalgroup\Sms\Api\SmsOrderRepositoryInterface;
 use Dotdigitalgroup\Sms\Model\ResourceModel\SmsOrderFactory as SmsOrderResourceFactory;
 use Dotdigitalgroup\Sms\Model\Query\GetList;
 use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 
 class SmsOrderRepository implements SmsOrderRepositoryInterface
 {
@@ -27,7 +28,7 @@ class SmsOrderRepository implements SmsOrderRepositoryInterface
     private $smsList;
 
     /**
-     * SMSOrderRepository constructor.
+     * SmsOrderRepository constructor.
      * @param SmsOrderInterfaceFactory $smsOrderInterfaceFactory
      * @param SmsOrderResourceFactory $smsOrderResourceFactory
      * @param GetList $smsList
@@ -43,12 +44,17 @@ class SmsOrderRepository implements SmsOrderRepositoryInterface
     }
 
     /**
-     * @param $id
-     * @return \Dotdigitalgroup\Sms\Api\Data\SmsOrderInterface
+     * @inheritdoc
      */
     public function getById($id)
     {
-        return $this->smsOrderInterfaceFactory->create()->load($id, 'id');
+        $smsOrderQueueRow = $this->smsOrderInterfaceFactory->create()->load($id, 'id');
+        if (!$smsOrderQueueRow->getId()) {
+            throw new NoSuchEntityException(
+                __("The queued message that was requested doesn't exist.")
+            );
+        }
+        return $smsOrderQueueRow;
     }
 
     /**
@@ -68,5 +74,15 @@ class SmsOrderRepository implements SmsOrderRepositoryInterface
     public function getList(SearchCriteriaInterface $searchCriteria)
     {
         return $this->smsList->getList($searchCriteria);
+    }
+
+    /**
+     * @param \DateTime $date
+     */
+    public function expirePendingRowsOlderThan($date)
+    {
+        $this->smsOrderResourceFactory
+            ->create()
+            ->expirePendingRowsOlderThan($date);
     }
 }
