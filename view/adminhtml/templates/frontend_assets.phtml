@@ -1,5 +1,4 @@
 <?php
 /** @var \Dotdigitalgroup\Sms\Block\Adminhtml\Config\FrontendAssets $block */
-/** @var \Magento\Framework\Escaper $escaper */
 ?>
-<script src="<?= $escaper->escapeHtml($block->getViewFileUrl('Dotdigitalgroup_Sms::js/charCounter.js')) ?>"></script>
+<script src="<?= $block->escapeHtml($block->getViewFileUrl('Dotdigitalgroup_Sms::js/charCounter.js')) ?>"></script>

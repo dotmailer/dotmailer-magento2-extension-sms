@@ -1,12 +1,11 @@
 <?php
 /** @var \Dotdigitalgroup\Sms\Block\Adminhtml\Config\UnicodeWarningMessage $block */
-/** @var \Magento\Framework\Escaper $escaper */
 ?>
 
 <div class="message message-warning" id="ddg-unicode" style="display: none">
-    <?= $escaper->escapeHtml(__('One of more of your templates contain unicode characters.
+    <?= $block->escapeHtml(__('One of more of your templates contain unicode characters.
     Consider replacing them if you would like to reduce your character count.')); ?>
     <a href="https://support.dotdigital.com/hc/en-gb/articles/360011201040-SMS-message-length-and-Unicode"
        target="_blank">
-        <?= $escaper->escapeHtml(__('Read more about SMS message length and Unicode')); ?></a>.
+        <?= $block->escapeHtml(__('Read more about SMS message length and Unicode')); ?></a>.
 </div>
