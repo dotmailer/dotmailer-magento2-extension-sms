@@ -1,0 +1,14 @@
+<?php
+/** @var \Dotdigitalgroup\Sms\Block\Adminhtml\AppendNote $block */
+/** @var \Magento\Framework\Escaper $escaper */
+
+$counterSelector = sprintf('%s_counter', $block->getElement()->getId());
+$commentSelector = sprintf('%s_comment', $block->getElement()->getId());
+$totalSelector = sprintf('%s_total', $block->getElement()->getId());
+?>
+<?= $block->getElement()->getElementHtml(); ?>
+<p class="note ddg-note">
+    <?php //@codingStandardsIgnoreStart?>
+    <span id="<?= $escaper->escapeHtml($counterSelector); ?>"></span><span><?= $escaper->escapeHtml(__(' characters (')); ?></span><span id="<?= $escaper->escapeHtml($commentSelector)?>" style="display: none"><?= $escaper->escapeHtml(__('minimum ')); ?></span><span id="<?= $escaper->escapeHtml($totalSelector); ?>"></span><?= $escaper->escapeHtml(__(' SMS)')); ?>
+    <?php //@codingStandardsIgnoreEnd?>
+</p>
