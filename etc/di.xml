@@ -8,6 +8,13 @@
     <type name="Magento\Shipping\Controller\Adminhtml\Order\Shipment\AddTrack">
         <plugin name="ddg_update_shipment_plugin" type="Dotdigitalgroup\Sms\Plugin\Order\Shipment\ShipmentUpdatePlugin" sortOrder="3"/>
     </type>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="sms_report_grid_data_source" xsi:type="string">Dotdigitalgroup\Sms\Ui\Model\ResourceModel\SmsOrder\Collection</item>
+            </argument>
+        </arguments>
+    </type>
     <type name="Dotdigitalgroup\Email\Model\Cron\Cleaner">
         <plugin name="ddg_sms_cron_cleaner_plugin" type="Dotdigitalgroup\Sms\Plugin\CronCleanerPlugin"/>
     </type>

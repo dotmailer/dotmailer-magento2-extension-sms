@@ -18,6 +18,9 @@
                     <frontend_model>Dotdigitalgroup\Sms\Block\Adminhtml\Config\Enabled</frontend_model>
                     <backend_model>Dotdigitalgroup\Sms\Model\Adminhtml\Backend\SmsEnabledValue</backend_model>
                 </field>
+                <field id="sms_report" type="button" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <frontend_model>Dotdigitalgroup\Sms\Block\Adminhtml\Report\Sms</frontend_model>
+                </field>
                 <field id="manage_account" translate="label" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Manage account</label>
                     <frontend_model>Dotdigitalgroup\Sms\Block\Adminhtml\Config\SettingsButton</frontend_model>
