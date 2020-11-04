@@ -1,12 +1,11 @@
 <?php
 /** @var \Dotdigitalgroup\Sms\Block\Adminhtml\Config\AccountMessage $block */
-/** @var \Magento\Framework\Escaper $escaper */
 ?>
 <?php if ($block->shouldDisplayAccountMessage()): ?>
 <div class="comment">
     <?=
     // @codingStandardsIgnoreStart
-    $escaper
+    $block
         ->escapeHtml(
             __('Transactional SMS (powered by dotdigital Engagement Cloud) requires SMS pay-as-you-go to be enabled on your account.')
         );
@@ -14,7 +13,7 @@
     ?>
     <a href="https://support.dotdigital.com/hc/en-gb/articles/360015527219-Understand-SMS-pay-as-you-go-and-spend-limit"
        target="_blank">
-        <?= $escaper->escapeHtml(__('Learn how to activate SMS pay-as-you-go')); ?>
+        <?= $block->escapeHtml(__('Learn how to activate SMS pay-as-you-go')); ?>
     </a>.
 </div>
 <?php endif; ?>
