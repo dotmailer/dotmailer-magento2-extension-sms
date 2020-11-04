@@ -55,7 +55,7 @@ class NewShipmentPlugin
                     ->buildAdditionalData(
                         $order,
                         $tracking['number'],
-                        $tracking['carrier_code']
+                        $tracking['title']
                     )->queue();
             }
         }

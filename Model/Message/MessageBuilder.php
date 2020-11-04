@@ -4,6 +4,7 @@ namespace Dotdigitalgroup\Sms\Model\Message;
 
 use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterface;
 use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
+use Dotdigitalgroup\Sms\Model\Message\Text\Compiler;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
 
@@ -15,18 +16,26 @@ class MessageBuilder
     private $scopeConfig;
 
     /**
+     * @var Compiler
+     */
+    private $messageCompiler;
+
+    /**
      * @var array
      */
-    private $smsMessages = [];
+    private $smsTemplates = [];
 
     /**
      * MessageBuilder constructor.
      * @param ScopeConfigInterface $scopeConfig
+     * @param Compiler $messageCompiler
      */
     public function __construct(
-        ScopeConfigInterface $scopeConfig
+        ScopeConfigInterface $scopeConfig,
+        Compiler $messageCompiler
     ) {
         $this->scopeConfig = $scopeConfig;
+        $this->messageCompiler = $messageCompiler;
     }
 
     /**
@@ -54,7 +63,7 @@ class MessageBuilder
                         ]
                     ]
                 ],
-                'body' => $this->getMessageText($item)
+                'body' => $this->getCompiledMessageText($item)
             ];
         }
 
@@ -65,21 +74,24 @@ class MessageBuilder
      * @param SmsOrderInterface $item
      * @return string
      */
-    private function getMessageText($item)
+    private function getCompiledMessageText($item)
     {
-        if (!isset($this->smsMessages[$item->getStoreId()][$item->getTypeId()])) {
-            $this->setMessageText($item->getStoreId(), $item->getTypeId());
+        if (!isset($this->smsTemplates[$item->getStoreId()][$item->getTypeId()])) {
+            $this->setRawMessageText($item->getStoreId(), $item->getTypeId());
         }
-        return $this->smsMessages[$item->getStoreId()][$item->getTypeId()];
+        return $this->messageCompiler->compile(
+            $this->smsTemplates[$item->getStoreId()][$item->getTypeId()],
+            $item
+        );
     }
 
     /**
      * @param $storeId
      * @param $typeId
      */
-    private function setMessageText($storeId, $typeId)
+    private function setRawMessageText($storeId, $typeId)
     {
-        $this->smsMessages[$storeId][$typeId] = $this->scopeConfig->getValue(
+        $this->smsTemplates[$storeId][$typeId] = $this->scopeConfig->getValue(
             ConfigInterface::TRANSACTIONAL_SMS_MESSAGE_TYPES_MAP[$typeId],
             ScopeInterface::SCOPE_STORES,
             $storeId

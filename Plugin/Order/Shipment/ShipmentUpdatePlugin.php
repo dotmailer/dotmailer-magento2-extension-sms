@@ -64,7 +64,7 @@ class ShipmentUpdatePlugin
             ->buildAdditionalData(
                 $order,
                 $subject->getRequest()->getParam('number'),
-                $subject->getRequest()->getParam('carrier')
+                $subject->getRequest()->getParam('title')
             )->queue();
 
         return $result;

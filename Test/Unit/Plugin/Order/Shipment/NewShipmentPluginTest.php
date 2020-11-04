@@ -75,7 +75,8 @@ class NewShipmentPluginTest extends TestCase
             ->with('tracking')
             ->willReturn($tracking = [[
                 'number' => 35589,
-                'carrier_code' => 'Chaz'
+                'carrier_code' => 'chaz',
+                'title' => 'Chaz Express'
             ]]);
 
         $this->orderRepositoryInterfaceMock
@@ -90,7 +91,7 @@ class NewShipmentPluginTest extends TestCase
             ->with(
                 $this->orderInterfaceMock,
                 $tracking[0]['number'],
-                $tracking[0]['carrier_code']
+                $tracking[0]['title']
             )
             ->willReturn($this->newShipmentMock);
 

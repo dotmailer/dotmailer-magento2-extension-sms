@@ -93,8 +93,8 @@ class ShipmentUpdatePluginTest extends TestCase
         $this->requestInterfaceMock
             ->expects($this->at(2))
             ->method('getParam')
-            ->with('carrier')
-            ->willReturn($trackingCode = 'Chaz');
+            ->with('title')
+            ->willReturn($trackingCode = 'chaz');
 
         $this->shipmentRepositoryInterfaceMock
             ->expects($this->once())
