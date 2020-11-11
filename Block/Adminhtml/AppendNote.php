@@ -27,6 +27,14 @@ class AppendNote extends \Magento\Config\Block\System\Config\Form\Field
     }
 
     /**
+     * @return AbstractElement
+     */
+    public function getElement()
+    {
+        return $this->element;
+    }
+
+    /**
      * Return element html
      *
      * @param  \Magento\Framework\Data\Form\Element\AbstractElement $element
@@ -39,10 +47,24 @@ class AppendNote extends \Magento\Config\Block\System\Config\Form\Field
     }
 
     /**
-     * @return AbstractElement
+     * @param AbstractElement $element
+     * @return string
      */
-    public function getElement()
+    protected function _renderValue(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
-        return $this->element;
+        if ($element->getTooltip()) {
+            $html = '<td class="value with-tooltip">';
+            $html .= '<div class="tooltip"><span class="help"><span></span></span>';
+            $html .= '<div class="tooltip-content">' . $element->getTooltip() . '</div></div>';
+            $html .= $this->_getElementHtml($element);
+        } else {
+            $html = '<td class="value">';
+            $html .= $this->_getElementHtml($element);
+        }
+        if ($element->getComment()) {
+            $html .= '<p class="note"><span>' . $element->getComment() . '</span></p>';
+        }
+        $html .= '</td>';
+        return $html;
     }
 }
