@@ -5,7 +5,6 @@ namespace Dotdigitalgroup\Sms\Model\Message\Variable;
 use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterface;
 use Magento\Framework\Serialize\SerializerInterface;
-use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
@@ -86,8 +85,13 @@ class Resolver
      */
     private function getFirstName($sms)
     {
-        return $this->orderRepository->get($sms->getOrderId())
-            ->getCustomerFirstname();
+        $order = $this->orderRepository->get($sms->getOrderId());
+
+        if ($order->getCustomerFirstname() === null) {
+            return $order->getShippingAddress()->getFirstname();
+        }
+
+        return $order->getCustomerFirstname();
     }
 
     /**
@@ -96,8 +100,13 @@ class Resolver
      */
     private function getLastName($sms)
     {
-        return $this->orderRepository->get($sms->getOrderId())
-            ->getCustomerLastname();
+        $order = $this->orderRepository->get($sms->getOrderId());
+
+        if ($order->getCustomerLastname() === null) {
+            return $order->getShippingAddress()->getLastname();
+        }
+
+        return $order->getCustomerLastname();
     }
 
     /**
