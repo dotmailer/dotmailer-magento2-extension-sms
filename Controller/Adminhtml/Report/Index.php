@@ -42,7 +42,7 @@ class Index extends \Magento\Backend\App\Action
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu(self::ADMIN_RESOURCE);
         $resultPage->addBreadcrumb(__('Reports'), __('Reports'));
-        $resultPage->getConfig()->getTitle()->prepend(__('SMS Message Report'));
+        $resultPage->getConfig()->getTitle()->prepend(__('SMS Sends Report'));
         return $resultPage;
     }
 }
