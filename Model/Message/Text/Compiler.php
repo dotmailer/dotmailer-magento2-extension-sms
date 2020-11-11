@@ -34,7 +34,7 @@ class Compiler
             $matchesToResolve = $matches[1];
 
             foreach ($matchesToResolve as $i => $match) {
-                $replacedValue = $this->variableResolver->resolve($match, $sms);
+                $replacedValue = $this->variableResolver->resolve(trim($match, " "), $sms);
                 $text = str_replace($matchesToReplace[$i], $replacedValue, $text);
             }
         }
