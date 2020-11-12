@@ -64,7 +64,6 @@
                     <label>Message</label>
                     <tooltip><![CDATA[Messages will be sent for the order statuses 'On Hold' and 'Canceled'. Variables: {{ first_name }}, {{ last_name }}, {{ email }}, {{ store_name }}, {{ order_id }}, {{ order_status }}.]]></tooltip>
                     <frontend_model>Dotdigitalgroup\Sms\Block\Adminhtml\AppendNote</frontend_model>
-                    <comment><![CDATA[Messages will be sent for the order statuses 'On Hold' and 'Canceled'.]]></comment>
                 </field>
                 <!-- New Shipment -->
                 <field id="new_shipment_heading" translate="label" sortOrder="35" showInStore="1" showInWebsite="1" showInDefault="1">
