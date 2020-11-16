@@ -124,7 +124,8 @@ class Resolver
      */
     private function getStoreName($sms)
     {
-        return $this->storeManager->getStore($sms->getStoreId())->getName();
+        $groupId = $this->storeManager->getStore($sms->getStoreId())->getStoreGroupId();
+        return $this->storeManager->getGroup($groupId)->getName();
     }
 
     /**
