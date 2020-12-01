@@ -3,9 +3,9 @@
 namespace Dotdigitalgroup\Sms\Model;
 
 use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterface;
-use Magento\Framework\Model\AbstractExtensibleModel;
+use Magento\Framework\Model\AbstractModel;
 
-class SmsOrder extends AbstractExtensibleModel implements SmsOrderInterface
+class SmsOrder extends AbstractModel implements SmsOrderInterface
 {
     /**
      * @var string
