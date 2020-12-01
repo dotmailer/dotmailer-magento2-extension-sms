@@ -6,7 +6,6 @@ use Dotdigitalgroup\Email\Helper\Config as EmailConfig;
 use Dotdigitalgroup\Email\Helper\OauthValidator;
 use Magento\Backend\Block\Template\Context;
 use Magento\Framework\Data\Form\Element\AbstractElement;
-use Magento\Framework\View\Helper\SecureHtmlRenderer;
 
 class SettingsButton extends \Magento\Config\Block\System\Config\Form\Field
 {
@@ -28,18 +27,16 @@ class SettingsButton extends \Magento\Config\Block\System\Config\Form\Field
      * @param OauthValidator $oauthValidator
      * @param EmailConfig $emailConfig
      * @param array $data
-     * @param SecureHtmlRenderer|null $secureRenderer
      */
     public function __construct(
         Context $context,
         OauthValidator $oauthValidator,
         EmailConfig $emailConfig,
-        array $data = [],
-        ?SecureHtmlRenderer $secureRenderer = null
+        array $data = []
     ) {
         $this->emailConfig = $emailConfig;
         $this->oauthValidator = $oauthValidator;
-        parent::__construct($context, $data, $secureRenderer);
+        parent::__construct($context, $data);
     }
 
     /**
