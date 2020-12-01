@@ -46,7 +46,6 @@ class MessageBuilder
     {
         $batch = [];
 
-        /** @var SmsOrderInterface $item */
         foreach ($items as $item) {
             $batch[] = [
                 'to' => [

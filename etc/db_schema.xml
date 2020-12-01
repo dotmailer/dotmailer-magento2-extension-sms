@@ -7,12 +7,14 @@
         <column xsi:type="smallint" name="website_id" unsigned="true" nullable="false" padding="5" default="0" comment="Website ID"/>
         <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" padding="5" default="0" comment="Store ID"/>
         <column xsi:type="smallint" name="type_id" unsigned="true" nullable="false" padding="5" default="0" comment="Type ID"/>
+        <column xsi:type="smallint" name="order_id" unsigned="true" nullable="false" comment="Order ID"/>
+        <column xsi:type="varchar" name="phone_number" nullable="true" length="255" comment="Phone number"/>
+        <column xsi:type="varchar" name="email" nullable="true" length="255" comment="Customer email"/>
+        <column xsi:type="text" name="additional_data" nullable="true" comment="Additional data"/>
         <column xsi:type="smallint" name="status" nullable="true" padding="2" comment="Status"/>
-        <column xsi:type="smallint" name="order_id" nullable="false" comment="Order ID"/>
-        <column xsi:type="varchar" name="phone_number" nullable="true" length="255" comment="Phone Number"/>
-        <column xsi:type="text" name="message" nullable="true" comment="Message"/>
+        <column xsi:type="text" name="content" nullable="true" comment="Message content"/>
         <column xsi:type="varchar" name="message_id" nullable="true" length="255" comment="Message ID"/>
-        <column xsi:type="text" name="additional_data" nullable="true" comment="Additional Data"/>
+        <column xsi:type="text" name="message" nullable="true" comment="Delivery message"/>
         <column xsi:type="timestamp" name="sent_at" on_update="false" nullable="true" comment="Sent at date"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation time"/>
         <column xsi:type="timestamp" name="updated_at" on_update="false" nullable="true" comment="Update time"/>

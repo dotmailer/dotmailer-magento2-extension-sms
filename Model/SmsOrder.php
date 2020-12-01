@@ -72,6 +72,14 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
+     * @return string
+     */
+    public function getEmail()
+    {
+        return $this->getData(self::EMAIL);
+    }
+
+    /**
      * @return string|void
      */
     public function getMessage()
@@ -101,6 +109,14 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     public function getSentAt()
     {
         return $this->getData(self::SENT_AT);
+    }
+
+    /**
+     * @return string
+     */
+    public function getContent()
+    {
+        return $this->getData(self::CONTENT);
     }
 
     /**
@@ -164,6 +180,16 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
+     * @param $email
+     * @return $this
+     */
+    public function setEmail($email)
+    {
+        $this->setData(self::EMAIL, $email);
+        return $this;
+    }
+
+    /**
      * @param $message
      * @return SmsOrder
      */
@@ -199,7 +225,17 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
      */
     public function setSentAt($sentAt)
     {
-        $this->setData(self::SENT_AT);
+        $this->setData(self::SENT_AT, $sentAt);
+        return $this;
+    }
+
+    /**
+     * @param $content
+     * @return $this
+     */
+    public function setContent($content)
+    {
+        $this->setData(self::CONTENT, $content);
         return $this;
     }
 }

@@ -15,7 +15,7 @@ class OrderItemNotificationEnqueuer
     /**
      * @var SmsOrderInterfaceFactory
      */
-    private $smsOrderInterface;
+    private $smsOrderInterfaceFactory;
 
     /**
      * @var SmsOrderRepositoryInterface
@@ -34,19 +34,19 @@ class OrderItemNotificationEnqueuer
 
     /**
      * AbstractQueueManager constructor.
-     * @param SmsOrderInterfaceFactory $smsOrderInterface
+     * @param SmsOrderInterfaceFactory $smsOrderInterfaceFactory
      * @param SmsOrderRepositoryInterface $smsOrderRepositoryInterface
      * @param TransactionalSms $transactionalSms
      * @param StoreManagerInterface $storeManager
      */
     public function __construct(
-        SmsOrderInterfaceFactory $smsOrderInterface,
+        SmsOrderInterfaceFactory $smsOrderInterfaceFactory,
         SmsOrderRepositoryInterface $smsOrderRepositoryInterface,
         TransactionalSms $transactionalSms,
         StoreManagerInterface $storeManager
     ) {
         $this->storeManager = $storeManager;
-        $this->smsOrderInterface = $smsOrderInterface;
+        $this->smsOrderInterfaceFactory = $smsOrderInterfaceFactory;
         $this->smsOrderRepositoryInterface = $smsOrderRepositoryInterface;
         $this->transactionalSms = $transactionalSms;
     }
@@ -70,7 +70,7 @@ class OrderItemNotificationEnqueuer
 
         $orderId = (int) $order->getId();
 
-        $smsOrder = $this->smsOrderInterface
+        $smsOrder = $this->smsOrderInterfaceFactory
             ->create()
             ->setOrderId($orderId)
             ->setStoreId($storeId)
@@ -78,6 +78,7 @@ class OrderItemNotificationEnqueuer
             ->setTypeId($smsType)
             ->setStatus(0)
             ->setPhoneNumber($order->getShippingAddress()->getTelephone())
+            ->setEmail($order->getCustomerEmail())
             ->setAdditionalData($additionalData);
 
         $this->smsOrderRepositoryInterface

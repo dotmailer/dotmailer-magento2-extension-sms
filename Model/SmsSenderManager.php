@@ -129,7 +129,8 @@ class SmsSenderManager implements TaskRunInterface
             if (is_array($sendResults)) {
                 $this->afterSendProcessor->process(
                     $queue->getItems(),
-                    $sendResults
+                    $sendResults,
+                    $messageBatch
                 );
             }
         }

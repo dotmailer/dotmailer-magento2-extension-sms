@@ -19,11 +19,6 @@ class AfterSendProcessorTest extends TestCase
     private $smsOrderRepositoryMock;
 
     /**
-     * @var MessageBuilder
-     */
-    private $messageBuilderMock;
-
-    /**
      * @var SearchCriteriaBuilder
      */
     private $searchCriteriaBuilderMock;
@@ -46,27 +41,25 @@ class AfterSendProcessorTest extends TestCase
     protected function setUp() :void
     {
         $this->smsOrderRepositoryMock = $this->createMock(SmsOrderRepositoryInterface::class);
-        $this->messageBuilderMock = $this->createMock(MessageBuilder::class);
         $this->searchCriteriaBuilderMock = $this->createMock(SearchCriteriaBuilder::class);
         $this->searchCriteriaMock = $this->createMock(SearchCriteriaInterface::class);
         $this->searchResultsInterfaceMock = $this->createMock(SearchResultsInterface::class);
 
         $this->afterSendProcessor = new AfterSendProcessor(
-            $this->smsOrderRepositoryMock,
-            $this->messageBuilderMock,
-            $this->searchCriteriaBuilderMock
+            $this->smsOrderRepositoryMock
         );
     }
 
     public function testRowsAreUpdatedWithNormalResults()
     {
         $results = $this->getExpectedResults();
+        $messageBatch = $this->getMessageBatch();
         $items = $this->getSmsOrderMockArray(5, 4);
 
         $this->smsOrderRepositoryMock->expects($this->atLeast(4))
             ->method('save');
 
-        $this->afterSendProcessor->process($items, $results);
+        $this->afterSendProcessor->process($items, $results, $messageBatch);
     }
 
     private function getSmsOrderMockArray($start, $multiple)
@@ -79,6 +72,9 @@ class AfterSendProcessorTest extends TestCase
                 ->willReturn($mock);
             $mock->expects($this->once())
                 ->method('setStatus')
+                ->willReturn($mock);
+            $mock->expects($this->once())
+                ->method('setContent')
                 ->willReturn($mock);
 
             $smsOrderMocks[$i] = $mock;
@@ -109,8 +105,21 @@ class AfterSendProcessorTest extends TestCase
         ];
     }
 
-    private function getBatchData()
+    private function getMessageBatch()
     {
-        return ['5', '6', '7', '8'];
+        return [
+            [
+                'body' => 'good message'
+            ],
+            [
+                'body' => 'bad message'
+            ],
+            [
+                'body' => 'my message'
+            ],
+            [
+                'body' => 'chaz message'
+            ],
+        ];
     }
 }

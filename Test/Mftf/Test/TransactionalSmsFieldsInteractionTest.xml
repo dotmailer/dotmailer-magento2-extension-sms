@@ -18,13 +18,15 @@
         </before>
 
         <after>
-            <actionGroup ref="ResetSmsFields" stepKey="ResetSmsFields"/>
             <actionGroup ref="ResetDotmailerAccountData" stepKey="resetAccountData"/>
             <actionGroup ref="AdminLogoutActionGroup" stepKey="logout"/>
         </after>
 
         <amOnPage url="{{AdminTransactionalSmsPage.url}}" stepKey="amOnDotdigitalTransactionalSmsPage"/>
         <waitForPageLoad stepKey="waitForPageLoad"/>
+
+        <!-- Hold on to the default value of AdminTransactionalSmsSection.newOrderSmsMessage -->
+        <grabValueFrom selector="{{AdminTransactionalSmsSection.newOrderSmsMessage}}" stepKey="grabDefaultNewOrderMessage"/>
 
         <actionGroup ref="FillSmsFields" stepKey="FillSmsTextAreaWithVariables">
             <argument name="smsText" value="{{SmsMessages.smsTextWithVariables}}"/>
@@ -52,6 +54,10 @@
 
         <scrollToTopOfPage stepKey="scrollToTop"/>
         <see userInput="One or more of your templates contain unicode characters. Consider replacing them if you would like to reduce your character count. Read more about SMS message length and Unicode. " selector="#ddg-unicode" stepKey="validateUnicode"/>
+
+        <actionGroup ref="ResetSmsFields" stepKey="ResetSmsFields">
+            <argument name="originalNewOrderSmsMessage" value="{$grabDefaultNewOrderMessage}"/>
+        </actionGroup>
     </test>
 </tests>
 

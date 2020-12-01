@@ -117,6 +117,10 @@ class OrderNotificationEnqueuerTest extends TestCase
             ->willReturn($telephone = '+4407400000000');
 
         $this->orderInterfaceMock->expects($this->once())
+            ->method('getCustomerEmail')
+            ->willReturn($email = 'chaz@emailsim.io');
+
+        $this->orderInterfaceMock->expects($this->once())
             ->method('getId')
             ->willReturn($orderId = 1);
 
@@ -159,6 +163,11 @@ class OrderNotificationEnqueuerTest extends TestCase
         $this->smsOrderInterfaceMock->expects($this->once())
             ->method('setPhoneNumber')
             ->with($telephone)
+            ->willReturn($this->smsOrderInterfaceMock);
+
+        $this->smsOrderInterfaceMock->expects($this->once())
+            ->method('setEmail')
+            ->with($email)
             ->willReturn($this->smsOrderInterfaceMock);
 
         $this->smsOrderInterfaceMock->expects($this->once())
