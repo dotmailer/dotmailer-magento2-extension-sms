@@ -1,7 +1,7 @@
 require([
     'jquery',
     'domReady!',
-    'smsCounter',
+    'smsCounter'
 
 ], function ($) {
     'use strict';
@@ -11,7 +11,7 @@ require([
 
     $(document).ready(function () {
         $('.ddg-note').each(function (i, obj) {
-            selectors.push('#' + obj.firstElementChild.id.replace("_counter", ""));
+            selectors.push('#' + obj.firstElementChild.id.replace('_counter', ''));
         });
 
         searchForUnicode();
@@ -40,13 +40,12 @@ require([
 
     /**
      *
-     * @param counterSelector
-     * @param commentSelector
-     * @param totalSelector
-     * @param smsText
+     * @param {String} counterSelector
+     * @param {String} commentSelector
+     * @param {String} totalSelector
+     * @param {String} smsText
      */
-    function updateNote(counterSelector, commentSelector, totalSelector, smsText)
-    {
+    function updateNote(counterSelector, commentSelector, totalSelector, smsText) {
         let smsParsed = SmsCounter.count(smsText);
 
         $(counterSelector).text(smsParsed.length);
@@ -60,10 +59,9 @@ require([
     }
 
     /**
-     * @param smsText
+     * @param {String} smsText
      */
-    function updateUnicode(smsText)
-    {
+    function updateUnicode(smsText) {
         let smsParsed = SmsCounter.count(smsText);
 
         if (smsParsed.encoding === 'UTF16') {
@@ -73,13 +71,16 @@ require([
         }
     }
 
-    function searchForUnicode()
-    {
+    /**
+     *
+     */
+    function searchForUnicode() {
         let unicodeFound = false;
 
         selectors.forEach(function (entry) {
             if ($(entry).val() !== undefined) {
                 let smsParsed = SmsCounter.count($(entry).val());
+
                 if (smsParsed.encoding === 'UTF16') {
                     unicodeFound = true;
                     $(unicodeMessageSelector).show();
@@ -92,11 +93,16 @@ require([
         });
     }
 
-    function delay(callback, ms)
-    {
+    /**
+     * @param {Object} callback
+     * @param {Integer} ms
+     */
+    function delay(callback, ms) {
         let timer = 0;
+
         return function () {
-            let context = this, args = arguments;
+            let context = this,
+                args = arguments;
             clearTimeout(timer);
             timer = setTimeout(function () {
                 callback.apply(context, args);
