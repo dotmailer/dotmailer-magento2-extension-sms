@@ -4,6 +4,7 @@
         <transactional_sms>
             <sms_settings>
                 <enabled>0</enabled>
+                <phone_number_validation>0</phone_number_validation>
                 <batch_size>1000</batch_size>
             </sms_settings>
             <sms_templates>

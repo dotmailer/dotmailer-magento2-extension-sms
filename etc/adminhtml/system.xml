@@ -25,6 +25,11 @@
                     <label>Manage account</label>
                     <frontend_model>Dotdigitalgroup\Sms\Block\Adminhtml\Config\SettingsButton</frontend_model>
                 </field>
+                <field id="phone_number_validation" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable phone number validation</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <frontend_model>Dotdigitalgroup\Sms\Block\Adminhtml\Config\Enabled</frontend_model>
+                </field>
             </group>
             <group id="sms_templates" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>SMS Templates</label>

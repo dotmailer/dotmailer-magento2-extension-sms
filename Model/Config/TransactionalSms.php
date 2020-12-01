@@ -2,10 +2,12 @@
 
 namespace Dotdigitalgroup\Sms\Model\Config;
 
+use Magento\Directory\Model\AllowedCountries;
+use Magento\Config\Model\Config\Backend\Admin\Custom;
+use Magento\Framework\App\Config\ReinitableConfigInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\RequestInterface;
-use Magento\Framework\App\Config\ReinitableConfigInterface;
 use Magento\Store\Api\StoreWebsiteRelationInterface;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -76,6 +78,19 @@ class TransactionalSms
     {
         return $this->scopeConfig->getValue(
             ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_ENABLED,
+            ScopeInterface::SCOPE_STORES,
+            $storeId
+        );
+    }
+
+    /**
+     * @param $storeId
+     * @return bool
+     */
+    public function isPhoneNumberValidationEnabled($storeId)
+    {
+        return $this->scopeConfig->getValue(
+            ConfigInterface::XML_PATH_SMS_PHONE_NUMBER_VALIDATION,
             ScopeInterface::SCOPE_STORES,
             $storeId
         );
@@ -181,7 +196,7 @@ class TransactionalSms
             }
         }
     }
-    
+
     /**
      * Can be overridden via config.xml
      *
@@ -192,5 +207,79 @@ class TransactionalSms
         return $this->scopeConfig->getValue(
             ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_BATCH_SIZE
         );
+    }
+
+    /**
+     * @param $websiteId
+     * @return string
+     */
+    public function getPreferredCountry($websiteId)
+    {
+        return $this->scopeConfig->getValue(
+            Custom::XML_PATH_GENERAL_COUNTRY_DEFAULT,
+            ScopeInterface::SCOPE_WEBSITES,
+            $websiteId
+        );
+    }
+
+    /**
+     * @param $websiteId
+     * @return string
+     */
+    public function getAllowedCountries($websiteId)
+    {
+        return $this->scopeConfig->getValue(
+            AllowedCountries::ALLOWED_COUNTRIES_PATH,
+            ScopeInterface::SCOPE_WEBSITES,
+            $websiteId
+        );
+    }
+
+    /**
+     * Prepare telephone field config according to the Magento default config
+     * @param $addressType
+     * @param string $method
+     * @return array
+     */
+    public function telephoneFieldConfig($addressType, $method = '')
+    {
+        return  [
+            'component' => 'Magento_Ui/js/form/element/abstract',
+            'config' => [
+                'customScope' => $addressType . $method,
+                'customEntry' => null,
+                'template' => 'ui/form/field',
+                'elementTmpl' => 'Dotdigitalgroup_Sms/form/element/telephone',
+                'tooltip' => [
+                    'description' => 'For SMS order notifications.',
+                    'tooltipTpl' => 'ui/form/element/helper/tooltip'
+                ],
+            ],
+            'dataScope' => $addressType . $method . '.telephone',
+            'label' => __('Phone Number'),
+            'provider' => 'checkoutProvider',
+            'sortOrder' => 120,
+            'validation' => [
+                "required-entry"    => true,
+                "max_text_length"   => 255,
+                "min_text_length"   => 1,
+                'validate-phone-number' => true
+            ],
+            'options' => [],
+            'filterBy' => null,
+            'customEntry' => null,
+            'visible' => true,
+            'focused' => false,
+        ];
+    }
+
+    /**
+     * @param string $addressType
+     * @param string $method
+     * @return string
+     */
+    public function getDataScopePrefix($addressType, $method = '')
+    {
+        return $addressType . $method;
     }
 }

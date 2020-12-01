@@ -1,0 +1,75 @@
+<?php
+/**
+ * @var $block \Magento\Framework\View\Element\Template
+ * @var $view \Dotdigitalgroup\Sms\ViewModel\TelephoneInputConfig
+ */
+// @codingStandardsIgnoreFile
+$view = $block->getData('config');
+?>
+<script type="application/javascript">
+    require([
+        'jquery',
+        'intlTelInput',
+        'Magento_Ui/js/lib/validation/utils'
+    ], function ($, intlTelInput, validationUtils) {
+        ddgTelephoneRenderComplete = function(node) {
+
+            let input = $(node),
+                container = input.closest('.control');
+
+            const errorMap = ["Invalid telephone number.", "Invalid country code.", "Telephone number is too short.", "Telephone number is too long.", "Invalid telephone number."];
+
+            window.intlTelInput(input[0], <?= $view->getConfig(); ?>)
+
+            let validatorObj = {
+                message: '',
+                validate: function (value) {
+                    if (validationUtils.isEmpty(value)) {
+                        return;
+                    }
+                    let countryCodeClass = input.parent().find(".iti__selected-flag .iti__flag").attr('class');
+
+                    if (countryCodeClass === undefined || countryCodeClass.indexOf(' ') === -1) {
+                        this.message = errorMap[1];
+                        return false;
+                    }
+
+                    countryCodeClass = countryCodeClass.split(' ')[1];
+                    let countryCode = countryCodeClass.split('__')[1];
+                    let isValid = intlTelInputUtils.isValidNumber(value, countryCode);
+
+                    if (isValid) {
+                        this.message = '';
+                    } else {
+                        let errorCode = intlTelInputUtils.getValidationError(value, countryCode);
+                        this.message = ($.inArray(errorCode, errorMap)) ? errorMap[errorCode] : errorMap[0];
+                    }
+
+                    return isValid;
+                }
+            };
+
+            var reset = function () {
+                container.find($('.field-error')).remove();
+            };
+
+            var error = function(message) {
+                return $('<div class="field-error"><span>' + message + '</span></div>');
+            };
+
+            // on blur: validate
+            input.on('blur', function () {
+                reset();
+                if (input.val().trim()) {
+                    validatorObj.validate(input.val());
+                    if (validatorObj.message.length) {
+                        container.append(error($.mage.__(validatorObj.message)));
+                    }
+                }
+            });
+
+            // on keyup / change flag: reset
+            input.on('change keyup', reset);
+        }
+    });
+</script>
