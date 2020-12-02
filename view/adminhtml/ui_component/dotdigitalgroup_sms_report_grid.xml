@@ -27,6 +27,7 @@
                 </item>
             </argument>
         </argument>
+        <aclResource>Dotdigitalgroup_Sms::report</aclResource>
     </dataSource>
     <container name="listing_top">
         <argument name="data" xsi:type="array">
