@@ -1,16 +1,16 @@
 var config = {
     paths: {
-        "intlTelInput": 'Dotdigitalgroup_Sms/js/intlTelInput',
-        "intlTelInputUtils": 'Dotdigitalgroup_Sms/js/utils',
-        "internationalTelephoneInput": 'Dotdigitalgroup_Sms/js/internationalTelephoneInput'
+        'intlTelInput': 'Dotdigitalgroup_Sms/js/intlTelInput',
+        'intlTelInputUtils': 'Dotdigitalgroup_Sms/js/utils',
+        'internationalTelephoneInput': 'Dotdigitalgroup_Sms/js/internationalTelephoneInput'
     },
 
     shim: {
         'intlTelInput': {
-            'deps':['jquery', 'knockout']
+            'deps': ['jquery', 'knockout']
         },
         'internationalTelephoneInput': {
-            'deps':['jquery', 'intlTelInput']
+            'deps': ['jquery', 'intlTelInput']
         }
     },
 
