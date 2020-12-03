@@ -48,15 +48,15 @@
         <seeElementInDOM selector="div.admin__data-grid-filters-current" stepKey="seeFilterIsOn"/>
 
         <actionGroup ref="ClearAndNavigateFilterFields" stepKey="validateFilterFields"/>
-        <seeElement selector="{{AdminDotdigitalFilterFieldsSection.inputFilter('email')}}" stepKey="seeEmailFilter"/>
-        <seeElement selector="{{AdminDotdigitalFilterFieldsSection.inputFilter('order_id')}}" stepKey="seeOrderIdFilter"/>
-        <seeElement selector="{{AdminDotdigitalFilterFieldsSection.selectFilter('type_id')}}" stepKey="seeTypeFilter"/>
-        <seeElement selector="{{AdminDotdigitalFilterFieldsSection.selectFilter('store_id')}}" stepKey="seeStoreFilter"/>
-        <seeElement selector="{{AdminDotdigitalFilterFieldsSection.selectFilter('website_id')}}" stepKey="seeWebsiteFilter"/>
-        <seeElement selector="{{AdminDotdigitalFilterFieldsSection.inputFilter('phone_number')}}" stepKey="seePhoneFilter"/>
-        <seeElement selector="{{AdminDotdigitalFilterFieldsSection.inputFilter('content')}}" stepKey="seeContentFilter"/>
-        <seeElement selector="{{AdminDotdigitalFilterFieldsSection.inputFilter('message')}}" stepKey="seeMessageFilter"/>
-        <seeElement selector="{{AdminDotdigitalFilterFieldsSection.selectFilter('status')}}" stepKey="seeStatusFilter"/>
+        <seeElement selector="{{AdminFilterFieldsSection.filterInput('email')}}" stepKey="seeEmailFilter"/>
+        <seeElement selector="{{AdminFilterFieldsSection.filterInput('order_id')}}" stepKey="seeOrderIdFilter"/>
+        <seeElement selector="{{AdminFilterFieldsSection.filterSelect('type_id')}}" stepKey="seeTypeFilter"/>
+        <seeElement selector="{{AdminFilterFieldsSection.filterSelect('store_id')}}" stepKey="seeStoreFilter"/>
+        <seeElement selector="{{AdminFilterFieldsSection.filterSelect('website_id')}}" stepKey="seeWebsiteFilter"/>
+        <seeElement selector="{{AdminFilterFieldsSection.filterInput('phone_number')}}" stepKey="seePhoneFilter"/>
+        <seeElement selector="{{AdminFilterFieldsSection.filterInput('content')}}" stepKey="seeContentFilter"/>
+        <seeElement selector="{{AdminFilterFieldsSection.filterInput('message')}}" stepKey="seeMessageFilter"/>
+        <seeElement selector="{{AdminFilterFieldsSection.filterSelect('status')}}" stepKey="seeStatusFilter"/>
 
     </test>
 </tests>
