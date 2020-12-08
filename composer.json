@@ -21,7 +21,8 @@
         "magento/module-quote": ">=100 <103",
         "magento/module-sales": ">=100 <104",
         "magento/module-ui": ">=100 <102",
-        "magento/module-shipping": "100.*"
+        "magento/module-shipping": "100.*",
+        "magento/module-directory": "100.*"
     },
     "autoload": {
         "files": [ "registration.php" ],
