@@ -260,9 +260,9 @@ class TransactionalSms
             'provider' => 'checkoutProvider',
             'sortOrder' => 120,
             'validation' => [
-                "required-entry"    => true,
-                "max_text_length"   => 255,
-                "min_text_length"   => 1,
+                "required-entry" => true,
+                "max_text_length" => 255,
+                "min_text_length" => 1,
                 'validate-phone-number' => true
             ],
             'options' => [],
