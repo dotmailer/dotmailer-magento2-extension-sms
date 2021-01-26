@@ -24,3 +24,10 @@ bin/magento setup:upgrade
 ## Credits
 This module features an option to enable international telephone number validation. Our supporting code uses a version of the [International Telephone Input](https://github.com/jackocnr/intl-tel-input) JavaScript plugin. We've also borrowed some components from this [MaxMage Magento module](https://github.com/MaxMage/international-telephone-input). Kudos and thanks!
 
+## 1.0.0
+  
+###### What’s new
+- SMS notifications for new order confirmation, order update, new shipment, shipment update and new credit memo.
+- SMS sender cron script to process and send queued SMS.
+- Phone number validation in the customer account and at checkout.
+- 'SMS Sends' report.
