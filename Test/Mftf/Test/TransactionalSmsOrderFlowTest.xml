@@ -49,6 +49,10 @@
             <actionGroup ref="AdminLogoutActionGroup" stepKey="logout"/>
         </after>
 
+        <!-- Go to SMS Sends Report grid and wait for page load -->
+        <amOnPage url="{{AdminTransactionalSmsReportPage.url}}" stepKey="amOnDotdigitalTransactionalSmsReportPage"/>
+        <waitForPageLoad stepKey="waitForPageLoad1"/>
+
         <!-- Check initial Pending state -->
         <actionGroup ref="FilterTransactionalSmsStatusFields" stepKey="selectStatusPending">
             <argument name="smsStatus" value="SmsMessages.statusPending"/>
