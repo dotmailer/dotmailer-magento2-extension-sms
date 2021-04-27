@@ -24,6 +24,12 @@ bin/magento setup:upgrade
 ## Credits
 This module features an option to enable international telephone number validation. Our supporting code uses a version of the [International Telephone Input](https://github.com/jackocnr/intl-tel-input) JavaScript plugin. We've also borrowed some components from this [MaxMage Magento module](https://github.com/MaxMage/international-telephone-input). Kudos and thanks!
 
+## 1.1.1
+
+###### Bug fixes
+- We've added some extra code to prevent customers from submitting telephone numbers without a country code.
+- We fixed the positioning of the tooltip that is displayed alongside each SMS message textarea in the admin.
+
 ## 1.1.0
 
 ###### Bug fixes
