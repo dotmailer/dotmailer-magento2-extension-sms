@@ -9,7 +9,7 @@
             <description value="Check that alphanumeric field appears only if it's selected in dropdown"/>
             <severity value="MINOR"/>
             <group value="FS/mftf-134277"/>
-            <group value="dotmailer"/>
+            <group value="dotdigitalSms"/>
         </annotations>
 
         <before>

@@ -9,7 +9,7 @@
             <description value="Check function of server-side validation for saved values."/>
             <severity value="MINOR"/>
             <group value="FS/mftf-134277-2"/>
-            <group value="dotmailer"/>
+            <group value="dotdigitalSms"/>
         </annotations>
 
         <before>

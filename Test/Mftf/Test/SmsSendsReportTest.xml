@@ -8,7 +8,7 @@
             <title value="Test SMS Sends Report grid"/>
             <description value="The dotdigital SMS Sends Report can be viewed, filtered and sorted."/>
             <severity value="MINOR"/>
-            <group value="dotmailer"/>
+            <group value="dotdigitalSms"/>
         </annotations>
 
         <before>
