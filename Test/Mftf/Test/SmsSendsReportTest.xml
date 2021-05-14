@@ -9,6 +9,7 @@
             <description value="The dotdigital SMS Sends Report can be viewed, filtered and sorted."/>
             <severity value="MINOR"/>
             <group value="dotdigitalSms"/>
+            <testCaseId value="BUNDLE-2870"/>
         </annotations>
 
         <before>
