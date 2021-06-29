@@ -21,6 +21,9 @@
     <type name="Dotdigitalgroup\Email\Console\Command\Provider\TaskProvider">
         <plugin name="ddg_sms_task_provider_plugin" type="Dotdigitalgroup\Sms\Plugin\TaskProviderPlugin"/>
     </type>
+    <type name="Dotdigitalgroup\Email\Model\Sync\Integration\DotdigitalConfig">
+        <plugin name="ddg_sms_config_provider_plugin" type="Dotdigitalgroup\Sms\Plugin\ConfigProviderPlugin"/>
+    </type>
     <type name="Magento\Checkout\Block\Checkout\LayoutProcessor">
         <plugin name="ddg_sms_international_telephone_layout_processor_plugin" type="Dotdigitalgroup\Sms\Plugin\Block\Checkout\LayoutProcessor"/>
     </type>
