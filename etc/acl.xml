@@ -5,12 +5,12 @@
             <resource id="Magento_Backend::admin">
                 <resource id="Magento_Backend::marketing">
                     <resource id="Dotdigitalgroup_Email::automation">
-                        <resource id="Dotdigitalgroup_Sms::config" title="dotdigital SMS" translate="title" sortOrder="15"/>
+                        <resource id="Dotdigitalgroup_Sms::config" title="Dotdigital SMS" translate="title" sortOrder="15"/>
                     </resource>
                 </resource>
                 <resource id="Magento_Reports::report">
-                    <resource id="Dotdigitalgroup_Sms::reports" title="dotdigital SMS" translate="title">
-                        <resource id="Dotdigitalgroup_Sms::report" title="dotdigital SMS Messages" translate="title" sortOrder="20"/>
+                    <resource id="Dotdigitalgroup_Sms::reports" title="Dotdigital SMS" translate="title">
+                        <resource id="Dotdigitalgroup_Sms::report" title="Dotdigital SMS Messages" translate="title" sortOrder="20"/>
                     </resource>
                 </resource>
             </resource>

@@ -8,7 +8,7 @@ use Magento\Framework\Module\ModuleListInterface;
 class ModulePlugin
 {
     const MODULE_NAME = 'Dotdigitalgroup_Sms';
-    const MODULE_DESCRIPTION = 'Engagement Cloud SMS for Magento 2';
+    const MODULE_DESCRIPTION = 'Dotdigital SMS for Magento 2';
 
     /**
      * @var ModuleListInterface

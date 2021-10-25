@@ -3,7 +3,7 @@
        xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
     <test name="TransactionalSmsOrderFlowTest">
         <annotations>
-            <features value="Engagement Cloud module"/>
+            <features value="Dotdigital module"/>
             <stories value="dotdigital Transactional SMS"/>
             <title value="Test SMS order flow"/>
             <description value="Validate that order creation creates new SMS message records."/>
