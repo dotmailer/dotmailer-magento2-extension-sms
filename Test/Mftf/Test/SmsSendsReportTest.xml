@@ -3,10 +3,10 @@
        xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
     <test name="SmsSendsReportTest">
         <annotations>
-            <features value="Engagement Cloud module"/>
-            <stories value="Test dotdigital report grids"/>
+            <features value="Dotdigital module"/>
+            <stories value="Test Dotdigital report grids"/>
             <title value="Test SMS Sends Report grid"/>
-            <description value="The dotdigital SMS Sends Report can be viewed, filtered and sorted."/>
+            <description value="The Dotdigital SMS Sends Report can be viewed, filtered and sorted."/>
             <severity value="MINOR"/>
             <group value="dotdigitalSms"/>
             <testCaseId value="BUNDLE-2870"/>

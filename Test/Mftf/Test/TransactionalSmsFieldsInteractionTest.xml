@@ -3,8 +3,8 @@
        xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
     <test name="TransactionalSmsFieldsInteractionTest">
         <annotations>
-            <features value="Engagement Cloud module"/>
-            <stories value="dotdigital Transactional SMS"/>
+            <features value="Dotdigital module"/>
+            <stories value="Dotdigital Transactional SMS"/>
             <title value="Test Transactional SMS field interactions"/>
             <description value="Check that SMS character counting and unicode detectio work as expected."/>
             <severity value="MINOR"/>
