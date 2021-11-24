@@ -2,7 +2,6 @@
 
 namespace Dotdigitalgroup\Sms\Model\Queue;
 
-use Dotdigitalgroup\Email\Model\DateIntervalFactory;
 use Dotdigitalgroup\Sms\Api\SmsOrderRepositoryInterface;
 use Dotdigitalgroup\Sms\Model\Config\TransactionalSms;
 use Magento\Framework\Api\SearchCriteriaBuilder;
@@ -17,11 +16,6 @@ class OrderQueueManager
     const SMS_STATUS_FAILED = 3;
     const SMS_STATUS_EXPIRED = 4;
     const SMS_STATUS_UNKNOWN = 5;
-
-    /**
-     * @var DateIntervalFactory
-     */
-    private $dateIntervalFactory;
 
     /**
      * @var SmsOrderRepositoryInterface
@@ -50,7 +44,6 @@ class OrderQueueManager
 
     /**
      * OrderQueueManager constructor.
-     * @param DateIntervalFactory $dateIntervalFactory
      * @param SmsOrderRepositoryInterface $smsOrderRepository
      * @param TransactionalSms $transactionalSmsConfig
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
@@ -58,14 +51,12 @@ class OrderQueueManager
      * @param StoreManagerInterface $storeManager
      */
     public function __construct(
-        DateIntervalFactory $dateIntervalFactory,
         SmsOrderRepositoryInterface $smsOrderRepository,
         TransactionalSms $transactionalSmsConfig,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         DateTimeFactory $dateTimeFactory,
         StoreManagerInterface $storeManager
     ) {
-        $this->dateIntervalFactory = $dateIntervalFactory;
         $this->smsOrderRepository = $smsOrderRepository;
         $this->transactionalSmsConfig = $transactionalSmsConfig;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
@@ -109,7 +100,7 @@ class OrderQueueManager
     public function expirePendingSends()
     {
         $now = $this->dateTimeFactory->create('now', new \DateTimeZone('UTC'));
-        $oneDayAgo = $now->sub($this->dateIntervalFactory->create(['interval_spec' => 'PT24H']));
+        $oneDayAgo = $now->sub(new \DateInterval('PT24H'));
 
         $this->smsOrderRepository->expirePendingRowsOlderThan($oneDayAgo);
     }
