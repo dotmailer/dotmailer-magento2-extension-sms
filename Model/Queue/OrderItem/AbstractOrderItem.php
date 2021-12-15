@@ -64,8 +64,6 @@ abstract class AbstractOrderItem
     }
 
     /**
-     * @param $order
-     * @param $additionalData
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
