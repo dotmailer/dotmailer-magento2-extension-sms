@@ -3,8 +3,8 @@
        xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
     <test name="TransactionalSmsFieldsTest">
         <annotations>
-            <features value="Engagement Cloud module"/>
-            <stories value="dotdigital Transactional SMS"/>
+            <features value="Dotdigital module"/>
+            <stories value="Dotdigital Transactional SMS"/>
             <title value="Validate Transactional SMS fields"/>
             <description value="Test that required fields exist in the Transactional SMS section."/>
             <severity value="MINOR"/>
