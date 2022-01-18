@@ -35,6 +35,11 @@ This module features an option to enable international telephone number validati
 ##### Bug fixes
 - Duplicate SMS sends were being queued on some setups; we’ve added checks in our observers to prevent this happening.
 
+### 1.2.1 
+
+##### Bug fixes
+- Duplicate SMS sends were being queued on some setups; we’ve added checks in our observers to prevent this happening.
+
 ### 1.2.0
 
 ###### What’s new
