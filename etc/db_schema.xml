@@ -7,7 +7,7 @@
         <column xsi:type="smallint" name="website_id" unsigned="true" nullable="false" padding="5" default="0" comment="Website ID"/>
         <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" padding="5" default="0" comment="Store ID"/>
         <column xsi:type="smallint" name="type_id" unsigned="true" nullable="false" padding="5" default="0" comment="Type ID"/>
-        <column xsi:type="smallint" name="order_id" unsigned="true" nullable="false" comment="Order ID"/>
+        <column xsi:type="int" name="order_id" unsigned="true" nullable="false" comment="Order ID"/>
         <column xsi:type="varchar" name="phone_number" nullable="true" length="255" comment="Phone number"/>
         <column xsi:type="varchar" name="email" nullable="true" length="255" comment="Customer email"/>
         <column xsi:type="text" name="additional_data" nullable="true" comment="Additional data"/>
