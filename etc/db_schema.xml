@@ -23,10 +23,10 @@
         </constraint>
         <constraint xsi:type="foreign" referenceId="EMAIL_SMS_ORDER_QUEUE_WEBSITE_ID_STORE_WEBSITE_WEBSITE_ID" table="email_sms_order_queue" column="website_id" referenceTable="store_website" referenceColumn="website_id" onDelete="CASCADE"/>
         <constraint xsi:type="foreign" referenceId="EMAIL_SMS_ORDER_QUEUE_STORE_ID_STORE_STORE_ID" table="email_sms_order_queue" column="store_id" referenceTable="store" referenceColumn="store_id" onDelete="CASCADE"/>
-        <index referenceId="EMAIL_SMS_ORDER_QUEUE_WEBSITE_ID">
+        <index referenceId="EMAIL_SMS_ORDER_QUEUE_WEBSITE_ID" indexType="btree">
             <column name="website_id"/>
         </index>
-        <index referenceId="EMAIL_SMS_ORDER_QUEUE_STORE_ID">
+        <index referenceId="EMAIL_SMS_ORDER_QUEUE_STORE_ID" indexType="btree">
             <column name="store_id"/>
         </index>
     </table>
