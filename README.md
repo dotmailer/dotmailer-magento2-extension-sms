@@ -34,11 +34,13 @@ This module features an option to enable international telephone number validati
 
 ##### Bug fixes
 - Duplicate SMS sends were being queued on some setups; we’ve added checks in our observers to prevent this happening.
+- Sends relating to order ids longer than 5 digits would be queued for order_id 65535. This has been fixed with a schema update.
 
 ### 1.2.1 
 
 ##### Bug fixes
 - Duplicate SMS sends were being queued on some setups; we’ve added checks in our observers to prevent this happening.
+- Sends relating to order ids longer than 5 digits would be queued for order_id 65535. This has been fixed with a schema update.
 
 ### 1.2.0
 
