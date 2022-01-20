@@ -10,7 +10,7 @@ use Dotdigitalgroup\Sms\Model\Queue\SenderProgressHandler;
 use Magento\Framework\Api\SearchResultsInterface;
 use Magento\Framework\DataObject;
 use Magento\Framework\Stdlib\DateTime;
-use PHPStan\Testing\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class SenderProgressHandlerTest extends TestCase
 {
