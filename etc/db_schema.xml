@@ -7,7 +7,7 @@
         <column xsi:type="smallint" name="website_id" unsigned="true" nullable="false" padding="5" default="0" comment="Website ID"/>
         <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" padding="5" default="0" comment="Store ID"/>
         <column xsi:type="smallint" name="type_id" unsigned="true" nullable="false" padding="5" default="0" comment="Type ID"/>
-        <column xsi:type="smallint" name="order_id" unsigned="true" nullable="false" comment="Order ID"/>
+        <column xsi:type="int" name="order_id" unsigned="true" nullable="false" comment="Order ID"/>
         <column xsi:type="varchar" name="phone_number" nullable="true" length="255" comment="Phone number"/>
         <column xsi:type="varchar" name="email" nullable="true" length="255" comment="Customer email"/>
         <column xsi:type="text" name="additional_data" nullable="true" comment="Additional data"/>
@@ -23,10 +23,10 @@
         </constraint>
         <constraint xsi:type="foreign" referenceId="EMAIL_SMS_ORDER_QUEUE_WEBSITE_ID_STORE_WEBSITE_WEBSITE_ID" table="email_sms_order_queue" column="website_id" referenceTable="store_website" referenceColumn="website_id" onDelete="CASCADE"/>
         <constraint xsi:type="foreign" referenceId="EMAIL_SMS_ORDER_QUEUE_STORE_ID_STORE_STORE_ID" table="email_sms_order_queue" column="store_id" referenceTable="store" referenceColumn="store_id" onDelete="CASCADE"/>
-        <index referenceId="EMAIL_SMS_ORDER_QUEUE_WEBSITE_ID">
+        <index referenceId="EMAIL_SMS_ORDER_QUEUE_WEBSITE_ID" indexType="btree">
             <column name="website_id"/>
         </index>
-        <index referenceId="EMAIL_SMS_ORDER_QUEUE_STORE_ID">
+        <index referenceId="EMAIL_SMS_ORDER_QUEUE_STORE_ID" indexType="btree">
             <column name="store_id"/>
         </index>
     </table>
