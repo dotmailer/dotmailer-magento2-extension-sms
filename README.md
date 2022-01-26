@@ -21,6 +21,11 @@ This module features an option to enable international telephone number validati
 
 ## Changelog
 
+### 1.3.1
+
+##### Bug fixes
+- We fixed an incorrect class import in one of our unit tests. 
+
 ### 1.3.0
 
 ##### What's new
@@ -31,10 +36,6 @@ This module features an option to enable international telephone number validati
 - `setup_version` has been removed from module.xml; in the Dashboard, we now use composer.json to provide the current active module version.
 - Menus and ACL resources are now translatable. [External contribution](https://github.com/dotmailer/dotmailer-magento2-extension-sms/pull/5)
 - We replaced our use of a custom `DateIntervalFactory`, instead using the native `\DateInterval`.
-
-##### Bug fixes
-- Duplicate SMS sends were being queued on some setups; we’ve added checks in our observers to prevent this happening.
-- Sends relating to order ids longer than 5 digits would be queued for order_id 65535. This has been fixed with a schema update.
 
 ### 1.2.1 
 
