@@ -12,7 +12,7 @@ This module provides support for Transactional SMS notifications to Magento merc
   - `Dotdigitalgroup_Email` 4.14.0+
   
 ## Activation
-- This module is included in all our metapackages. Please refer to [these instructions](https://github.com/dotmailer/dotmailer-magento2-extension#installation) to install via the Magento Marketplace.
+- This module is included in our core extension. Please refer to [these instructions](https://github.com/dotmailer/dotmailer-magento2-extension#installation) to install via the Magento Marketplace.
 - Ensure you have set valid API credentials in **Configuration > Dotdigital > Account Settings**
 - Head to **Configuration > Dotdigital > Transactional SMS** for configuration.
 
