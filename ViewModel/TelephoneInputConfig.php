@@ -43,7 +43,7 @@ class TelephoneInputConfig implements ArgumentInterface
     private $storeManager;
 
     /**
-     * PhoneConfig constructor.
+     * TelephoneInputConfig constructor.
      * @param TransactionalSms $transactionalSmsConfig
      * @param RequestInterface $request
      * @param Escaper $escaper
@@ -68,6 +68,8 @@ class TelephoneInputConfig implements ArgumentInterface
     }
 
     /**
+     * Get config block for frontend.
+     *
      * @return bool|string
      */
     public function getConfig()
@@ -81,16 +83,18 @@ class TelephoneInputConfig implements ArgumentInterface
         ];
 
         if ($this->transactionalSmsConfig->getAllowedCountries($websiteId)) {
-            $config["onlyCountries"] = $this->escaper->escapeJs(
-                explode(",", $this->transactionalSmsConfig->getAllowedCountries($websiteId))
-            );
+            $config["onlyCountries"] = array_map(function ($countryCode) {
+                return $this->escaper->escapeJs($countryCode);
+            }, explode(",", $this->transactionalSmsConfig->getAllowedCountries($websiteId)));
         }
 
         return $this->serializer->serialize($config);
     }
 
     /**
-     * @param $fileId
+     * Get path for script.
+     *
+     * @param string $fileId
      * @return string
      */
     private function getViewFileUrl($fileId)
