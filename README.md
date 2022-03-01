@@ -21,6 +21,11 @@ This module features an option to enable international telephone number validati
 
 ## Changelog
 
+### 1.3.2
+
+##### Improvements
+- We’ve updated our code for compatibility with PHP 8.1.
+
 ### 1.3.1
 
 ##### Bug fixes
