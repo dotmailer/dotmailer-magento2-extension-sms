@@ -12,7 +12,7 @@ This module provides support for Transactional SMS notifications to Magento merc
   - `Dotdigitalgroup_Email` 4.14.0+
   
 ## Activation
-- This module is included in all our metapackages. Please refer to [these instructions](https://github.com/dotmailer/dotmailer-magento2-extension#installation) to install via the Magento Marketplace.
+- This module is included in our core extension. Please refer to [these instructions](https://github.com/dotmailer/dotmailer-magento2-extension#installation) to install via the Magento Marketplace.
 - Ensure you have set valid API credentials in **Configuration > Dotdigital > Account Settings**
 - Head to **Configuration > Dotdigital > Transactional SMS** for configuration.
 
@@ -20,6 +20,11 @@ This module provides support for Transactional SMS notifications to Magento merc
 This module features an option to enable international telephone number validation. Our supporting code uses a version of the [International Telephone Input](https://github.com/jackocnr/intl-tel-input) JavaScript plugin. We've also borrowed some components from this [MaxMage Magento module](https://github.com/MaxMage/international-telephone-input). Kudos and thanks!
 
 ## Changelog
+
+### 1.3.2
+
+##### Improvements
+- We’ve updated our code for compatibility with PHP 8.1.
 
 ### 1.3.1
 
