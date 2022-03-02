@@ -25,6 +25,7 @@ This module features an option to enable international telephone number validati
 
 ##### Improvements
 - We’ve updated our code for compatibility with PHP 8.1.
+- PHP 7.2 is now a minimum requirement for running this module.
 
 ### 1.3.1
 
