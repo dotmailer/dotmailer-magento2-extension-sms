@@ -11,11 +11,17 @@ $view = $block->getData('config');
         'jquery'
     ], function ($) {
         ddgTelephoneRenderComplete = function(node) {
-            var telephoneInput = $(node)[0];
-            var iti = window.intlTelInput(telephoneInput, <?= $view->getConfig(); ?>);
+            let telephoneInput = $(node)[0],
+                iti = window.intlTelInput(telephoneInput, <?= $view->getConfig(); ?>);
 
             telephoneInput.addEventListener('blur', function() {
                 telephoneInput.value = iti.getNumber();
+            });
+
+            document.addEventListener('numberIsInvalid', function(event) {
+                telephoneInput.value = event.detail.number;
+                telephoneInput.value = iti.getNumber();
+                telephoneInput.dispatchEvent(new Event('change'));
             });
         }
     });

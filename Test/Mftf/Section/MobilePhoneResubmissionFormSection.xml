@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="MobileFormResubmissionFormSection">
+        <element name="resubmissionForm" type="text" selector="#telephone-resubmission" />
+        <element name="resubmissionFormField" type="input" selector="#telephone-resubmission .input-text" />
+        <element name="resubmissionFormUpdateButton" type="button" selector="#ddg-phone-update" />
+    </section>
+</sections>

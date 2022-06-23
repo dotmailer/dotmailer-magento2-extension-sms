@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="TelephoneNumberPreValidationTest">
+        <annotations>
+            <features value="Dotdigital module"/>
+            <stories value="dotdigital Transactional SMS"/>
+            <title value="Mobile phone pre validation"/>
+            <description value="Validate if existing mobile number is valid or no."/>
+            <severity value="MINOR"/>
+            <group value="dotdigitalSms"/>
+        </annotations>
+
+        <before>
+            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup1"/>
+            <!-- Create simple customer -->
+            <comment userInput="Create simple customer" stepKey="createSimpleCustomerComment"/>
+            <createData entity="Simple_US_Customer_CA" stepKey="simpleCustomer"/>
+
+            <!-- Create the category -->
+            <comment userInput="Create the category" stepKey="createCategoryComment"/>
+            <createData entity="ApiCategory" stepKey="createCategory"/>
+            <!-- Create Simple Product -->
+            <comment userInput="Create Simple Product" stepKey="createSimpleProductComment"/>
+            <createData entity="SimpleProductPrice10Qty1" stepKey="simpleProduct">
+                <requiredEntity createDataKey="createCategory"/>
+            </createData>
+
+            <actionGroup ref="SetDotmailerAccountData" stepKey="SetDotmailerAccountData"/>
+            <actionGroup ref="EnableSms" stepKey="EnableSmsOptions" />
+            <actionGroup ref="EnablePhoneNumberValidation" stepKey="EnablePhoneNumberValidationOptions" />
+        </before>
+
+        <after>
+            <deleteData createDataKey="simpleCustomer" stepKey="deleteSimpleCustomer"/>
+            <deleteData createDataKey="simpleProduct" stepKey="deleteSimpleProduct"/>
+            <deleteData createDataKey="createCategory" stepKey="deleteCategory"/>
+            <actionGroup ref="EnableSms" stepKey="DisableSmsOptions">
+                <argument name="enabled" value="No"/>
+            </actionGroup>
+            <actionGroup ref="EnableSms" stepKey="DisablePhoneNumberValidationOptions">
+                <argument name="enabled" value="No"/>
+            </actionGroup>
+            <actionGroup ref="ResetDotmailerAccountData" stepKey="resetAccountData"/>
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="logout"/>
+        </after>
+
+        <!-- Go to Checkout Shipping Page for Customer -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginAsStoreFront">
+            <argument name="Customer" value="$$simpleCustomer$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontOpenProductEntityPageActionGroup" stepKey="openProductPageOnStorefront">
+            <argument name="product" value="$$simpleProduct$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAddToTheCartActionGroup" stepKey="addProductToCart"/>
+        <actionGroup ref="StorefrontOpenCheckoutPageActionGroup" stepKey="goToCheckoutPage"/>
+
+        <!-- Assert that you see error message and form -->
+        <waitForPageLoad stepKey="waitForUpdate"/>
+        <seeElement selector="{{MobileFormResubmissionFormSection.resubmissionForm}}" stepKey="seeResubmissionForm"/>
+        <seeElement selector="{{StorefrontCustomerSignInPopupFormSection.errorMessage}}" stepKey="seeErrorMessage"/>
+
+        <!-- Update form and assert that you don't see errors  -->
+        <fillField
+                selector="{{MobileFormResubmissionFormSection.resubmissionFormField}}"
+                userInput="{{US_Address_CA.telephone}}"
+                stepKey="fillPhoneNumber"
+        />
+        <click selector="{{MobileFormResubmissionFormSection.resubmissionFormUpdateButton}}" stepKey="updatePhoneNumber" />
+        <waitForPageLoad stepKey="waitForUpdate2"/>
+
+        <dontSeeElement selector="{{MobileFormResubmissionFormSection.resubmissionForm}}" stepKey="dontSeeResubmissionForm"/>
+        <dontSeeElement selector="{{StorefrontCustomerSignInPopupFormSection.errorMessage}}" stepKey="dontSeeErrorMessage"/>
+    </test>
+</tests>

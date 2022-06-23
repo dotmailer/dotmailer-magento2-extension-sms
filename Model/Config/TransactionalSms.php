@@ -45,6 +45,8 @@ class TransactionalSms
     private $storeManager;
 
     /**
+     * Transactional SMS constructor.
+     *
      * @param ScopeConfigInterface $scopeConfig
      * @param WriterInterface $configWriter
      * @param RequestInterface $request
@@ -84,7 +86,9 @@ class TransactionalSms
     }
 
     /**
-     * @param $storeId
+     * Is phone number validation enabled.
+     *
+     * @param string|int $storeId
      * @return bool
      */
     public function isPhoneNumberValidationEnabled($storeId)
@@ -97,7 +101,9 @@ class TransactionalSms
     }
 
     /**
-     * @param $websiteId
+     * SMS enabled at website level.
+     *
+     * @param string|int $websiteId
      * @return bool
      */
     private function isSmsEnabledAtWebsiteLevel($websiteId)
@@ -110,8 +116,10 @@ class TransactionalSms
     }
 
     /**
-     * @param $storeId
-     * @param $smsPath
+     * SMS type enabled.
+     *
+     * @param string|int $storeId
+     * @param string $smsPath
      * @return bool
      */
     public function isSmsTypeEnabled($storeId, $smsPath)
@@ -124,8 +132,13 @@ class TransactionalSms
     }
 
     /**
+     * Force switch off.
+     *
      * Switches off the global SMS enabled flag in the current scope,
      * and in any direct parent or child scopes.
+     *
+     * @return void
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function forceSwitchOff()
     {
@@ -148,7 +161,9 @@ class TransactionalSms
     }
 
     /**
-     * @param $storeId
+     * Switch off at store level.
+     *
+     * @param string|int $storeId
      */
     private function switchOffAtStoreLevel($storeId)
     {
@@ -161,7 +176,9 @@ class TransactionalSms
     }
 
     /**
-     * @param $websiteId
+     * Switch off at website level.
+     *
+     * @param string|int $websiteId
      */
     private function switchOffAtWebsiteLevel($websiteId)
     {
@@ -174,7 +191,7 @@ class TransactionalSms
     }
 
     /**
-     *
+     * Switch off at default level.
      */
     private function switchOffAtDefaultLevel()
     {
@@ -185,7 +202,9 @@ class TransactionalSms
     }
 
     /**
-     * @param $websiteId
+     * Switch off all child stores.
+     *
+     * @param string|int $websiteId
      */
     private function switchOffForAllChildStores($websiteId)
     {
@@ -210,7 +229,9 @@ class TransactionalSms
     }
 
     /**
-     * @param $websiteId
+     * Get preferred country.
+     *
+     * @param string|int $websiteId
      * @return string
      */
     public function getPreferredCountry($websiteId)
@@ -223,7 +244,9 @@ class TransactionalSms
     }
 
     /**
-     * @param $websiteId
+     * Get allowed countries.
+     *
+     * @param string|int $websiteId
      * @return string
      */
     public function getAllowedCountries($websiteId)
@@ -236,8 +259,9 @@ class TransactionalSms
     }
 
     /**
-     * Prepare telephone field config according to the Magento default config
-     * @param $addressType
+     * Prepare telephone field config according to the Magento default config.
+     *
+     * @param string $addressType
      * @param string $method
      * @return array
      */
@@ -274,6 +298,33 @@ class TransactionalSms
     }
 
     /**
+     * Prepare phone resubmission fieldset.
+     *
+     * @return array
+     */
+    public function getResubmissionForm(): array
+    {
+         return [
+             'component' => 'Dotdigitalgroup_Sms/js/view/telephoneResubmission',
+             'provider' => 'checkoutProvider',
+             'config' => [
+                 'template' => 'Dotdigitalgroup_Sms/telephone-resubmission'
+             ],
+             'children' => [
+                 'telephone-resubmission-fieldset' => [
+                     'component' => 'uiComponent',
+                     'displayArea' => 'telephone-resubmission-fields',
+                     'children' => [
+                         'telephone' => $this->telephoneFieldConfig('telephone', 'Resubmission')
+                     ]
+                 ]
+             ]
+         ];
+    }
+
+    /**
+     * Get data scope prefix.
+     *
      * @param string $addressType
      * @param string $method
      * @return string
