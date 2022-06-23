@@ -24,6 +24,9 @@ var config = {
             },
             'Magento_Ui/js/lib/validation/validator': {
                 'Dotdigitalgroup_Sms/js/telephoneValidatorCheckout': true
+            },
+            'Magento_Checkout/js/action/select-shipping-address': {
+                'Dotdigitalgroup_Sms/js/telephoneValidatorShipping': true
             }
         }
     }

@@ -20,6 +20,7 @@ class LayoutProcessor
 
     /**
      * LayoutProcessor constructor.
+     *
      * @param TransactionalSms $transactionalSmsConfig
      * @param StoreManagerInterface $storeManager
      */
@@ -32,8 +33,10 @@ class LayoutProcessor
     }
 
     /**
+     * After process.
+     *
      * @param MageLayoutProcessor $subject
-     * @param $jsLayout
+     * @param array $jsLayout
      * @return mixed
      */
     public function afterProcess(MageLayoutProcessor $subject, $jsLayout)
@@ -47,9 +50,14 @@ class LayoutProcessor
         // @codingStandardsIgnoreStart
         $shippingConfiguration = &$jsLayout['components']['checkout']['children']['steps']['children']['shipping-step']['children']['shippingAddress']['children']['shipping-address-fieldset']['children'];
         $billingConfiguration = &$jsLayout['components']['checkout']['children']['steps']['children']['billing-step']['children']['payment']['children']['payments-list']['children'];
+        $shippingSelection = &$jsLayout['components']['checkout']['children']['steps']['children']['shipping-step']['children']['shippingAddress']['children']['before-form']['children'];
 
         if (isset($shippingConfiguration)) {
             $shippingConfiguration['telephone'] = $this->transactionalSmsConfig->telephoneFieldConfig("shippingAddress");
+        }
+
+        if (isset($shippingSelection)) {
+            $shippingSelection['custom-checkout-form-container'] = $this->transactionalSmsConfig->getResubmissionForm();
         }
 
         /* config: checkout/options/display_billing_address_on = payment_method */
