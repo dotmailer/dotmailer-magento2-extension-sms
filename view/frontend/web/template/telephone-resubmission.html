@@ -1,0 +1,13 @@
+<div>
+    <form id="telephone-resubmission" class="form" data-bind="attr: {'data-hasrequired': $t('* Required Fields')}" style="display: none;">
+        <fieldset class="fieldset">
+            <!-- ko foreach: getRegion('telephone-resubmission-fields') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+            <button id="ddg-phone-update" type="button" data-bind="click: onSubmit" class="action">
+                <span data-bind="i18n: 'Update'"></span>
+            </button>
+        </fieldset>
+    </form>
+</div>
+

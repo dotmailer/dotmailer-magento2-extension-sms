@@ -12,5 +12,6 @@
         <data key="statusDelivered">Delivered</data>
         <data key="sharedPoolNumber">shared_pool_number</data>
         <data key="alphanumericNumber">alphanumeric_number</data>
+        <data key="errorMessage">Enter a valid phone number to receive SMS order notifications.</data>
     </entity>
 </entities>
