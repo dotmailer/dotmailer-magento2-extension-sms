@@ -21,6 +21,14 @@ This module features an option to enable international telephone number validati
 
 ## Changelog
 
+### 1.4.0
+
+##### What's new
+- If phone number validation is enabled, customers with stored, non-international phone numbers will be asked to update their phone number at checkout.
+
+##### Improvements
+- We updated the flag PNG files for the telephone input country selector.
+
 ### 1.3.2
 
 ##### Improvements
