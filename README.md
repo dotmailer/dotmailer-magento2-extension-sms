@@ -21,6 +21,11 @@ This module features an option to enable international telephone number validati
 
 ## Changelog
 
+### 1.4.1
+
+##### Bug fixes
+- We fixed a CSS error that displayed incorrect country flags in the telephone input selector. 
+
 ### 1.4.0
 
 ##### What's new
