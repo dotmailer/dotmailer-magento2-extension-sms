@@ -3,19 +3,20 @@ define([
     'mage/utils/wrapper',
     'Magento_Ui/js/model/messageList',
     'mage/translate',
-    'Magento_Checkout/js/model/quote'
-], function ($, wrapper, messageList, $t, quote) {
+    'Magento_Checkout/js/model/quote',
+    'Magento_Customer/js/model/customer'
+], function ($, wrapper, messageList, $t, quote, customer) {
     'use strict';
 
     return function (selectShippingAddress) {
         return wrapper.wrap(selectShippingAddress, function (originalSelectShippingAddress, config, element) {
             originalSelectShippingAddress(config, element);
-
             const validateQuotePhone = () => {
                 let shippingAddress = quote.shippingAddress(),
                     regex = /^\+(?:[0-9] ?){6,14}[0-9]$/,
                     ddgContainerSelector = $('#telephone-resubmission'),
                     phoneNumber = shippingAddress.telephone,
+                    isLoggedIn = customer.isLoggedIn(),
                     isValid = regex.test(phoneNumber);
 
                 ddgContainerSelector.hide();
@@ -24,7 +25,7 @@ define([
                     return;
                 }
 
-                if (!isValid && ddgContainerSelector.length) {
+                if (!isValid && ddgContainerSelector.length && isLoggedIn) {
                     ddgContainerSelector.show();
                     let event = new CustomEvent('numberIsInvalid', {'detail': {'number': phoneNumber}});
 
