@@ -21,6 +21,12 @@ This module features an option to enable international telephone number validati
 
 ## Changelog
 
+### 1.4.2
+
+##### Bug fixes
+- Order notifications for virtual products will now fall back to the billing address phone number in the absence of a shipping address phone number.
+- We spotted an issue with the phone number field appearing twice at checkout; this has been fixed.
+
 ### 1.4.1
 
 ##### Bug fixes
