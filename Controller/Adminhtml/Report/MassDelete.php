@@ -2,7 +2,7 @@
 
 namespace Dotdigitalgroup\Sms\Controller\Adminhtml\Report;
 
-use Dotdigitalgroup\Email\Helper\MassDeleteCsrf;
+use Dotdigitalgroup\Email\Controller\Adminhtml\MassDeleteCsrf;
 use Dotdigitalgroup\Sms\Model\ResourceModel\SmsOrder;
 use Dotdigitalgroup\Sms\Model\ResourceModel\SmsOrder\CollectionFactory;
 use Magento\Backend\App\Action\Context;

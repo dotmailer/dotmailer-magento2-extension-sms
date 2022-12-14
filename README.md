@@ -9,7 +9,7 @@ This module provides support for Transactional SMS notifications to Magento merc
 - An active Dotdigital account with the SMS pay-as-you-go service enabled.
 - Available from Magento 2.3+
 - Requires Dotdigital extension versions:
-  - `Dotdigitalgroup_Email` 4.14.0+
+  - `Dotdigitalgroup_Email` 4.20.0+
   
 ## Activation
 - This module is included in our core extension. Please refer to [these instructions](https://github.com/dotmailer/dotmailer-magento2-extension#installation) to install via the Magento Marketplace.
