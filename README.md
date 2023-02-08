@@ -21,6 +21,13 @@ This module features an option to enable international telephone number validati
 
 ## Changelog
 
+### 1.5.0
+
+##### Improvements
+
+- We replaced usages of `SearchResultsFactory` and `SearchResults` classes with `SearchResultsInterfaceFactory` and `SearchResultsInterface` respectively.
+- Note: this release requires Email v4.20.0.
+
 ### 1.4.2
 
 ##### Bug fixes
