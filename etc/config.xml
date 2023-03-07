@@ -20,5 +20,12 @@
                 <new_credit_memo_message>{{first_name}}, your order {{ order_id }} from {{ store_name }} has been refunded for {{ refund_amount }}</new_credit_memo_message>
             </sms_templates>
         </transactional_sms>
+        <connector_consent>
+            <sms>
+                <enabled>0</enabled>
+                <signup_text></signup_text>
+                <marketing_consent_text></marketing_consent_text>
+            </sms>
+        </connector_consent>
     </default>
 </config>
