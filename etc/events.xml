@@ -6,4 +6,7 @@
     <event name="sales_order_creditmemo_save_after">
         <observer name="ddg_sms_sales_order_creditmemo_save_after" instance="Dotdigitalgroup\Sms\Observer\Sales\OrderCreditmemoSaveAfter" />
     </event>
+    <event name="sales_order_place_after">
+        <observer name="ddg_sms_checkout_consent" instance="Dotdigitalgroup\Sms\Observer\Sales\CheckoutConsentObserver" />
+    </event>
 </config>

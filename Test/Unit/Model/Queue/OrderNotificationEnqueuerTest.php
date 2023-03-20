@@ -5,7 +5,7 @@ namespace Dotdigitalgroup\Sms\Test\Unit\Model\Queue;
 use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterface;
 use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterfaceFactory;
 use Dotdigitalgroup\Sms\Api\SmsOrderRepositoryInterface;
-use Dotdigitalgroup\Sms\Model\Config\TransactionalSms;
+use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\OrderItemNotificationEnqueuer;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Store\Api\Data\StoreInterface;
@@ -26,9 +26,9 @@ class OrderNotificationEnqueuerTest extends TestCase
     private $smsOrderInterfaceFactoryMock;
 
     /**
-     * @var TransactionalSms|\PHPUnit\Framework\MockObject\MockObject
+     * @var Configuration|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $transactionalSmsMock;
+    private $moduleConfigMock;
 
     /**
      * @var SmsOrderRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject
@@ -69,7 +69,7 @@ class OrderNotificationEnqueuerTest extends TestCase
             ->getMock();
 
         $this->smsOrderInterfaceFactoryMock = $this->createMock(SmsOrderInterfaceFactory::class);
-        $this->transactionalSmsMock = $this->createMock(TransactionalSms::class);
+        $this->moduleConfigMock = $this->createMock(Configuration::class);
         $this->smsOrderRepositoryInterfaceMock = $this->createMock(SmsOrderRepositoryInterface::class);
         $this->storeManagerInterfaceMock = $this->createMock(StoreManagerInterface::class);
         $this->storeInterfaceMock = $this->createMock(StoreInterface::class);
@@ -79,7 +79,7 @@ class OrderNotificationEnqueuerTest extends TestCase
         $this->smsOrderNotificationEnqueuer = new OrderItemNotificationEnqueuer(
             $this->smsOrderInterfaceFactoryMock,
             $this->smsOrderRepositoryInterfaceMock,
-            $this->transactionalSmsMock,
+            $this->moduleConfigMock,
             $this->storeManagerInterfaceMock
         );
     }
@@ -95,12 +95,12 @@ class OrderNotificationEnqueuerTest extends TestCase
             ->method('getId')
             ->willReturn($storeId = 1);
 
-        $this->transactionalSmsMock->expects($this->once())
+        $this->moduleConfigMock->expects($this->once())
             ->method('isSmsEnabled')
             ->with($storeId)
             ->willReturn(true);
 
-        $this->transactionalSmsMock->expects($this->once())
+        $this->moduleConfigMock->expects($this->once())
             ->method('isSmsTypeEnabled')
             ->willReturn(true);
 
@@ -203,12 +203,12 @@ class OrderNotificationEnqueuerTest extends TestCase
             ->method('getId')
             ->willReturn($storeId = 1);
 
-        $this->transactionalSmsMock->expects($this->once())
+        $this->moduleConfigMock->expects($this->once())
             ->method('isSmsEnabled')
             ->with($storeId)
             ->willReturn(false);
 
-        $this->transactionalSmsMock->expects($this->never())
+        $this->moduleConfigMock->expects($this->never())
             ->method('isSmsTypeEnabled');
 
         $this->orderInterfaceMock->expects($this->never())

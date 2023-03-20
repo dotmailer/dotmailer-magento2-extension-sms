@@ -5,7 +5,7 @@ namespace Dotdigitalgroup\Sms\Model\Queue\OrderItem;
 use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterfaceFactory;
 use Dotdigitalgroup\Sms\Api\SmsOrderRepositoryInterface;
 use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
-use Dotdigitalgroup\Sms\Model\Config\TransactionalSms;
+use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Magento\Store\Model\StoreManagerInterface;
 
 class OrderItemNotificationEnqueuer
@@ -23,9 +23,9 @@ class OrderItemNotificationEnqueuer
     private $smsOrderRepositoryInterface;
 
     /**
-     * @var TransactionalSms
+     * @var Configuration
      */
-    private $transactionalSms;
+    private $moduleConfig;
 
     /**
      * @var StoreManagerInterface
@@ -36,19 +36,19 @@ class OrderItemNotificationEnqueuer
      * AbstractQueueManager constructor.
      * @param SmsOrderInterfaceFactory $smsOrderInterfaceFactory
      * @param SmsOrderRepositoryInterface $smsOrderRepositoryInterface
-     * @param TransactionalSms $transactionalSms
+     * @param Configuration $moduleConfig
      * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         SmsOrderInterfaceFactory $smsOrderInterfaceFactory,
         SmsOrderRepositoryInterface $smsOrderRepositoryInterface,
-        TransactionalSms $transactionalSms,
+        Configuration $moduleConfig,
         StoreManagerInterface $storeManager
     ) {
         $this->storeManager = $storeManager;
         $this->smsOrderInterfaceFactory = $smsOrderInterfaceFactory;
         $this->smsOrderRepositoryInterface = $smsOrderRepositoryInterface;
-        $this->transactionalSms = $transactionalSms;
+        $this->moduleConfig = $moduleConfig;
     }
 
     /**
@@ -63,8 +63,8 @@ class OrderItemNotificationEnqueuer
     {
         $storeId = $this->storeManager->getStore()->getId();
 
-        if (!$this->transactionalSms->isSmsEnabled($storeId) ||
-            !$this->transactionalSms->isSmsTypeEnabled($storeId, $smsConfigPath)) {
+        if (!$this->moduleConfig->isSmsEnabled($storeId) ||
+            !$this->moduleConfig->isSmsTypeEnabled($storeId, $smsConfigPath)) {
             return;
         }
 

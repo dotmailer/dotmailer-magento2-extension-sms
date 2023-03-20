@@ -2,16 +2,46 @@
 
 namespace Dotdigitalgroup\Sms\Plugin\Block\Checkout;
 
-use Dotdigitalgroup\Sms\Model\Config\TransactionalSms;
+use Dotdigitalgroup\Sms\Component\ConsentCheckbox;
+use Dotdigitalgroup\Sms\Component\ConsentTelephone;
+use Dotdigitalgroup\Sms\Component\ConsentText;
+use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Magento\Checkout\Block\Checkout\LayoutProcessor as MageLayoutProcessor;
+use Magento\Customer\Helper\Session\CurrentCustomerAddress;
+use Magento\Customer\Model\Session;
 use Magento\Store\Model\StoreManagerInterface;
 
 class LayoutProcessor
 {
     /**
-     * @var TransactionalSms
+     * @var ConsentCheckbox
      */
-    private $transactionalSmsConfig;
+    private $consentCheckbox;
+
+    /**
+     * ConsentTelephone
+     */
+    private $consentTelephone;
+
+    /**
+     * @var ConsentText
+     */
+    private $consentText;
+
+    /**
+     * @var Configuration
+     */
+    private $moduleConfig;
+
+    /**
+     * @var Session
+     */
+    private $customerSession;
+
+    /**
+     * @var CurrentCustomerAddress
+     */
+    private $currentCustomerAddress;
 
     /**
      * @var StoreManagerInterface
@@ -21,14 +51,27 @@ class LayoutProcessor
     /**
      * LayoutProcessor constructor.
      *
-     * @param TransactionalSms $transactionalSmsConfig
+     * @param ConsentCheckbox $consentCheckbox
+     * @param ConsentTelephone $consentTelephone
+     * @param ConsentText $consentText
+     * @param Configuration $moduleConfig
      * @param StoreManagerInterface $storeManager
      */
     public function __construct(
-        TransactionalSms $transactionalSmsConfig,
+        ConsentCheckbox $consentCheckbox,
+        ConsentTelephone $consentTelephone,
+        ConsentText $consentText,
+        Configuration $moduleConfig,
+        Session $customerSession,
+        CurrentCustomerAddress $currentCustomerAddress,
         StoreManagerInterface $storeManager
     ) {
-        $this->transactionalSmsConfig = $transactionalSmsConfig;
+        $this->consentCheckbox = $consentCheckbox;
+        $this->consentTelephone = $consentTelephone;
+        $this->consentText = $consentText;
+        $this->moduleConfig = $moduleConfig;
+        $this->customerSession = $customerSession;
+        $this->currentCustomerAddress = $currentCustomerAddress;
         $this->storeManager = $storeManager;
     }
 
@@ -43,7 +86,7 @@ class LayoutProcessor
     {
         $storeId = $this->storeManager->getStore()->getId();
 
-        if (!$this->transactionalSmsConfig->isPhoneNumberValidationEnabled($storeId)) {
+        if (!$this->moduleConfig->isPhoneNumberValidationEnabled($storeId)) {
             return $jsLayout;
         }
 
@@ -53,11 +96,19 @@ class LayoutProcessor
         $shippingSelection = &$jsLayout['components']['checkout']['children']['steps']['children']['shipping-step']['children']['shippingAddress']['children']['before-form']['children'];
 
         if (isset($shippingConfiguration)) {
-            $shippingConfiguration['telephone'] = $this->transactionalSmsConfig->telephoneFieldConfig("shippingAddress");
+            $shippingConfiguration['telephone'] = $this->moduleConfig->telephoneFieldConfig("shippingAddress");
+
+            if (!$this->currentCustomerHasStoredShippingAddress()) {
+                $this->appendConsentLayout($shippingConfiguration, $storeId);
+            }
         }
 
         if (isset($shippingSelection)) {
-            $shippingSelection['custom-checkout-form-container'] = $this->transactionalSmsConfig->getResubmissionForm();
+            $shippingSelection['dd-telephone-resubmission-form'] = $this->moduleConfig->getResubmissionForm();
+
+            if ($this->currentCustomerHasStoredShippingAddress()) {
+                $this->appendConsentLayout($shippingSelection, $storeId);
+            }
         }
 
         /* config: checkout/options/display_billing_address_on = payment_method */
@@ -65,8 +116,8 @@ class LayoutProcessor
             foreach ($billingConfiguration as $key => &$element) {
                 $method = substr($key, 0, -5);
 
-                $element['dataScopePrefix'] = $this->transactionalSmsConfig->getDataScopePrefix("billingAddress", $method);
-                $element['children']['form-fields']['children']['telephone'] = $this->transactionalSmsConfig->telephoneFieldConfig("billingAddress", $method);
+                $element['dataScopePrefix'] = $this->moduleConfig->getDataScopePrefix("billingAddress", $method);
+                $element['children']['form-fields']['children']['telephone'] = $this->moduleConfig->telephoneFieldConfig("billingAddress", $method);
             }
         }
 
@@ -74,10 +125,38 @@ class LayoutProcessor
         if (isset($jsLayout['components']['checkout']['children']['steps']['children']['billing-step']['children']['payment']['children']['afterMethods']['children']['billing-address-form'])) {
             $method = 'shared';
 
-            $jsLayout['components']['checkout']['children']['steps']['children']['billing-step']['children']['payment']['children']['afterMethods']['children']['billing-address-form']['children']['form-fields']['children']['telephone'] = $this->transactionalSmsConfig->telephoneFieldConfig("billingAddress", $method);
+            $jsLayout['components']['checkout']['children']['steps']['children']['billing-step']['children']['payment']['children']['afterMethods']['children']['billing-address-form']['children']['form-fields']['children']['telephone'] = $this->moduleConfig->telephoneFieldConfig("billingAddress", $method);
         }
         // @codingStandardsIgnoreEnd
 
         return $jsLayout;
+    }
+
+    /**
+     * Checks if current customer is logged in and has a stored shipping address.
+     *
+     * @return bool
+     */
+    private function currentCustomerHasStoredShippingAddress()
+    {
+        return $this->customerSession->isLoggedIn() && $this->currentCustomerAddress->getDefaultShippingAddress();
+    }
+
+    /**
+     * Add consent components to the XML tree.
+     *
+     * @param array $layoutNode
+     * @param string|int $storeId
+     * @return void
+     */
+    private function appendConsentLayout(&$layoutNode, $storeId)
+    {
+        if (!$this->moduleConfig->isSmsConsentEnabled($storeId)) {
+            return;
+        }
+
+        $layoutNode['dd_sms_consent_checkbox'] = $this->consentCheckbox->render($storeId);
+        $layoutNode['dd_sms_consent_telephone'] = $this->consentTelephone->render();
+        $layoutNode['dd_sms_consent_text'] = $this->consentText->render($storeId);
     }
 }

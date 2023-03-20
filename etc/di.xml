@@ -27,4 +27,7 @@
     <type name="Magento\Checkout\Block\Checkout\LayoutProcessor">
         <plugin name="ddg_sms_international_telephone_layout_processor_plugin" type="Dotdigitalgroup\Sms\Plugin\Block\Checkout\LayoutProcessor"/>
     </type>
+    <type name="Magento\Checkout\Model\ShippingInformationManagement">
+        <plugin name="ddg_sms_shipping__plugin" type="Dotdigitalgroup\Sms\Plugin\Checkout\ShippingInformationManagementPlugin"/>
+    </type>
 </config>

@@ -3,7 +3,7 @@
 namespace Dotdigitalgroup\Sms\Model\Queue;
 
 use Dotdigitalgroup\Sms\Api\SmsOrderRepositoryInterface;
-use Dotdigitalgroup\Sms\Model\Config\TransactionalSms;
+use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Intl\DateTimeFactory;
 use Magento\Store\Model\StoreManagerInterface;
@@ -23,9 +23,9 @@ class OrderQueueManager
     private $smsOrderRepository;
 
     /**
-     * @var TransactionalSms
+     * @var Configuration
      */
-    private $transactionalSmsConfig;
+    private $moduleConfig;
 
     /**
      * @var SearchCriteriaBuilder
@@ -45,20 +45,20 @@ class OrderQueueManager
     /**
      * OrderQueueManager constructor.
      * @param SmsOrderRepositoryInterface $smsOrderRepository
-     * @param TransactionalSms $transactionalSmsConfig
+     * @param Configuration $moduleConfig
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param DateTimeFactory $dateTimeFactory
      * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         SmsOrderRepositoryInterface $smsOrderRepository,
-        TransactionalSms $transactionalSmsConfig,
+        Configuration $moduleConfig,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         DateTimeFactory $dateTimeFactory,
         StoreManagerInterface $storeManager
     ) {
         $this->smsOrderRepository = $smsOrderRepository;
-        $this->transactionalSmsConfig = $transactionalSmsConfig;
+        $this->moduleConfig = $moduleConfig;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->dateTimeFactory = $dateTimeFactory;
         $this->storeManager = $storeManager;
@@ -76,7 +76,7 @@ class OrderQueueManager
             ->addFilter('status', self::SMS_STATUS_PENDING)
             ->addFilter('store_id', [$storeIds], 'in')
             ->addFilter('phone_number', null, 'neq')
-            ->setPageSize($this->transactionalSmsConfig->getBatchSize());
+            ->setPageSize($this->moduleConfig->getBatchSize());
 
         return $this->smsOrderRepository->getList($searchCriteria->create());
     }

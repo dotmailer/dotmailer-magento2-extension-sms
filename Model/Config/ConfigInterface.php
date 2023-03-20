@@ -28,16 +28,9 @@ interface ConfigInterface
     public const XML_PATH_SMS_NEW_CREDIT_MEMO_ENABLED = 'transactional_sms/sms_templates/new_credit_memo_enabled';
     public const XML_PATH_SMS_NEW_CREDIT_MEMO_MESSAGE = 'transactional_sms/sms_templates/new_credit_memo_message';
 
-    /**
-     * CONSENT SECTION.
-     */
-    public const XML_PATH_CONSENT_SMS_ENABLED =
-        'connector_consent/sms/enabled';
-    public const XML_PATH_CONSENT_SMS_SIGNUP_TEXT =
-        'connector_consent/sms/signup_text';
-    public const XML_PATH_CONSENT_SMS_MARKETING_TEXT =
-        'connector_consent/sms/marketing_consent_text';
-
+    public const XML_PATH_CONSENT_SMS_ENABLED = 'connector_consent/sms/enabled';
+    public const XML_PATH_CONSENT_SMS_SIGNUP_TEXT = 'connector_consent/sms/signup_text';
+    public const XML_PATH_CONSENT_SMS_MARKETING_TEXT = 'connector_consent/sms/marketing_consent_text';
 
     public const SMS_TYPE_NEW_ORDER = 1;
     public const SMS_TYPE_UPDATE_ORDER = 2;

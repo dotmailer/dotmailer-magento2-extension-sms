@@ -154,14 +154,14 @@
                 <field id="enabled" translate="label" sortOrder="10" type="select" showInStore="1" showInWebsite="1" showInDefault="1">
                     <label>Ask for SMS marketing consent</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment><![CDATA[If yes, adds a consent opt-in checkbox to mobile number fields.]]></comment>
+                    <comment><![CDATA[Enable this to capture and record consent for SMS marketing.]]></comment>
                 </field>
                 <field id="signup_text" translate="label" sortOrder="20" type="textarea" showInWebsite="1" showInStore="1" showInDefault="1">
                     <label>Sign up text</label>
                     <comment><![CDATA[The text here is displayed next to the checkbox in checkout.]]></comment>
                 </field>
                 <field id="marketing_consent_text" translate="label" sortOrder="20" type="textarea" showInWebsite="1" showInStore="1" showInDefault="1">
-                    <label>Sms marketing consent text</label>
+                    <label>SMS marketing consent text</label>
                     <comment><![CDATA[Explain what you will do with consent, how customers can withdraw consent, and where they can learn more.]]></comment>
                 </field>
             </group>

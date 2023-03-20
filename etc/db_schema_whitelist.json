@@ -27,5 +27,12 @@
             "EMAIL_SMS_ORDER_QUEUE_WEBSITE_ID_STORE_WEBSITE_WEBSITE_ID": true,
             "EMAIL_SMS_ORDER_QUEUE_STORE_ID_STORE_STORE_ID": true
         }
+    },
+    "email_contact": {
+        "column": {
+            "mobile_number": true,
+            "sms_subscriber_status": true,
+            "sms_subscriber_imported": true
+        }
     }
 }

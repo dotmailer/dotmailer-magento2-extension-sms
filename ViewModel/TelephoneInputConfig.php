@@ -2,7 +2,7 @@
 
 namespace Dotdigitalgroup\Sms\ViewModel;
 
-use Dotdigitalgroup\Sms\Model\Config\TransactionalSms;
+use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Escaper;
 use Magento\Framework\Serialize\SerializerInterface;
@@ -13,9 +13,9 @@ use Magento\Store\Model\StoreManagerInterface;
 class TelephoneInputConfig implements ArgumentInterface
 {
     /**
-     * @var TransactionalSms
+     * @var Configuration
      */
-    private $transactionalSmsConfig;
+    private $moduleConfig;
 
     /**
      * @var RequestInterface
@@ -44,7 +44,7 @@ class TelephoneInputConfig implements ArgumentInterface
 
     /**
      * TelephoneInputConfig constructor.
-     * @param TransactionalSms $transactionalSmsConfig
+     * @param Configuration $moduleConfig
      * @param RequestInterface $request
      * @param Escaper $escaper
      * @param SerializerInterface $serializer
@@ -52,14 +52,14 @@ class TelephoneInputConfig implements ArgumentInterface
      * @param StoreManagerInterface $storeManager
      */
     public function __construct(
-        TransactionalSms $transactionalSmsConfig,
+        Configuration $moduleConfig,
         RequestInterface $request,
         Escaper $escaper,
         SerializerInterface $serializer,
         AssetRepository $assetRepository,
         StoreManagerInterface $storeManager
     ) {
-        $this->transactionalSmsConfig = $transactionalSmsConfig;
+        $this->moduleConfig = $moduleConfig;
         $this->request = $request;
         $this->escaper = $escaper;
         $this->serializer = $serializer;
@@ -79,13 +79,13 @@ class TelephoneInputConfig implements ArgumentInterface
         $config  = [
             "nationalMode" => false,
             "utilsScript"  => $this->getViewFileUrl('Dotdigitalgroup_Sms::js/utils.js'),
-            "preferredCountries" => [$this->transactionalSmsConfig->getPreferredCountry($websiteId)]
+            "preferredCountries" => [$this->moduleConfig->getPreferredCountry($websiteId)]
         ];
 
-        if ($this->transactionalSmsConfig->getAllowedCountries($websiteId)) {
+        if ($this->moduleConfig->getAllowedCountries($websiteId)) {
             $config["onlyCountries"] = array_map(function ($countryCode) {
                 return $this->escaper->escapeJs($countryCode);
-            }, explode(",", $this->transactionalSmsConfig->getAllowedCountries($websiteId)));
+            }, explode(",", $this->moduleConfig->getAllowedCountries($websiteId)));
         }
 
         return $this->serializer->serialize($config);

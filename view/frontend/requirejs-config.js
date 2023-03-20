@@ -27,6 +27,9 @@ var config = {
             },
             'Magento_Checkout/js/action/select-shipping-address': {
                 'Dotdigitalgroup_Sms/js/telephoneValidatorShipping': true
+            },
+            'Magento_Checkout/js/model/shipping-save-processor/payload-extender': {
+                'Dotdigitalgroup_Sms/js/model/shipping-save-processor/setConsentMixin': true
             }
         }
     }

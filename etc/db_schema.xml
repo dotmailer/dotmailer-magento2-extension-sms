@@ -30,4 +30,9 @@
             <column name="store_id"/>
         </index>
     </table>
+    <table name="email_contact">
+        <column xsi:type="varchar" name="mobile_number" length="255" nullable="true" comment="Mobile number"/>
+        <column xsi:type="smallint" name="sms_subscriber_status" padding="5" unsigned="true" nullable="true" identity="false" comment="SMS subscriber status"/>
+        <column xsi:type="smallint" name="sms_subscriber_imported" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Is Subscriber Imported"/>
+    </table>
 </schema>

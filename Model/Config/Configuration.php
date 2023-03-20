@@ -12,7 +12,7 @@ use Magento\Store\Api\StoreWebsiteRelationInterface;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
-class TransactionalSms
+class Configuration
 {
     /**
      * @var ScopeConfigInterface
@@ -126,6 +126,21 @@ class TransactionalSms
     {
         return $this->scopeConfig->getValue(
             $smsPath,
+            ScopeInterface::SCOPE_STORES,
+            $storeId
+        );
+    }
+
+    /**
+     * Is SMS consent capture enabled.
+     *
+     * @param string|int $storeId
+     * @return bool
+     */
+    public function isSmsConsentEnabled($storeId)
+    {
+        return $this->scopeConfig->getValue(
+            ConfigInterface::XML_PATH_CONSENT_SMS_ENABLED,
             ScopeInterface::SCOPE_STORES,
             $storeId
         );

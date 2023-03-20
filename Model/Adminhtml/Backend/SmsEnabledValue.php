@@ -3,7 +3,7 @@
 namespace Dotdigitalgroup\Sms\Model\Adminhtml\Backend;
 
 use Dotdigitalgroup\Sms\Model\Account;
-use Dotdigitalgroup\Sms\Model\Config\TransactionalSms;
+use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Magento\Framework\App\Config\Value;
 
 class SmsEnabledValue extends Value
@@ -14,7 +14,7 @@ class SmsEnabledValue extends Value
     private $account;
 
     /**
-     * @var TransactionalSms
+     * @var Configuration
      */
     private $smsConfig;
 
@@ -28,7 +28,7 @@ class SmsEnabledValue extends Value
      * @param \Magento\Framework\Model\ResourceModel\AbstractResource|null $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb|null $resourceCollection
      * @param Account $account
-     * @param TransactionalSms $smsConfig
+     * @param Configuration $smsConfig
      * @param array $data
      */
     public function __construct(
@@ -39,7 +39,7 @@ class SmsEnabledValue extends Value
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         Account $account,
-        TransactionalSms $smsConfig,
+        Configuration $smsConfig,
         array $data = []
     ) {
         $this->account = $account;
