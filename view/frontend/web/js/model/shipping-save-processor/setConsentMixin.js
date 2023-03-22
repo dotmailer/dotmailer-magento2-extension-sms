@@ -7,12 +7,11 @@ define([
     'use strict';
 
     return function (payloadExtender) {
-
         return wrapper.wrap(payloadExtender, function (originalAction, payload) {
             payload = originalAction(payload);
 
-            var hasProvidedConsent = $('[name="custom_attributes[dd_sms_consent_checkbox]"]').is(':checked');
-            var consentTelephone = $('[name="custom_attributes[dd_sms_consent_telephone]"]').val();
+            let hasProvidedConsent = $('[name="dd_consent[dd_sms_consent_checkbox]"]').is(':checked');
+            let consentTelephone = $('[name="dd_consent[dd_sms_consent_telephone]"]').val();
 
             payload.addressInformation.extension_attributes = _.extend(
                 payload.addressInformation.extension_attributes || {},
@@ -21,7 +20,6 @@ define([
                     dd_sms_consent_telephone: consentTelephone
                 }
             );
-
             return payload;
         });
     };

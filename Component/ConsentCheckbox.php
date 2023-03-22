@@ -39,7 +39,7 @@ class ConsentCheckbox
                 'elementTmpl' => 'ui/form/element/checkbox',
                 'options' => [],
             ],
-            'dataScope' => 'shippingAddress.custom_attributes.dd_sms_consent_checkbox',
+            'dataScope' => 'shippingAddress.dd_consent.dd_sms_consent_checkbox',
             'description' => $this->getSmsSignUpText($storeId),
             'provider' => 'checkoutProvider',
             'visible' => true,

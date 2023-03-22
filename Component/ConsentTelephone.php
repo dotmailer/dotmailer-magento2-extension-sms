@@ -17,7 +17,7 @@ class ConsentTelephone
                 'template' => 'ui/form/field',
                 'elementTmpl' => 'Dotdigitalgroup_Sms/form/element/telephone',
             ],
-            'dataScope' => 'shippingAddress.custom_attributes.dd_sms_consent_telephone',
+            'dataScope' => 'shippingAddress.dd_consent.dd_sms_consent_telephone',
             'label' => null,
             'provider' => 'checkoutProvider',
             'sortOrder' => 200,
