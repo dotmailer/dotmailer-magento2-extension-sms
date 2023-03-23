@@ -32,8 +32,10 @@ class ShippingInformationManagementPlugin
     }
 
     /**
+     * Before save address information.
+     *
      * @param ShippingInformationManagement $subject
-     * @param $cartId
+     * @param int $cartId
      * @param ShippingInformationInterface $addressInformation
      *
      * @return null
@@ -47,8 +49,14 @@ class ShippingInformationManagementPlugin
             $shippingExtensionAttributes = $this->shippingInformationExtensionFactory->create();
         }
 
-        $this->checkoutSession->setData('dd_sms_consent_checkbox', $shippingExtensionAttributes->getDdSmsConsentCheckbox());
-        $this->checkoutSession->setData('dd_sms_consent_telephone', $shippingExtensionAttributes->getDdSmsConsentTelephone());
+        $this->checkoutSession->setData(
+            'dd_sms_consent_checkbox',
+            $shippingExtensionAttributes->getDdSmsConsentCheckbox()
+        );
+        $this->checkoutSession->setData(
+            'dd_sms_consent_telephone',
+            $shippingExtensionAttributes->getDdSmsConsentTelephone()
+        );
 
         return null;
     }

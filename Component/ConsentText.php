@@ -2,24 +2,22 @@
 
 namespace Dotdigitalgroup\Sms\Component;
 
-use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
-use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Store\Model\ScopeInterface;
+use Dotdigitalgroup\Sms\Model\Config\Configuration;
 
 class ConsentText
 {
     /**
-     * @var ScopeConfigInterface
+     * @var Configuration
      */
-    private $scopeConfig;
+    private $moduleConfig;
 
     /**
-     * @param ScopeConfigInterface $scopeConfig
+     * @param Configuration $moduleConfig
      */
     public function __construct(
-        ScopeConfigInterface $scopeConfig
+        Configuration $moduleConfig
     ) {
-        $this->scopeConfig = $scopeConfig;
+        $this->moduleConfig = $moduleConfig;
     }
 
     /**
@@ -39,7 +37,7 @@ class ConsentText
             ],
             'id' => 'dd_sms_consent_text',
             'class' => 'dd-sms-consent-text',
-            'text' => $this->getSmsMarketingConsentText($storeId),
+            'text' => $this->moduleConfig->getSmsMarketingConsentText($storeId),
             'provider' => 'checkoutProvider',
             'sortOrder' => 220,
             'options' => [],
@@ -48,20 +46,5 @@ class ConsentText
             'visible' => true,
             'focused' => false,
         ];
-    }
-
-    /**
-     * Get SMS marketing consent text.
-     *
-     * @param string|int $storeId
-     * @return string
-     */
-    private function getSmsMarketingConsentText($storeId)
-    {
-        return $this->scopeConfig->getValue(
-            ConfigInterface::XML_PATH_CONSENT_SMS_MARKETING_TEXT,
-            ScopeInterface::SCOPE_STORES,
-            $storeId
-        );
     }
 }

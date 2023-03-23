@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="page.main.title">
+            <action method="setPageTitle">
+                <argument translate="true" name="title" xsi:type="string">Subscriptions</argument>
+            </action>
+        </referenceBlock>
+        <referenceBlock name="dd.account.subscriptions">
+            <block
+                ifconfig="connector_consent/sms/enabled"
+                name="dd.account.sms.marketingconsent"
+                template="Dotdigitalgroup_Sms::customer/account/marketing-consent.phtml"
+                after="dd.account.subscriptions.newsletter">
+                <arguments>
+                    <argument name="config" xsi:type="object">Dotdigitalgroup\Sms\ViewModel\Customer\Account\MarketingConsent</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+        <referenceContainer name="main">
+            <block
+                template="Dotdigitalgroup_Sms::customer/account/js-marketing-consent.phtml"
+                name="dd.account.sms.marketingconsent.js">
+                <arguments>
+                    <argument name="telephoneInputConfig" xsi:type="object">Dotdigitalgroup\Sms\ViewModel\TelephoneInputConfig</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

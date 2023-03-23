@@ -2,24 +2,22 @@
 
 namespace Dotdigitalgroup\Sms\Component;
 
-use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
-use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Store\Model\ScopeInterface;
+use Dotdigitalgroup\Sms\Model\Config\Configuration;
 
 class ConsentCheckbox
 {
     /**
-     * @var ScopeConfigInterface
+     * @var Configuration
      */
-    private $scopeConfig;
+    private $moduleConfig;
 
     /**
-     * @param ScopeConfigInterface $scopeConfig
+     * @param Configuration $moduleConfig
      */
     public function __construct(
-        ScopeConfigInterface $scopeConfig
+        Configuration $moduleConfig
     ) {
-        $this->scopeConfig = $scopeConfig;
+        $this->moduleConfig = $moduleConfig;
     }
 
     /**
@@ -40,7 +38,7 @@ class ConsentCheckbox
                 'options' => [],
             ],
             'dataScope' => 'shippingAddress.dd_consent.dd_sms_consent_checkbox',
-            'description' => $this->getSmsSignUpText($storeId),
+            'description' => $this->moduleConfig->getSmsSignUpText($storeId),
             'provider' => 'checkoutProvider',
             'visible' => true,
             'checked' => false,
@@ -48,20 +46,5 @@ class ConsentCheckbox
             'sortOrder' => 180,
             'id' => 'dd_sms_consent_checkbox',
         ];
-    }
-
-    /**
-     * Get SMS marketing consent text.
-     *
-     * @param string|int $storeId
-     * @return string
-     */
-    private function getSmsSignUpText($storeId)
-    {
-        return $this->scopeConfig->getValue(
-            ConfigInterface::XML_PATH_CONSENT_SMS_SIGNUP_TEXT,
-            ScopeInterface::SCOPE_STORES,
-            $storeId
-        );
     }
 }

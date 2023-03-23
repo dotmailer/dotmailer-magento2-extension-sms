@@ -1,0 +1,28 @@
+<?php
+/**
+ * @var $block \Magento\Framework\View\Element\Template
+ * @var $telephoneInputConfig \Dotdigitalgroup\Sms\ViewModel\TelephoneInputConfig
+ */
+
+// @codingStandardsIgnoreFile
+$telephoneInputConfig = $block->getData('telephoneInputConfig');
+?>
+
+<script type="text/x-magento-init">
+    {
+        "input[name='mobile_number']": {
+            "Dotdigitalgroup_Sms/js/internationalTelephoneInput": <?= $telephoneInputConfig->getConfig(); ?>
+        },
+
+        "#connector-newsletter-form-validate": {
+            "validation": {
+                "rules": {
+                    "mobile_number": {
+                        "validate-phone-number-with-checkbox": true
+                    }
+                },
+                "errorLabelContainer": ".mobile-number-error"
+            }
+        }
+    }
+</script>

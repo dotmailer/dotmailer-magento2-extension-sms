@@ -5,6 +5,8 @@ namespace Dotdigitalgroup\Sms\Component;
 class ConsentTelephone
 {
     /**
+     * Render.
+     *
      * @return array
      */
     public function render()

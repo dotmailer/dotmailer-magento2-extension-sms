@@ -30,4 +30,11 @@
     <type name="Magento\Checkout\Model\ShippingInformationManagement">
         <plugin name="ddg_sms_shipping__plugin" type="Dotdigitalgroup\Sms\Plugin\Checkout\ShippingInformationManagementPlugin"/>
     </type>
+    <type name="Magento\Newsletter\Controller\Manage\Index">
+        <plugin name="dd_sms_newsletter_plugin" type="Dotdigitalgroup\Sms\Plugin\Customer\Account\NewsletterManageIndexPlugin"/>
+    </type>
+    <type name="Dotdigitalgroup\Email\Controller\Customer\Newsletter">
+        <plugin name="dd_sms_newsletter_controller_plugin"
+                type="Dotdigitalgroup\Sms\Plugin\Customer\Account\NewsletterControllerPlugin"/>
+    </type>
 </config>

@@ -1,0 +1,28 @@
+<?php
+/**
+ * @var $block \Magento\Framework\View\Element\Template
+ * @var $escaper \Magento\Framework\Escaper
+ * @var $view \Dotdigitalgroup\Sms\ViewModel\Customer\Account\MarketingConsent
+ */
+
+// @codingStandardsIgnoreFile
+$view = $block->getData('config');
+?>
+
+<fieldset class="fieldset">
+    <legend class="legend"><span><?= $escaper->escapeHtml(__('SMS Marketing Subscription')) ?></span></legend>
+    <div class="field choice">
+        <input type="checkbox" name="is_sms_subscribed" id="dd_sms_consent_checkbox" value="1" title="SMS Marketing Subscription"
+            <?php if ($view->isSubscribed()): ?> checked="checked"<?php endif; ?> class="checkbox">
+        <label for="dd_sms_consent_checkbox" class="label">
+            <span><?= $escaper->escapeHtml($view->getSmsSignUpText()) ?></span>
+        </label>
+    </div>
+    <div class="field telephone">
+        <input type="text" name="mobile_number" id="dd_sms_consent_mobile_number" class="input-text" value="<?= $escaper->escapeHtml($view->getStoredMobileNumber()) ?>"/>
+        <div class="mobile-number-error"></div>
+    </div>
+    <div class="dd-sms-consent-text">
+        <span><?= $escaper->escapeHtml($view->getSmsMarketingConsentText()); ?></span>
+    </div>
+</fieldset>

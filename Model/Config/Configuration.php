@@ -176,6 +176,36 @@ class Configuration
     }
 
     /**
+     * Get SMS marketing consent text.
+     *
+     * @param string|int $storeId
+     * @return string
+     */
+    public function getSmsSignUpText($storeId)
+    {
+        return $this->scopeConfig->getValue(
+            ConfigInterface::XML_PATH_CONSENT_SMS_SIGNUP_TEXT,
+            ScopeInterface::SCOPE_STORES,
+            $storeId
+        );
+    }
+
+    /**
+     * Get SMS marketing consent text.
+     *
+     * @param string|int $storeId
+     * @return string
+     */
+    public function getSmsMarketingConsentText($storeId)
+    {
+        return $this->scopeConfig->getValue(
+            ConfigInterface::XML_PATH_CONSENT_SMS_MARKETING_TEXT,
+            ScopeInterface::SCOPE_STORES,
+            $storeId
+        );
+    }
+
+    /**
      * Switch off at store level.
      *
      * @param string|int $storeId

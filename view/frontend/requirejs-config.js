@@ -17,7 +17,7 @@ var config = {
     config: {
         mixins: {
             'mage/validation': {
-                'Dotdigitalgroup_Sms/js/telephoneValidatorAddress': true
+                'Dotdigitalgroup_Sms/js/telephoneValidatorAccount': true
             },
             'Magento_Ui/js/form/element/abstract': {
                 'Dotdigitalgroup_Sms/js/setAdditionalParams': true

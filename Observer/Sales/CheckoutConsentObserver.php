@@ -51,6 +51,11 @@ class CheckoutConsentObserver implements ObserverInterface
 
     /**
      * @param Logger $logger
+     * @param ContactFactory $contactFactory
+     * @param ContactResource $contactResource
+     * @param CollectionFactory $contactCollectionFactory
+     * @param CheckoutSession $checkoutSession
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         Logger $logger,

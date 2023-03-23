@@ -19,7 +19,7 @@ class LayoutProcessor
     private $consentCheckbox;
 
     /**
-     * ConsentTelephone
+     * @var ConsentTelephone
      */
     private $consentTelephone;
 
@@ -55,6 +55,8 @@ class LayoutProcessor
      * @param ConsentTelephone $consentTelephone
      * @param ConsentText $consentText
      * @param Configuration $moduleConfig
+     * @param Session $customerSession
+     * @param CurrentCustomerAddress $currentCustomerAddress
      * @param StoreManagerInterface $storeManager
      */
     public function __construct(
