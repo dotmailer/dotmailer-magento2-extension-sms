@@ -90,7 +90,7 @@ class TelephoneInputConfig implements ArgumentInterface
 
         return $this->serializer->serialize($config);
     }
-
+    
     /**
      * Get path for script.
      *

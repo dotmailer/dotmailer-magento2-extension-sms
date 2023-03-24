@@ -20,6 +20,7 @@
         </referenceBlock>
         <referenceContainer name="main">
             <block
+                ifconfig="transactional_sms/sms_settings/phone_number_validation"
                 template="Dotdigitalgroup_Sms::customer/account/js-marketing-consent.phtml"
                 name="dd.account.sms.marketingconsent.js">
                 <arguments>
