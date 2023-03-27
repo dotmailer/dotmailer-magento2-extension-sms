@@ -2,9 +2,7 @@
 
 namespace Dotdigitalgroup\Sms\Plugin\Block\Checkout;
 
-use Dotdigitalgroup\Sms\Component\ConsentCheckbox;
-use Dotdigitalgroup\Sms\Component\ConsentTelephone;
-use Dotdigitalgroup\Sms\Component\ConsentText;
+use Dotdigitalgroup\Sms\Component\ConsentCollapseGroup;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Magento\Checkout\Block\Checkout\LayoutProcessor as MageLayoutProcessor;
 use Magento\Customer\Helper\Session\CurrentCustomerAddress;
@@ -13,21 +11,6 @@ use Magento\Store\Model\StoreManagerInterface;
 
 class LayoutProcessor
 {
-    /**
-     * @var ConsentCheckbox
-     */
-    private $consentCheckbox;
-
-    /**
-     * @var ConsentTelephone
-     */
-    private $consentTelephone;
-
-    /**
-     * @var ConsentText
-     */
-    private $consentText;
-
     /**
      * @var Configuration
      */
@@ -49,32 +32,31 @@ class LayoutProcessor
     private $storeManager;
 
     /**
+     * @var ConsentCollapseGroup
+     */
+    private $consentCollapseGroup;
+
+    /**
      * LayoutProcessor constructor.
      *
-     * @param ConsentCheckbox $consentCheckbox
-     * @param ConsentTelephone $consentTelephone
-     * @param ConsentText $consentText
      * @param Configuration $moduleConfig
      * @param Session $customerSession
      * @param CurrentCustomerAddress $currentCustomerAddress
      * @param StoreManagerInterface $storeManager
+     * @param ConsentCollapseGroup $consentCollapseGroup
      */
     public function __construct(
-        ConsentCheckbox $consentCheckbox,
-        ConsentTelephone $consentTelephone,
-        ConsentText $consentText,
         Configuration $moduleConfig,
         Session $customerSession,
         CurrentCustomerAddress $currentCustomerAddress,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        ConsentCollapseGroup $consentCollapseGroup,
     ) {
-        $this->consentCheckbox = $consentCheckbox;
-        $this->consentTelephone = $consentTelephone;
-        $this->consentText = $consentText;
         $this->moduleConfig = $moduleConfig;
         $this->customerSession = $customerSession;
         $this->currentCustomerAddress = $currentCustomerAddress;
         $this->storeManager = $storeManager;
+        $this->consentCollapseGroup = $consentCollapseGroup;
     }
 
     /**
@@ -88,17 +70,15 @@ class LayoutProcessor
     {
         $storeId = $this->storeManager->getStore()->getId();
 
-        if (!$this->moduleConfig->isPhoneNumberValidationEnabled($storeId)) {
-            return $jsLayout;
-        }
-
         // @codingStandardsIgnoreStart
         $shippingConfiguration = &$jsLayout['components']['checkout']['children']['steps']['children']['shipping-step']['children']['shippingAddress']['children']['shipping-address-fieldset']['children'];
         $billingConfiguration = &$jsLayout['components']['checkout']['children']['steps']['children']['billing-step']['children']['payment']['children']['payments-list']['children'];
         $shippingSelection = &$jsLayout['components']['checkout']['children']['steps']['children']['shipping-step']['children']['shippingAddress']['children']['before-form']['children'];
 
         if (isset($shippingConfiguration)) {
-            $shippingConfiguration['telephone'] = $this->moduleConfig->telephoneFieldConfig("shippingAddress");
+            if ($this->moduleConfig->isPhoneNumberValidationEnabled($storeId)) {
+                $shippingConfiguration['telephone'] = $this->moduleConfig->telephoneFieldConfig("shippingAddress");
+            }
 
             if (!$this->currentCustomerHasStoredShippingAddress()) {
                 $this->appendConsentLayout($shippingConfiguration, $storeId);
@@ -106,11 +86,17 @@ class LayoutProcessor
         }
 
         if (isset($shippingSelection)) {
-            $shippingSelection['dd-telephone-resubmission-form'] = $this->moduleConfig->getResubmissionForm();
+            if ($this->moduleConfig->isPhoneNumberValidationEnabled($storeId)) {
+                $shippingSelection['dd-telephone-resubmission-form'] = $this->moduleConfig->getResubmissionForm();
+            }
 
             if ($this->currentCustomerHasStoredShippingAddress()) {
                 $this->appendConsentLayout($shippingSelection, $storeId);
             }
+        }
+
+        if (!$this->moduleConfig->isPhoneNumberValidationEnabled($storeId)) {
+            return $jsLayout;
         }
 
         /* config: checkout/options/display_billing_address_on = payment_method */
@@ -157,8 +143,6 @@ class LayoutProcessor
             return;
         }
 
-        $layoutNode['dd_sms_consent_checkbox'] = $this->consentCheckbox->render($storeId);
-        $layoutNode['dd_sms_consent_telephone'] = $this->consentTelephone->render();
-        $layoutNode['dd_sms_consent_text'] = $this->consentText->render($storeId);
+        $layoutNode['dd_sms_consent_collapse_group'] = $this->consentCollapseGroup->render();
     }
 }

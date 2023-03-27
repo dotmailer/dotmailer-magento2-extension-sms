@@ -1,6 +1,6 @@
 <?php
 
-namespace Dotdigitalgroup\Sms\Component;
+namespace Dotdigitalgroup\Sms\Component\Consent;
 
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
 

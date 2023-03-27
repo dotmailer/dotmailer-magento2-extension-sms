@@ -1,6 +1,6 @@
 <?php
 
-namespace Dotdigitalgroup\Sms\Component;
+namespace Dotdigitalgroup\Sms\Component\Consent;
 
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
 
@@ -29,13 +29,11 @@ class ConsentCheckbox
     public function render($storeId)
     {
         return [
-            'component' => 'Magento_Ui/js/form/element/abstract',
+            'component' => 'Magento_Ui/js/form/element/boolean',
             'config' => [
-                'id' => 'dd_sms_consent_checkbox',
                 'customScope' => 'shippingAddress.custom_attributes',
                 'template' => 'ui/form/field',
                 'elementTmpl' => 'ui/form/element/checkbox',
-                'options' => [],
             ],
             'dataScope' => 'shippingAddress.dd_consent.dd_sms_consent_checkbox',
             'description' => $this->moduleConfig->getSmsSignUpText($storeId),
@@ -44,7 +42,6 @@ class ConsentCheckbox
             'checked' => false,
             'validation' => [],
             'sortOrder' => 180,
-            'id' => 'dd_sms_consent_checkbox',
         ];
     }
 }

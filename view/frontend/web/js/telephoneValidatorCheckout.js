@@ -1,21 +1,17 @@
 define([
     'jquery',
     'ko',
-    'intlTelInput'
-], function ($, ko, intlTelInput) {
+    'intlTelInput',
+    'Dotdigitalgroup_Sms/js/model/telephoneValidation',
+    'Dotdigitalgroup_Sms/js/model/telephoneValidationError'
+], function ($, ko, intlTelInput, phoneValidate, phoneErrorHandler) {
     'use strict';
 
     return function (validator) {
 
-        var errorMap = [
-            'Invalid telephone number',
-            'Invalid country code',
-            'Telephone number is too short',
-            'Telephone number is too long',
-            'Invalid telephone number'
-        ];
+        var errorMap = phoneErrorHandler.getErrorMap(),
 
-        var validatorObj = {
+         validatorObj = {
             message: '',
 
             /**
@@ -36,12 +32,12 @@ define([
                     return false;
                 }
 
-                countryCodeClass = countryCodeClass.split(' ')[1];
-                countryCode = countryCodeClass.split('__')[1];
-                isValid = window.intlTelInputUtils.isValidNumber(value, countryCode);
+                isValid = phoneValidate(value, countryCodeClass);
 
                 if (!isValid) {
-                    errorCode = window.intlTelInputUtils.getValidationError(value, countryCode);
+                    countryCodeClass = countryCodeClass.split(' ')[1];
+                    countryCode = countryCodeClass.split('__')[1];
+                    errorCode = phoneErrorHandler.getErrorCode(value, countryCode);
                     this.message = typeof errorMap[errorCode] === 'undefined' ?
                         errorMap[0] :
                         errorMap[errorCode];
