@@ -18,7 +18,7 @@ define([
 
             countryCodeClass = consentForm.find('.iti__selected-flag .iti__flag').attr('class');
 
-            if (consentFormUiClass().isChecked()) {
+            if (consentFormUiClass().isChecked() && typeof countryCodeClass !== 'undefined') {
                 isValid = validate(
                     consentFormUiClass().consentPhoneInput().value(),
                     countryCodeClass
