@@ -1,7 +1,7 @@
 var config = {
     map: {
         '*': {
-            smsCounter: 'Dotdigitalgroup_Sms/js/counter/sms_counter'
+            smsCounter: 'Dotdigitalgroup_Sms/js/counter/smsCounter'
         }
     }
 };

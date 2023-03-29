@@ -12,6 +12,7 @@ define([
             let hasProvidedConsent = $('[name="dd_consent[dd_sms_consent_checkbox]"]').is(':checked'),
              consentTelephone = $('[name="dd_consent[dd_sms_consent_telephone]"]').val();
 
+            /* eslint-disable camelcase */
             payload.addressInformation.extension_attributes = _.extend(
                 payload.addressInformation.extension_attributes || {},
                 {
@@ -19,6 +20,7 @@ define([
                     dd_sms_consent_telephone: consentTelephone
                 }
             );
+            /* eslint-enable camelcase */
             return payload;
         });
     };

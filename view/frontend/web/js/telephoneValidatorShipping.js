@@ -54,8 +54,7 @@ define([
             };
 
             (async () => {
-                while (!$('#telephone-resubmission').length)
-                    {await new Promise(resolve => setTimeout(resolve, 1));}
+                while (!$('#telephone-resubmission').length) { await new Promise(resolve => setTimeout(resolve, 1)); }
                 validateQuotePhone();
             })();
         });

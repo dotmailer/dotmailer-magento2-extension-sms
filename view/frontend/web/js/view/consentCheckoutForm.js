@@ -2,9 +2,8 @@ define([
     'jquery',
     'Magento_Ui/js/form/form',
     'ko',
-    'Magento_Checkout/js/model/quote',
-    'intlTelInput'
-], function ($, Component, ko, quote, intlTelInput) {
+    'Magento_Checkout/js/model/quote'
+], function ($, Component, ko, quote) {
     'use strict';
     return Component.extend({
 
@@ -25,35 +24,34 @@ define([
          */
         onReady: function (element, UiClass) {
 
-            const parent_component = ko.contextFor(element).$parent,
-                parent_telephone_input = parent_component?.getChild('telephone'),
-                consent_telephone_input = UiClass
+            const parentComponent = ko.contextFor(element).$parent,
+                parentTelephoneInput = parentComponent?.getChild('telephone'),
+                consentTelephoneInput = UiClass
                     .regions['consent-checkout-form-fields']()[0]
                     .getChild('dd_sms_consent_telephone'),
-                consent_checkbox = UiClass
+                consentCheckbox = UiClass
                     .regions['consent-checkout-form-fields-checkbox']()[0]
                     .getChild('dd_sms_consent_checkbox');
 
-            this.isChecked(consent_checkbox.value());
-            this.consentPhoneInput(consent_telephone_input);
+            this.isChecked(consentCheckbox.value());
+            this.consentPhoneInput(consentTelephoneInput);
 
             document.addEventListener('numberIsValid', (validationEvent) => {
-                if (!consent_telephone_input.value())
-                {
+                if (!consentTelephoneInput.value()) {
                     this.isValid(true);
-                    this.updateTelephoneField(consent_telephone_input,validationEvent.detail.value);
+                    this.updateTelephoneField(consentTelephoneInput, validationEvent.detail.value);
                 }
             });
 
-            consent_checkbox.value.subscribe((value) => this.isChecked(value));
+            consentCheckbox.value.subscribe((value) => this.isChecked(value));
 
-            if(parent_telephone_input) {
-                parent_telephone_input.value.subscribe((value) => {
+            if (parentTelephoneInput) {
+                parentTelephoneInput.value.subscribe((value) => {
                     const newValueValid = window.intlTelInputUtils.isValidNumber(value);
-                    if (!consent_telephone_input.value() && newValueValid)
-                    {
+
+                    if (!consentTelephoneInput.value() && newValueValid) {
                         this.isValid(newValueValid);
-                        this.updateTelephoneField(consent_telephone_input,value);
+                        this.updateTelephoneField(consentTelephoneInput, value);
                         return true;
                     }
                 });
@@ -61,23 +59,23 @@ define([
 
             quote.shippingAddress.subscribe((address) => {
                 const newValueValid = window.intlTelInputUtils.isValidNumber(address.telephone, address.countryId),
-                 oldValueValid = window.intlTelInputUtils.isValidNumber(consent_telephone_input.value());
+                 oldValueValid = window.intlTelInputUtils.isValidNumber(consentTelephoneInput.value());
 
                 this.isValid(newValueValid);
                 if (
                     newValueValid
                     && !this.isChecked()
                 ) {
-                    this.updateTelephoneField(consent_telephone_input,address.telephone);
+                    this.updateTelephoneField(consentTelephoneInput, address.telephone);
                     return true;
                 }
 
                 if (
                     newValueValid
                     && this.isChecked()
-                    && !consent_telephone_input.value()
+                    && !consentTelephoneInput.value()
                 ) {
-                    this.updateTelephoneField(consent_telephone_input,address.telephone);
+                    this.updateTelephoneField(consentTelephoneInput, address.telephone);
                     return true;
                 }
 
@@ -85,24 +83,24 @@ define([
                     oldValueValid
                     && !newValueValid
                 ) {
-                    this.updateTelephoneField(consent_telephone_input,consent_telephone_input.value());
+                    this.updateTelephoneField(consentTelephoneInput, consentTelephoneInput.value());
                     return true;
                 }
 
                 if (
                     !newValueValid
                 ) {
-                    this.updateTelephoneField(consent_telephone_input,consent_telephone_input.value());
+                    this.updateTelephoneField(consentTelephoneInput, consentTelephoneInput.value());
                     return true;
                 }
 
             });
 
             this.isChecked.subscribe((checked) => {
-                if (checked && !consent_telephone_input.value()) {
+                if (checked && !consentTelephoneInput.value()) {
                     this.updateTelephoneField(
-                        consent_telephone_input,
-                        parent_telephone_input?.value() ?? quote.shippingAddress().telephone
+                        consentTelephoneInput,
+                        parentTelephoneInput?.value() ?? quote.shippingAddress().telephone
                     );
                 }
             });
@@ -118,12 +116,14 @@ define([
          */
         updateTelephoneField: function (UiClass, value, triggerDOM = true) {
             setTimeout(() => {
-                const element = $('#' + UiClass.uid)
+                const element = $('#' + UiClass.uid);
+
                 if (element[0] && value) {
                     UiClass.value(value);
                     Object
                         .entries(window.intlTelInputGlobals.instances)
-                        .find(([key, value]) => value.telInput.id === element[0].id)
+                        // eslint-disable-next-line no-unused-vars
+                        .find(([key, intlElement]) => intlElement.telInput.id === element[0].id)
                         ?.pop()
                         ?.setNumber(`${value}`);
                 }
@@ -134,7 +134,7 @@ define([
                         'change'
                     );
                 }
-            },1);
+            }, 1);
         },
 
         /**

@@ -3,8 +3,9 @@ define([
     'intlTelInput',
     'jquery/validate',
     'Dotdigitalgroup_Sms/js/model/telephoneValidation',
-    'Dotdigitalgroup_Sms/js/model/telephoneValidationError'
-], function ($, intlTelInput, jqueryValidate, phoneValidate, phoneErrorHandler) {
+    'Dotdigitalgroup_Sms/js/model/telephoneValidationError',
+    'intlTelInputUtils'
+], function ($, intlTelInput, jqueryValidate, phoneValidate, phoneErrorHandler, intlTelInputUtils) {
     'use strict';
 
     var errorMap = phoneErrorHandler.getErrorMap(),
@@ -62,6 +63,7 @@ define([
                 if (!isValid) {
                     errorCode = window.intlTelInputUtils.getValidationError(value, countryCode);
 
+                    // eslint-disable-next-line max-len
                     $.validator.messages['validate-phone-number-with-checkbox'] = typeof errorMap[errorCode] === 'undefined' ?
                         errorMap[0] :
                         errorMap[errorCode];
