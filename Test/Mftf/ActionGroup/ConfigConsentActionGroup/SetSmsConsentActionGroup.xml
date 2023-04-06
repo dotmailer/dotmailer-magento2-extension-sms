@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="SetSmsConsentOptions">
+        <arguments>
+            <argument name="enabled" defaultValue="Yes" type="string"/>
+        </arguments>
+        <amOnPage url="{{AdminSmsConsentPage.url}}" stepKey="amOnDotdigitalConsentPage"/>
+        <waitForPageLoad stepKey="waitForPageLoad5"/>
+        <conditionalClick stepKey="expandConsentTab" selector="{{AdminSmsConsentSection.consentFieldsetToggle}}" dependentSelector="{{AdminSmsConsentSection.consentFieldset}}" visible="false"/>
+        <selectOption selector="{{AdminSmsConsentSection.consentEnabled}}" userInput="{{enabled}}" stepKey="setSmsConsentEnabled"/>
+        <fillField selector="{{AdminSmsConsentSection.signUpText}}" userInput="Test signup text" stepKey="setSignupText"/>
+        <fillField selector="{{AdminSmsConsentSection.marketingConsentText}}" userInput="Test SMS consent text" stepKey="setConsentText"/>
+        <click selector="{{AdminMainActionsSection.save}}" stepKey="saveConfig2"/>
+        <waitForPageLoad stepKey="waitForPageLoad6"/>
+    </actionGroup>
+</actionGroups>

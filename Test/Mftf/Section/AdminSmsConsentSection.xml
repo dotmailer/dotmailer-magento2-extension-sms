@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="AdminSmsConsentSection">
+        <element name="consentFieldsetToggle" type="button" selector="#connector_consent_sms-head"/>
+        <element name="consentFieldset" type="button" selector="#connector_consent_sms"/>
+        <element name="consentEnabled" type="select" selector="#connector_consent_sms_enabled"/>
+        <element name="signUpText" type="textarea" selector="#connector_consent_sms_signup_text" />
+        <element name="marketingConsentText" type="textarea" selector="#connector_consent_sms_marketing_consent_text" />
+    </section>
+</sections>

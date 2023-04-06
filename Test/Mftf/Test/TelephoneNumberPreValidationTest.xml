@@ -28,7 +28,7 @@
 
             <actionGroup ref="SetDotmailerAccountData" stepKey="SetDotmailerAccountData"/>
             <actionGroup ref="EnableSms" stepKey="EnableSmsOptions" />
-            <actionGroup ref="EnablePhoneNumberValidation" stepKey="EnablePhoneNumberValidationOptions" />
+            <actionGroup ref="SetPhoneNumberValidation" stepKey="EnablePhoneNumberValidationOptions" />
         </before>
 
         <after>

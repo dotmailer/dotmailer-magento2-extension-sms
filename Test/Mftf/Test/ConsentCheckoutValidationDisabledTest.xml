@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="ConsentCheckoutValidationDisabledTest">
+        <annotations>
+            <features value="Dotdigital module"/>
+            <stories value="Dotdigital SMS"/>
+            <title value="Consent checkout validation"/>
+            <description value="Confirm that consent fieldset appears at the shipping stage of checkout, and that submitted mobile numbers are validated."/>
+            <severity value="BLOCKER"/>
+            <group value="dotdigitalSms"/>
+        </annotations>
+
+        <before>
+            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup1"/>
+            <!-- Create customer with valid UK address and telephone -->
+            <comment userInput="Create simple customer" stepKey="createSimpleCustomerComment"/>
+            <createData entity="UK_Customer_DD" stepKey="createCustomer"/>
+
+            <!-- Create the category -->
+            <comment userInput="Create the category" stepKey="createCategoryComment"/>
+            <createData entity="ApiCategory" stepKey="createCategory"/>
+
+            <!-- Create Simple Product -->
+            <comment userInput="Create Simple Product" stepKey="createSimpleProductComment"/>
+            <createData entity="SimpleProductPrice10Qty1" stepKey="simpleProduct">
+                <requiredEntity createDataKey="createCategory"/>
+            </createData>
+
+            <actionGroup ref="SetDotmailerAccountData" stepKey="SetDotmailerAccountData"/>
+            <actionGroup ref="SetPhoneNumberValidation" stepKey="EnablePhoneNumberValidation">
+                <argument name="enabled" value="No"/>
+            </actionGroup>
+            <actionGroup ref="SetSmsConsentOptions" stepKey="SetSmsConsentOptions" />
+        </before>
+
+        <after>
+            <deleteData createDataKey="createCustomer" stepKey="deleteCustomer"/>
+            <deleteData createDataKey="simpleProduct" stepKey="deleteSimpleProduct"/>
+            <deleteData createDataKey="createCategory" stepKey="deleteCategory"/>
+
+            <actionGroup ref="SetPhoneNumberValidation" stepKey="DisablePhoneNumberValidation">
+                <argument name="enabled" value="No"/>
+            </actionGroup>
+            <actionGroup ref="SetSmsConsentOptions" stepKey="DisableSmsConsent">
+                <argument name="enabled" value="No"/>
+            </actionGroup>
+
+            <actionGroup ref="ResetDotmailerAccountData" stepKey="resetAccountData"/>
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="logout"/>
+        </after>
+
+        <!-- Go to Checkout Shipping Page for Customer -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginAsStoreFront">
+            <argument name="Customer" value="$$createCustomer$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontOpenProductEntityPageActionGroup" stepKey="openProductPageOnStorefront">
+            <argument name="product" value="$$simpleProduct$$"/>
+        </actionGroup>
+        <actionGroup ref="StorefrontAddToTheCartActionGroup" stepKey="addProductToCart"/>
+        <actionGroup ref="StorefrontOpenCheckoutPageActionGroup" stepKey="goToCheckoutPage"/>
+
+        <waitForPageLoad stepKey="waitForUpdate"/>
+
+        <!-- See consent fieldset -->
+        <seeElement selector="{{CheckoutConsentFormSection.consentForm}}" stepKey="seeConsentForm"/>
+        <seeElement selector="{{CheckoutConsentFormSection.consentCheckbox}}" stepKey="seeConsentCheckbox"/>
+        <dontSeeElement selector="{{CheckoutConsentFormSection.consentMobileNumber}}" stepKey="dontSeeConsentMobileNumber"/>
+
+        <!-- Opt in to SMS marketing -->
+        <checkOption selector="{{CheckoutConsentFormSection.consentCheckbox}}" stepKey="checkSmsConsentCheckbox1"/>
+
+        <!-- Mobile number is revealed -->
+        <waitForElement selector="{{CheckoutConsentFormSection.consentMobileNumber}}" stepKey="waitForConsentMobileNumber1"/>
+        <seeElement selector="{{CheckoutConsentFormSection.consentMobileNumber}}" stepKey="seeConsentMobileNumber"/>
+
+        <!-- Mobile number is auto-populated -->
+        <seeInField userInput="{{UK_Address_DD.telephone}}" selector="{{CheckoutConsentFormSection.consentMobileNumber}}" stepKey="seeAutoPopulatedMobileNumber"/>
+
+        <!-- Go to *Next* -->
+        <scrollTo selector="{{CheckoutShippingMethodsSection.next}}" stepKey="scrollToButtonNext1"/>
+        <actionGroup ref="StorefrontCheckoutClickNextButtonActionGroup" stepKey="goNext1"/>
+
+        <!-- Successfully proceed first time -->
+        <waitForElement selector="{{CheckoutPaymentSection.paymentSectionTitle}}" stepKey="waitForPaymentSectionLoaded1"/>
+        <seeInCurrentUrl url="#payment" stepKey="assertCheckoutPaymentUrl1"/>
+
+        <!-- Go back to Shipping -->
+        <click selector="{{CheckoutShippingSection.shippingTab}}" stepKey="returnToShippingPage"/>
+        <waitForElement selector="{{CheckoutShippingSection.isShippingStep}}" stepKey="waitForShippingStepIsOpened"/>
+        <seeInCurrentUrl url="#shipping" stepKey="seeCurrentUrl1"/>
+
+        <!-- Test no validation happens -->
+        <checkOption selector="{{CheckoutConsentFormSection.consentCheckbox}}" stepKey="checkSmsConsentCheckbox2"/>
+        <waitForElement selector="{{CheckoutConsentFormSection.consentMobileNumber}}" stepKey="waitForConsentMobileNumber2"/>
+
+        <clearField selector="{{CheckoutConsentFormSection.consentMobileNumber}}" stepKey="setEmptyConsentMobileNumber"/>
+
+        <!-- Proceeding should NOT be blocked by errors -->
+        <scrollTo selector="{{CheckoutShippingMethodsSection.next}}" stepKey="scrollToButtonNext2"/>
+        <actionGroup ref="StorefrontCheckoutClickNextButtonActionGroup" stepKey="goNext2"/>
+
+        <waitForElement selector="{{CheckoutPaymentSection.paymentSectionTitle}}" stepKey="waitForPaymentSectionLoaded2"/>
+        <seeInCurrentUrl url="#payment" stepKey="assertCheckoutPaymentUrl2"/>
+
+        <!-- Go back to Shipping -->
+        <click selector="{{CheckoutShippingSection.shippingTab}}" stepKey="returnToShippingPage2"/>
+        <waitForElement selector="{{CheckoutShippingSection.isShippingStep}}" stepKey="waitForShippingStepIsOpened2"/>
+        <seeInCurrentUrl url="#shipping" stepKey="seeCurrentUrl2"/>
+
+        <!-- Always proceed if checkbox is not checked -->
+        <uncheckOption selector="{{CheckoutConsentFormSection.consentCheckbox}}" stepKey="uncheckSmsConsentCheckbox"/>
+        <actionGroup ref="StorefrontCheckoutClickNextButtonActionGroup" stepKey="goNext3"/>
+        <waitForElement selector="{{CheckoutPaymentSection.paymentSectionTitle}}" stepKey="waitForPaymentSectionLoaded3"/>
+        <seeInCurrentUrl url="#payment" stepKey="assertCheckoutPaymentUrl3"/>
+
+    </test>
+</tests>
