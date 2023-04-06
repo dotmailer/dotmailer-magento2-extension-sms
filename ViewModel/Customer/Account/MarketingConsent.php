@@ -109,4 +109,16 @@ class MarketingConsent implements ArgumentInterface
         $contact = $this->containerViewModel->getContactFromTable();
         return $contact ? $contact->getMobileNumber() : '';
     }
+
+    /**
+     * Is validation enabled.
+     *
+     * @return string
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function isPhoneNumberValidationEnabled()
+    {
+        $storeId = $this->storeManager->getStore()->getId();
+        return $this->moduleConfig->isPhoneNumberValidationEnabled($storeId) ? 'true' : 'false';
+    }
 }

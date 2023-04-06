@@ -1,4 +1,4 @@
-<?php
+    <?php
 /**
  * @var $block \Magento\Framework\View\Element\Template
  * @var $escaper \Magento\Framework\Escaper
@@ -10,7 +10,9 @@ $view = $block->getData('config');
 ?>
 
 <fieldset class="fieldset">
-    <legend class="legend"><span><?= $escaper->escapeHtml(__('SMS Marketing Subscription')) ?></span></legend>
+    <?php if ($block->getData('printLegend')): ?>
+        <legend class="legend"><span><?= $escaper->escapeHtml(__('SMS Marketing Subscription')) ?></span></legend>
+    <?php endif; ?>
     <div class="field choice">
         <input type="checkbox" name="is_sms_subscribed" id="dd_sms_consent_checkbox" value="1" title="SMS Marketing Subscription"
             <?php if ($view->isSubscribed()): ?> checked="checked"<?php endif; ?> class="checkbox">
@@ -19,10 +21,16 @@ $view = $block->getData('config');
         </label>
     </div>
     <div class="field telephone">
-        <input type="text" name="mobile_number" id="dd_sms_consent_mobile_number" class="input-text" value="<?= $escaper->escapeHtml($view->getStoredMobileNumber()) ?>"/>
+        <input type="text"
+               name="mobile_number"
+               id="dd_sms_consent_mobile_number"
+               class="input-text"
+               value="<?= $escaper->escapeHtml($view->getStoredMobileNumber()) ?>"
+               data-validate='{"validate-phone-number-with-checkbox": <?= $view->isPhoneNumberValidationEnabled(); ?>}'
+        />
         <div class="mobile-number-error"></div>
     </div>
-    <div class="dd-sms-consent-text">
-        <span><?= $escaper->escapeHtml($view->getSmsMarketingConsentText()); ?></span>
+    <div id="dd_sms_consent_text" class="dd-sms-consent-text">
+        <p><span><?= $escaper->escapeHtml($view->getSmsMarketingConsentText()); ?></span><p>
     </div>
 </fieldset>

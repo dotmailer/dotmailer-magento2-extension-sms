@@ -11,17 +11,18 @@
             <block
                 ifconfig="connector_consent/sms/enabled"
                 name="dd.account.sms.marketingconsent"
-                template="Dotdigitalgroup_Sms::customer/account/marketing-consent.phtml"
+                template="Dotdigitalgroup_Sms::customer/marketing-consent.phtml"
                 after="dd.account.subscriptions.newsletter">
                 <arguments>
                     <argument name="config" xsi:type="object">Dotdigitalgroup\Sms\ViewModel\Customer\Account\MarketingConsent</argument>
+                    <argument name="printLegend" xsi:type="boolean">true</argument>
                 </arguments>
             </block>
         </referenceBlock>
         <referenceContainer name="main">
             <block
                 ifconfig="transactional_sms/sms_settings/phone_number_validation"
-                template="Dotdigitalgroup_Sms::customer/account/js-marketing-consent.phtml"
+                template="Dotdigitalgroup_Sms::customer/js-marketing-consent.phtml"
                 name="dd.account.sms.marketingconsent.js">
                 <arguments>
                     <argument name="telephoneInputConfig" xsi:type="object">Dotdigitalgroup\Sms\ViewModel\TelephoneInputConfig</argument>

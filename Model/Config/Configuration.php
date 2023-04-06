@@ -93,7 +93,7 @@ class Configuration
      */
     public function isPhoneNumberValidationEnabled($storeId)
     {
-        return $this->scopeConfig->getValue(
+        return $this->scopeConfig->isSetFlag(
             ConfigInterface::XML_PATH_SMS_PHONE_NUMBER_VALIDATION,
             ScopeInterface::SCOPE_STORES,
             $storeId

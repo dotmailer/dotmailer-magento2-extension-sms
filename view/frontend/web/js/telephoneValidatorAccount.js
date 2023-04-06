@@ -1,11 +1,9 @@
 define([
     'jquery',
-    'intlTelInput',
     'jquery/validate',
     'Dotdigitalgroup_Sms/js/model/telephoneValidation',
-    'Dotdigitalgroup_Sms/js/model/telephoneValidationError',
-    'intlTelInputUtils'
-], function ($, intlTelInput, jqueryValidate, phoneValidate, phoneErrorHandler, intlTelInputUtils) {
+    'Dotdigitalgroup_Sms/js/model/telephoneValidationError'
+], function ($, jqueryValidate, phoneValidate, phoneErrorHandler) {
     'use strict';
 
     var errorMap = phoneErrorHandler.getErrorMap(),
@@ -58,7 +56,7 @@ define([
                 }
 
                 countryCode = countryCodeClass.split('__')[1];
-                isValid = intlTelInputUtils.isValidNumber(value, countryCode);
+                isValid = window.intlTelInputUtils.isValidNumber(value, countryCode);
 
                 if (!isValid) {
                     errorCode = window.intlTelInputUtils.getValidationError(value, countryCode);
