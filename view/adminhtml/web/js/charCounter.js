@@ -7,49 +7,14 @@ require([
     let selectors = [],
      unicodeMessageSelector = '#ddg-unicode';
 
-    $(document).ready(function () {
-
-        $('.ddg-note').each(function (i, obj) {
-            selectors.push('#' + obj.firstElementChild.id.replace('_counter', ''));
-        });
-
-        // eslint-disable-next-line no-use-before-define
-        searchForUnicode();
-
-        selectors.forEach(function (entry) {
-            let counterSelector = entry + '_counter',
-             commentSelector = entry + '_comment',
-             totalSelector = entry + '_total';
-
-            if ($(entry).val() !== undefined) {
-                // eslint-disable-next-line no-use-before-define
-                updateNote(counterSelector, commentSelector, totalSelector, $(entry).val());
-            }
-        });
-    });
-
-    // eslint-disable-next-line no-use-before-define
-    $(document).on('keyup', selectors.join(', '), delay(function () {
-        let counterSelector = '#' + this.id + '_counter',
-         commentSelector = '#' + this.id + '_comment',
-         totalSelector = '#' + this.id + '_total';
-
-        if (this.value !== undefined) {
-            // eslint-disable-next-line no-use-before-define
-            updateNote(counterSelector, commentSelector, totalSelector, this.value);
-            // eslint-disable-next-line no-use-before-define
-            updateUnicode(this.value);
-        }
-    }, 500));
-
     /**
-     *
      * @param {String} counterSelector
      * @param {String} commentSelector
      * @param {String} totalSelector
      * @param {String} smsText
      */
     function updateNote(counterSelector, commentSelector, totalSelector, smsText) {
+        // eslint-disable-next-line no-undef
         let smsParsed = SmsCounter.count(smsText);
 
         $(counterSelector).text(smsParsed.length);
@@ -63,27 +28,14 @@ require([
     }
 
     /**
-     * @param {String} smsText
-     */
-    function updateUnicode(smsText) {
-        let smsParsed = SmsCounter.count(smsText);
-
-        if (smsParsed.encoding === 'UTF16') {
-            $(unicodeMessageSelector).show();
-        } else {
-            // eslint-disable-next-line no-use-before-define
-            searchForUnicode();
-        }
-    }
-
-    /**
-     *
+     * Search for unicode in all selectors
      */
     function searchForUnicode() {
         let unicodeFound = false;
 
         selectors.forEach(function (entry) {
             if ($(entry).val() !== undefined) {
+                // eslint-disable-next-line no-undef
                 let smsParsed = SmsCounter.count($(entry).val());
 
                 if (smsParsed.encoding === 'UTF16') {
@@ -99,8 +51,22 @@ require([
     }
 
     /**
+     * @param {String} smsText
+     */
+    function updateUnicode(smsText) {
+        // eslint-disable-next-line no-undef
+        let smsParsed = SmsCounter.count(smsText);
+
+        if (smsParsed.encoding === 'UTF16') {
+            $(unicodeMessageSelector).show();
+        } else {
+            searchForUnicode();
+        }
+    }
+
+    /**
      * @param {Object} callback
-     * @param {Integer} ms
+     * @param {Number} ms
      */
     function delay(callback, ms) {
         let timer = 0;
@@ -116,5 +82,38 @@ require([
             }, ms || 0);
         };
     }
+
+    $(document).ready(function () {
+        $('.ddg-note').each(function (i, obj) {
+            selectors.push('#' + obj.firstElementChild.id.replace('_counter', ''));
+        });
+
+        searchForUnicode();
+
+        selectors.forEach(function (entry) {
+            let counterSelector = entry + '_counter',
+             commentSelector = entry + '_comment',
+             totalSelector = entry + '_total';
+
+            if ($(entry).val() !== undefined) {
+                updateNote(counterSelector, commentSelector, totalSelector, $(entry).val());
+            }
+        });
+    });
+
+    // eslint-disable-next-line no-use-before-define
+    $(document).on('keyup', selectors.join(', '), delay(function (event) {
+        const message = $(event.target).val();
+        let counterSelector = '#' + event.target.id + '_counter',
+         commentSelector = '#' + event.target.id + '_comment',
+         totalSelector = '#' + event.target.id + '_total';
+
+        if (message !== undefined) {
+            // eslint-disable-next-line no-use-before-define
+            updateNote(counterSelector, commentSelector, totalSelector, message);
+            // eslint-disable-next-line no-use-before-define
+            updateUnicode(message);
+        }
+    }, 500));
 });
 
