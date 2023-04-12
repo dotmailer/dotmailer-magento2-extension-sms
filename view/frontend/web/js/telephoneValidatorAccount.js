@@ -1,8 +1,8 @@
 define([
     'jquery',
     'jquery/validate',
-    'Dotdigitalgroup_Sms/js/model/telephoneValidation',
-    'Dotdigitalgroup_Sms/js/model/telephoneValidationError'
+    'ddTelephoneValidation',
+    'ddTelephoneValidationError'
 ], function ($, jqueryValidate, phoneValidate, phoneErrorHandler) {
     'use strict';
 

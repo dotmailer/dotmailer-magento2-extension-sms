@@ -40,7 +40,7 @@ class ConsentCollapseGroup
         ConsentCheckbox $consentCheckbox,
         ConsentTelephone $consentTelephone,
         ConsentText $consentText,
-        StoreManagerInterface $storeManager,
+        StoreManagerInterface $storeManager
     ) {
         $this->consentCheckbox = $consentCheckbox;
         $this->consentTelephone = $consentTelephone;

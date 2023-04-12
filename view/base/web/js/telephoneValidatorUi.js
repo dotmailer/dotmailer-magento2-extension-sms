@@ -50,7 +50,7 @@ define([
         };
 
         validator.addRule(
-            'validate-phone-number',
+            'validate-phone-number-with-checkbox',
             validatorObj.validate,
             $.mage.__(validatorObj.message)
         );

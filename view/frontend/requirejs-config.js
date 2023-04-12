@@ -1,4 +1,11 @@
 var config = {
+    map: {
+        'Dotdigitalgroup_Sms': {
+            ddTelephoneValidation: 'Dotdigitalgroup_Sms/js/model/telephoneValidation',
+            ddTelephoneValidationError: 'Dotdigitalgroup_Sms/js/model/telephoneValidationError'
+        }
+    },
+
     paths: {
         'intlTelInput': 'Dotdigitalgroup_Sms/js/intlTelInput',
         'intlTelInputUtils': 'Dotdigitalgroup_Sms/js/utils',
