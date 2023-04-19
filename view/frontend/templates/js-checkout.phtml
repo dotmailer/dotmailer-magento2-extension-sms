@@ -8,8 +8,9 @@ $view = $block->getData('config');
 ?>
 <script type="application/javascript">
     require([
-        'jquery'
-    ], function ($) {
+        'jquery',
+        'Dotdigitalgroup_Sms/js/intlTelInput'
+    ], function ($, intlTelInput) {
         ddgTelephoneRenderComplete = function(node) {
             let telephoneInput = $(node)[0],
                 iti = window.intlTelInput(telephoneInput, <?= $view->getConfig(); ?>);

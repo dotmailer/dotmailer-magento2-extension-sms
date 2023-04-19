@@ -47,6 +47,9 @@ define([
 
             if (parentTelephoneInput) {
                 parentTelephoneInput.value.subscribe((value) => {
+                    if (typeof window.intlTelInputUtils === 'undefined') {
+                        return true;
+                    }
                     const newValueValid = window.intlTelInputUtils.isValidNumber(value);
 
                     if (!consentTelephoneInput.value() && newValueValid) {
@@ -58,6 +61,11 @@ define([
             }
 
             quote.shippingAddress.subscribe((address) => {
+
+                if (typeof window.intlTelInputUtils === 'undefined') {
+                    return true;
+                }
+
                 const newValueValid = window.intlTelInputUtils.isValidNumber(address.telephone, address.countryId),
                  oldValueValid = window.intlTelInputUtils.isValidNumber(consentTelephoneInput.value());
 
@@ -118,7 +126,7 @@ define([
             setTimeout(() => {
                 const element = $('#' + UiClass.uid);
 
-                if (element[0] && value) {
+                if (element[0] && value && typeof window.intlTelInputGlobals !== 'undefined') {
                     UiClass.value(value);
                     Object
                         .entries(window.intlTelInputGlobals.instances)
