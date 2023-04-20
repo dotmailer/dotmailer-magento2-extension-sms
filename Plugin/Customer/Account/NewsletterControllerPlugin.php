@@ -158,7 +158,7 @@ class NewsletterControllerPlugin
                     ->setStoreId($storeId);
             }
 
-            $contactModel->setSmsImported(Contact::EMAIL_CONTACT_NOT_IMPORTED);
+            $contactModel->setSmsSubscriberImported(Contact::EMAIL_CONTACT_NOT_IMPORTED);
             $this->contactResource->save($contactModel);
         } catch (LocalizedException|\Exception $e) {
             $this->logger->debug('Error when updating email_contact table', [(string) $e]);

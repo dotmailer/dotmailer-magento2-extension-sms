@@ -9,4 +9,7 @@
     <type name="Dotdigitalgroup\Email\Model\Connector\Module">
         <plugin name="module_plugin_sms" type="Dotdigitalgroup\Sms\Plugin\ModulePlugin" sortOrder="4"/>
     </type>
+    <type name="Magento\Customer\Controller\Adminhtml\Index\Save">
+        <plugin name="dd_sms_admin_customer_save" type="Dotdigitalgroup\Sms\Plugin\Customer\Controller\Adminhtml\Index\Save" sortOrder="1"/>
+    </type>
 </config>

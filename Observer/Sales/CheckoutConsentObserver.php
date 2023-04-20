@@ -110,7 +110,7 @@ class CheckoutConsentObserver implements ObserverInterface
                     ->setStoreId($order->getStoreId());
             }
 
-            $contactModel->setSmsImported(Contact::EMAIL_CONTACT_NOT_IMPORTED);
+            $contactModel->setSmsSubscriberImported(Contact::EMAIL_CONTACT_NOT_IMPORTED);
             $this->contactResource->save($contactModel);
         } catch (LocalizedException|\Exception $e) {
             $this->logger->debug((string) $e);

@@ -24,21 +24,6 @@ class Dotdigital extends Generic implements TabInterface
     private $contactCollectionFactory;
 
     /**
-     * @var ConsentCheckbox
-     */
-    private $consentCheckbox;
-
-    /**
-     * @var ConsentTelephone
-     */
-    private $consentTelephone;
-
-    /**
-     * @var Configuration
-     */
-    private $moduleConfig;
-
-    /**
      * @var \Magento\Store\Model\System\Store
      */
     protected $_systemStore;
@@ -49,20 +34,11 @@ class Dotdigital extends Generic implements TabInterface
     protected $_coreRegistry;
 
     /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
      * @param Context $context
      * @param Registry $registry
      * @param FormFactory $formFactory
      * @param Store $systemStore
      * @param ContactCollectionFactory $contactCollectionFactory
-     * @param ConsentCheckbox $consentCheckbox
-     * @param ConsentTelephone $consentTelephone
-     * @param Configuration $moduleConfig
-     * @param StoreManagerInterface $storeManager
      * @param array $data
      */
     public function __construct(
@@ -71,19 +47,11 @@ class Dotdigital extends Generic implements TabInterface
         \Magento\Framework\Data\FormFactory $formFactory,
         \Magento\Store\Model\System\Store $systemStore,
         ContactCollectionFactory $contactCollectionFactory,
-        ConsentCheckbox $consentCheckbox,
-        ConsentTelephone $consentTelephone,
-        Configuration $moduleConfig,
-        StoreManagerInterface $storeManager,
         array $data = []
     ) {
         $this->_coreRegistry = $registry;
         $this->_systemStore = $systemStore;
         $this->contactCollectionFactory = $contactCollectionFactory;
-        $this->consentCheckbox = $consentCheckbox;
-        $this->consentTelephone = $consentTelephone;
-        $this->moduleConfig = $moduleConfig;
-        $this->storeManager = $storeManager;
         parent::__construct($context, $registry, $formFactory, $data);
     }
 
@@ -188,6 +156,7 @@ class Dotdigital extends Generic implements TabInterface
         $smsSubscriberData = $this->retrieveSmsSubscriberData();
 
         $form = $this->_formFactory->create();
+        $form->setHtmlIdPrefix('dd_sms');
         $fieldset = $form->addFieldset(
             'base_fieldset',
             ['legend' => __('SMS Marketing Subscription')]
@@ -200,12 +169,13 @@ class Dotdigital extends Generic implements TabInterface
                 'label' => __('Subscribed to SMS marketing'),
                 'data-form-part' => $this->getData('target_form'),
                 'value' => $smsSubscriberData['is_subscribed'],
-                'onchange' => 'this.value = this.checked;'
+                'onchange' => 'this.value = this.checked;',
+                'name' => 'is_subscribed'
             ]
         );
         $checkbox->setIsChecked($smsSubscriberData['is_subscribed']);
 
-        $mobileNumber = $fieldset->addField(
+        $fieldset->addField(
             'dd_sms_consent_mobile_number',
             'text',
             [
@@ -231,6 +201,8 @@ class Dotdigital extends Generic implements TabInterface
     }
 
     /**
+     * To HTML method
+     *
      * @return string
      */
     protected function _toHtml()
@@ -244,21 +216,6 @@ class Dotdigital extends Generic implements TabInterface
     }
 
     /**
-     * Prepare the layout.
-     *
-     * @return $this
-     */
-    public function getFormHtml()
-    {
-        $html = parent::getFormHtml();
-        // You can call other Block also by using this function if you want to add phtml file. Otherwise, you can remove it.
-//        $html .= $this->getLayout()->createBlock(
-//            'Dotdigitalgroup_Sms\CustomerEdit\Block\Adminhtml\Customer\Edit\Tab\AdditionalBlock'
-//        )->toHtml();
-        return $html;
-    }
-
-    /**
      * Retrieve SMS subscriber data
      *
      * @return array
@@ -266,11 +223,9 @@ class Dotdigital extends Generic implements TabInterface
      */
     private function retrieveSmsSubscriberData()
     {
-        $websiteId = $this->storeManager->getWebsite()->getId();
         $contact = $this->contactCollectionFactory->create()
-            ->loadByCustomerIdAndWebsiteId(
+            ->loadByCustomerId(
                 $this->getCustomerId(),
-                $websiteId
             );
 
         return [
