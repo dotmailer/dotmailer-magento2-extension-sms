@@ -21,11 +21,11 @@
         </referenceBlock>
         <referenceContainer name="main">
             <block
-                ifconfig="transactional_sms/sms_settings/phone_number_validation"
                 template="Dotdigitalgroup_Sms::customer/js-marketing-consent.phtml"
                 name="dd.account.sms.marketingconsent.js">
                 <arguments>
                     <argument name="telephoneInputConfig" xsi:type="object">Dotdigitalgroup\Sms\ViewModel\TelephoneInputConfig</argument>
+                    <argument name="consentConfig" xsi:type="object">Dotdigitalgroup\Sms\ViewModel\Customer\Account\MarketingConsent</argument>
                 </arguments>
             </block>
         </referenceContainer>

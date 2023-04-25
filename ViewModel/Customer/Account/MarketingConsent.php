@@ -121,4 +121,15 @@ class MarketingConsent implements ArgumentInterface
         $storeId = $this->storeManager->getStore()->getId();
         return $this->moduleConfig->isPhoneNumberValidationEnabled($storeId) ? 'true' : 'false';
     }
+
+    /**
+     * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function shouldValidatePhoneNumberWithCheckbox()
+    {
+        $storeId = $this->storeManager->getStore()->getId();
+        return $this->moduleConfig->isSmsConsentEnabled($storeId) &&
+            $this->moduleConfig->isPhoneNumberValidationEnabled($storeId);
+    }
 }

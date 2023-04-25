@@ -14,14 +14,15 @@
         </referenceContainer>
         <referenceContainer name="content">
             <block
-                ifconfig="transactional_sms/sms_settings/phone_number_validation"
                 template="Dotdigitalgroup_Sms::customer/js-marketing-consent.phtml"
                 name="dd.account.create.sms.marketingconsent.js">
                 <arguments>
                     <argument name="telephoneInputConfig" xsi:type="object">Dotdigitalgroup\Sms\ViewModel\TelephoneInputConfig</argument>
+                    <argument name="consentConfig" xsi:type="object">Dotdigitalgroup\Sms\ViewModel\Customer\Account\MarketingConsent</argument>
                 </arguments>
             </block>
             <block
+                ifconfig="connector_consent/sms/enabled"
                 template="Dotdigitalgroup_Sms::customer/js-marketing-consent-toggler.phtml"
                 name="dd.account.create.sms.marketingconsent.checkbox.js">
             </block>

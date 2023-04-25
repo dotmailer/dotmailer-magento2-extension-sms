@@ -28,7 +28,6 @@ $view = $block->getData('config');
                value="<?= $escaper->escapeHtml($view->getStoredMobileNumber()) ?>"
                data-validate='{"validate-phone-number-with-checkbox": <?= $view->isPhoneNumberValidationEnabled(); ?>}'
         />
-        <div class="mobile-number-error"></div>
     </div>
     <div id="dd_sms_consent_text" class="dd-sms-consent-text">
         <p><span><?= $escaper->escapeHtml($view->getSmsMarketingConsentText()); ?></span><p>
