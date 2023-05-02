@@ -9,8 +9,8 @@ use Dotdigitalgroup\Email\Model\Contact;
 use Dotdigitalgroup\Email\Model\ContactFactory;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact\CollectionFactory;
-use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\Model\Subscriber;
+use Dotdigitalgroup\Sms\Model\Consent\ConsentManager;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Data\Form\FormKey\Validator as FormKeyValidator;
@@ -45,11 +45,6 @@ class NewsletterControllerPlugin
     private $contactCollectionFactory;
 
     /**
-     * @var Configuration
-     */
-    private $config;
-
-    /**
      * @var Session
      */
     private $customerSession;
@@ -65,15 +60,20 @@ class NewsletterControllerPlugin
     private $storeManager;
 
     /**
+     * @var ConsentManager
+     */
+    private $consentManager;
+
+    /**
      * @param Data $dataHelper
      * @param Logger $logger
      * @param ContactFactory $contactFactory
      * @param ContactResource $contactResource
      * @param CollectionFactory $contactCollectionFactory
-     * @param Configuration $config
      * @param Session $customerSession
      * @param FormKeyValidator $formKeyValidator
      * @param StoreManagerInterface $storeManager
+     * @param ConsentManager $consentManager
      */
     public function __construct(
         Data $dataHelper,
@@ -81,20 +81,20 @@ class NewsletterControllerPlugin
         ContactFactory $contactFactory,
         ContactResource $contactResource,
         CollectionFactory $contactCollectionFactory,
-        Configuration $config,
         Session $customerSession,
         FormKeyValidator $formKeyValidator,
         StoreManagerInterface $storeManager,
+        ConsentManager $consentManager
     ) {
         $this->dataHelper = $dataHelper;
         $this->logger = $logger;
         $this->contactFactory = $contactFactory;
         $this->contactResource = $contactResource;
         $this->contactCollectionFactory = $contactCollectionFactory;
-        $this->config = $config;
         $this->customerSession = $customerSession;
         $this->formKeyValidator = $formKeyValidator;
         $this->storeManager = $storeManager;
+        $this->consentManager = $consentManager;
     }
 
     /**
@@ -106,7 +106,7 @@ class NewsletterControllerPlugin
      * @return \Magento\Framework\App\ResponseInterface
      * @throws LocalizedException
      */
-    public function afterExecute(Newsletter $subject, $result)
+    public function afterExecute(Newsletter $subject, $result): ResponseInterface
     {
         if (! $this->formKeyValidator->validate($subject->getRequest())) {
             return $result;
@@ -119,7 +119,6 @@ class NewsletterControllerPlugin
         }
         $hasProvidedConsent = $subject->getRequest()->getParam('is_sms_subscribed');
         $consentMobileNumber = $subject->getRequest()->getParam('mobile_number');
-
         if ($hasProvidedConsent && !$consentMobileNumber) {
             return $result;
         }
@@ -136,32 +135,34 @@ class NewsletterControllerPlugin
 
             if ($contactModel) {
                 if ($this->contactHasJustOptedIn(
+                    $contactModel,
                     $hasProvidedConsent,
                     $consentMobileNumber
                 )) {
                     $contactModel->setMobileNumber($consentMobileNumber);
                     $contactModel->setSmsSubscriberStatus(Subscriber::STATUS_SUBSCRIBED);
-                }
+                    $contactModel->setSmsSubscriberImported(Contact::EMAIL_CONTACT_NOT_IMPORTED);
+                    $this->contactResource->save($contactModel);
 
-                if ($this->contactHasJustOptedOut(
+                    $this->consentManager->createConsentRecord($contactModel->getId(), $storeId);
+
+                } elseif ($this->contactHasJustOptedOut(
                     $contactModel,
                     $hasProvidedConsent
                 )) {
                     $contactModel->setSmsSubscriberStatus(Subscriber::STATUS_UNSUBSCRIBED);
+                    $contactModel->setSmsSubscriberImported(Contact::EMAIL_CONTACT_NOT_IMPORTED);
+                    $this->contactResource->save($contactModel);
+
+                } elseif ($contactModel->getMobileNumber() != $consentMobileNumber) {
+                    $contactModel->setMobileNumber($consentMobileNumber);
+                    $contactModel->setSmsSubscriberImported(Contact::EMAIL_CONTACT_NOT_IMPORTED);
+                    $this->contactResource->save($contactModel);
                 }
-            } else {
-                $contactModel = $this->contactFactory->create()
-                    ->setEmail($customerEmail)
-                    ->setMobileNumber($consentMobileNumber)
-                    ->setSmsSubscriberStatus(Subscriber::STATUS_SUBSCRIBED)
-                    ->setWebsiteId($websiteId)
-                    ->setStoreId($storeId);
             }
 
-            $contactModel->setSmsSubscriberImported(Contact::EMAIL_CONTACT_NOT_IMPORTED);
-            $this->contactResource->save($contactModel);
         } catch (LocalizedException|\Exception $e) {
-            $this->logger->debug('Error when updating email_contact table', [(string) $e]);
+            $this->logger->debug('Error when handling SMS subscription', [(string) $e]);
         }
 
         return $result;
@@ -170,14 +171,17 @@ class NewsletterControllerPlugin
     /**
      * Determine if a contact has just opted IN.
      *
+     * @param Contact $contact
      * @param bool|null $hasProvidedConsent
      * @param string $consentMobileNumber
      *
      * @return bool
      */
-    private function contactHasJustOptedIn(?bool $hasProvidedConsent, $consentMobileNumber)
+    private function contactHasJustOptedIn(Contact $contact, ?bool $hasProvidedConsent, string $consentMobileNumber): bool
     {
-        return $hasProvidedConsent && $consentMobileNumber;
+        return $contact->getSmsSubscriberStatus() != Subscriber::STATUS_SUBSCRIBED &&
+            $hasProvidedConsent &&
+            $consentMobileNumber;
     }
 
     /**
@@ -188,7 +192,7 @@ class NewsletterControllerPlugin
      *
      * @return bool
      */
-    private function contactHasJustOptedOut(Contact $contact, ?bool $hasProvidedConsent)
+    private function contactHasJustOptedOut(Contact $contact, ?bool $hasProvidedConsent): bool
     {
         return $contact->getSmsSubscriberStatus() == Subscriber::STATUS_SUBSCRIBED && !$hasProvidedConsent;
     }

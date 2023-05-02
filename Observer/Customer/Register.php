@@ -4,6 +4,7 @@ namespace Dotdigitalgroup\Sms\Observer\Customer;
 
 use Dotdigitalgroup\Email\Model\ContactFactory;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
+use Dotdigitalgroup\Sms\Model\Consent\ConsentManager;
 use Magento\Framework\Event\Observer;
 
 class Register implements \Magento\Framework\Event\ObserverInterface
@@ -19,13 +20,21 @@ class Register implements \Magento\Framework\Event\ObserverInterface
     private $contactResource;
 
     /**
+     * @var ConsentManager
+     */
+    private $consentManager;
+
+    /**
      * @param ContactFactory $contactFactory
      * @param ContactResource $contactResource
+     * @param ConsentManager $consentManager
      */
     public function __construct(
         ContactFactory $contactFactory,
-        ContactResource $contactResource
+        ContactResource $contactResource,
+        ConsentManager $consentManager
     ) {
+        $this->consentManager = $consentManager;
         $this->contactFactory = $contactFactory;
         $this->contactResource = $contactResource;
     }
@@ -37,10 +46,11 @@ class Register implements \Magento\Framework\Event\ObserverInterface
      * @return void
      * @throws \Magento\Framework\Exception\AlreadyExistsException
      */
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         $request = $observer->getAccountController()->getRequest()->getPost();
         $customer = $observer->getEvent()->getCustomer();
+        $storeId = $customer->getStoreId();
 
         if ($request->get('is_sms_subscribed')) {
             $contactModel = $this->contactFactory->create()
@@ -54,6 +64,7 @@ class Register implements \Magento\Framework\Event\ObserverInterface
                 $contactModel->setSmsSubscriberStatus($request->get('is_sms_subscribed'));
                 $this->contactResource->save($contactModel);
             }
+            $this->consentManager->createConsentRecord($contactModel->getId(), $storeId);
         }
     }
 }

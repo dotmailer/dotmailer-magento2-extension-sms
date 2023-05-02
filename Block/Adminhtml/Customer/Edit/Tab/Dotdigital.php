@@ -3,9 +3,6 @@
 namespace Dotdigitalgroup\Sms\Block\Adminhtml\Customer\Edit\Tab;
 
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact\CollectionFactory as ContactCollectionFactory;
-use Dotdigitalgroup\Sms\Component\Consent\ConsentCheckbox;
-use Dotdigitalgroup\Sms\Component\Consent\ConsentTelephone;
-use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\Model\Subscriber;
 use Magento\Backend\Block\Template\Context;
 use Magento\Customer\Controller\RegistryConstants;
@@ -14,8 +11,10 @@ use Magento\Framework\Registry;
 use Magento\Store\Model\System\Store;
 use Magento\Ui\Component\Layout\Tabs\TabInterface;
 use Magento\Backend\Block\Widget\Form\Generic;
-use Magento\Store\Model\StoreManagerInterface;
 
+/**
+ * @api
+ */
 class Dotdigital extends Generic implements TabInterface
 {
     /**

@@ -8,6 +8,7 @@ use Dotdigitalgroup\Email\Model\ContactFactory;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact\CollectionFactory;
 use Dotdigitalgroup\Sms\Model\Subscriber;
+use Dotdigitalgroup\Sms\Model\Consent\ConsentManager;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
@@ -50,12 +51,18 @@ class CheckoutConsentObserver implements ObserverInterface
     private $storeManager;
 
     /**
+     * @var ConsentManager
+     */
+    private $consentManager;
+
+    /**
      * @param Logger $logger
      * @param ContactFactory $contactFactory
      * @param ContactResource $contactResource
      * @param CollectionFactory $contactCollectionFactory
      * @param CheckoutSession $checkoutSession
      * @param StoreManagerInterface $storeManager
+     * @param ConsentManager $consentManager
      */
     public function __construct(
         Logger $logger,
@@ -63,7 +70,8 @@ class CheckoutConsentObserver implements ObserverInterface
         ContactResource $contactResource,
         CollectionFactory $contactCollectionFactory,
         CheckoutSession $checkoutSession,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        ConsentManager $consentManager
     ) {
         $this->logger = $logger;
         $this->contactFactory = $contactFactory;
@@ -71,6 +79,7 @@ class CheckoutConsentObserver implements ObserverInterface
         $this->contactCollectionFactory = $contactCollectionFactory;
         $this->checkoutSession = $checkoutSession;
         $this->storeManager = $storeManager;
+        $this->consentManager = $consentManager;
     }
 
     /**
@@ -90,6 +99,7 @@ class CheckoutConsentObserver implements ObserverInterface
         try {
             $order = $observer->getEvent()->getOrder();
             $websiteId = $this->storeManager->getStore($order->getStoreId())->getWebsiteId();
+            $storeId = $order->getStoreId();
             $consentMobileNumber = $this->checkoutSession->getData('dd_sms_consent_telephone');
 
             $contactModel = $this->contactCollectionFactory->create()
@@ -112,6 +122,7 @@ class CheckoutConsentObserver implements ObserverInterface
 
             $contactModel->setSmsSubscriberImported(Contact::EMAIL_CONTACT_NOT_IMPORTED);
             $this->contactResource->save($contactModel);
+            $this->consentManager->createConsentRecord($contactModel->getId(), $storeId);
         } catch (LocalizedException|\Exception $e) {
             $this->logger->debug((string) $e);
         }
