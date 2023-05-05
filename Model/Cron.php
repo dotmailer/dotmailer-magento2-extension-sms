@@ -4,7 +4,9 @@ namespace Dotdigitalgroup\Sms\Model;
 
 use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Email\Model\Cron\JobChecker;
-use Dotdigitalgroup\Sms\Model\SmsSenderManagerFactory;
+use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriberFactory;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 
 class Cron
 {
@@ -16,7 +18,7 @@ class Cron
     /**
      * @var SmsSenderManagerFactory
      */
-    private $senderManager;
+    private $senderManagerFactory;
 
     /**
      * @var JobChecker
@@ -24,22 +26,32 @@ class Cron
     private $jobChecker;
 
     /**
+     * @var SmsSubscriberFactory
+     */
+    private $smsSubscriberFactory;
+
+    /**
      * Cron constructor.
      * @param Logger $logger
-     * @param SmsSenderManagerFactory $senderManager
+     * @param SmsSenderManagerFactory $senderManagerFactory
      * @param JobChecker $jobChecker
+     * @param SmsSubscriberFactory $smsSubscriberFactory
      */
     public function __construct(
         Logger $logger,
-        SmsSenderManagerFactory $senderManager,
-        JobChecker $jobChecker
+        SmsSenderManagerFactory $senderManagerFactory,
+        JobChecker $jobChecker,
+        SmsSubscriberFactory $smsSubscriberFactory
     ) {
         $this->logger = $logger;
-        $this->senderManager = $senderManager;
+        $this->senderManagerFactory = $senderManagerFactory;
         $this->jobChecker = $jobChecker;
+        $this->smsSubscriberFactory = $smsSubscriberFactory;
     }
 
     /**
+     * Send sms order messages.
+     *
      * @return void
      */
     public function sendSmsOrderMessages()
@@ -49,7 +61,25 @@ class Cron
             $this->logger->info($message);
         }
 
-        $this->senderManager->create()
+        $this->senderManagerFactory->create()
             ->run();
+    }
+
+    /**
+     * Sms subscriber sync.
+     *
+     * @return void
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
+     */
+    public function smsSubscriberSync():void
+    {
+        if ($this->jobChecker->hasAlreadyBeenRun('ddg_automation_sms_subscriber')) {
+            $message = 'Skipping ddg_automation_sms_subscriber job run';
+            $this->logger->info($message);
+        }
+
+        $this->smsSubscriberFactory->create()
+            ->sync();
     }
 }

@@ -9,7 +9,8 @@ interface ConfigInterface
      */
     public const XML_PATH_TRANSACTIONAL_SMS_ENABLED = 'transactional_sms/sms_settings/enabled';
     public const XML_PATH_TRANSACTIONAL_SMS_DEFAULT_FROM_NAME = 'transactional_sms/sms_settings/default_sms_from_name';
-    public const XML_PATH_TRANSACTIONAL_SMS_ALPHANUMERIC_FROM_NAME = 'transactional_sms/sms_settings/alphanumeric_from_name';
+    public const XML_PATH_TRANSACTIONAL_SMS_ALPHANUMERIC_FROM_NAME =
+        'transactional_sms/sms_settings/alphanumeric_from_name';
     public const XML_PATH_SMS_PHONE_NUMBER_VALIDATION = 'transactional_sms/sms_settings/phone_number_validation';
     public const XML_PATH_TRANSACTIONAL_SMS_BATCH_SIZE = 'transactional_sms/sms_settings/batch_size';
 
@@ -31,6 +32,9 @@ interface ConfigInterface
     public const XML_PATH_CONSENT_SMS_ENABLED = 'connector_consent/sms/enabled';
     public const XML_PATH_CONSENT_SMS_SIGNUP_TEXT = 'connector_consent/sms/signup_text';
     public const XML_PATH_CONSENT_SMS_MARKETING_TEXT = 'connector_consent/sms/marketing_consent_text';
+
+    public const XML_PATH_CONNECTOR_SMS_SUBSCRIBER_SYNC_ENABLED = 'sync_settings/sync/sms_subscriber_enabled';
+    public const XML_PATH_CONNECTOR_SMS_SUBSCRIBER_ADDRESS_BOOK_ID = 'sync_settings/addressbook/sms_subscribers';
 
     public const SMS_TYPE_NEW_ORDER = 1;
     public const SMS_TYPE_UPDATE_ORDER = 2;

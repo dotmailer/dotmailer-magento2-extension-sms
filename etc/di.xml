@@ -37,4 +37,8 @@
         <plugin name="dd_sms_newsletter_controller_plugin"
                 type="Dotdigitalgroup\Sms\Plugin\Customer\Account\NewsletterControllerPlugin"/>
     </type>
+    <type name="Dotdigitalgroup\Email\Console\Command\Provider\SyncProvider">
+        <plugin name="ddg_sms_sync_provider_plugin"
+                type="Dotdigitalgroup\Sms\Plugin\SyncProviderPlugin"/>
+    </type>
 </config>

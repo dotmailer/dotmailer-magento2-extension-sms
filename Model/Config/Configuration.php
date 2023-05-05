@@ -8,9 +8,11 @@ use Magento\Framework\App\Config\ReinitableConfigInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\RequestInterface;
+use Magento\Store\Api\Data\WebsiteInterface;
 use Magento\Store\Api\StoreWebsiteRelationInterface;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Dotdigitalgroup\Email\Helper\Config;
 
 class Configuration
 {
@@ -377,5 +379,50 @@ class Configuration
     public function getDataScopePrefix($addressType, $method = '')
     {
         return $addressType . $method;
+    }
+
+    /**
+     * Check if SMS sync is enabled.
+     *
+     * @param int $websiteId
+     * @return bool
+     */
+    public function isSmsSyncEnabled($websiteId):bool
+    {
+        return (bool) $this->scopeConfig->getValue(
+            ConfigInterface::XML_PATH_CONNECTOR_SMS_SUBSCRIBER_SYNC_ENABLED,
+            ScopeInterface::SCOPE_WEBSITE,
+            $websiteId
+        );
+    }
+
+    /**
+     * Get the limit for the sync.
+     *
+     * @param int $websiteId
+     * @return int
+     */
+    public function getLimit($websiteId): int
+    {
+        return (int) $this->scopeConfig->getValue(
+            Config::XML_PATH_CONNECTOR_SYNC_LIMIT,
+            ScopeInterface::SCOPE_WEBSITE,
+            $websiteId
+        );
+    }
+
+    /**
+     * Get address book list ID.
+     *
+     * @param int $websiteId
+     * @return int
+     */
+    public function getListId($websiteId): int
+    {
+        return (int) $this->scopeConfig->getValue(
+            ConfigInterface::XML_PATH_CONNECTOR_SMS_SUBSCRIBER_ADDRESS_BOOK_ID,
+            ScopeInterface::SCOPE_WEBSITE,
+            $websiteId
+        );
     }
 }
