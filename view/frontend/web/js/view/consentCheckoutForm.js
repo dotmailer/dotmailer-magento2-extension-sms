@@ -126,8 +126,10 @@ define([
             setTimeout(() => {
                 const element = $('#' + UiClass.uid);
 
-                if (element[0] && value && typeof window.intlTelInputGlobals !== 'undefined') {
+                if (element[0] && value) {
                     UiClass.value(value);
+
+                    if (typeof window.intlTelInputGlobals === 'undefined') { return; }
                     Object
                         .entries(window.intlTelInputGlobals.instances)
                         // eslint-disable-next-line no-unused-vars
