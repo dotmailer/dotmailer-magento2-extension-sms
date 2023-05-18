@@ -2,9 +2,13 @@
 
 namespace Dotdigitalgroup\Sms\Model\Adminhtml\Source;
 
-class Status implements \Magento\Framework\Data\OptionSourceInterface
+use Magento\Framework\Data\OptionSourceInterface;
+
+class Status implements OptionSourceInterface
 {
     /**
+     * Return a list of statuses.
+     *
      * @return array
      */
     public function toOptionArray()

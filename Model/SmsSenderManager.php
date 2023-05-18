@@ -62,6 +62,7 @@ class SmsSenderManager implements TaskRunInterface
 
     /**
      * SmsSenderManager constructor.
+     *
      * @param Data $helper
      * @param SmsClientFactory $smsClientFactory
      * @param Configuration $moduleConfig
@@ -95,6 +96,7 @@ class SmsSenderManager implements TaskRunInterface
     }
 
     /**
+     * @inheritdoc
      */
     public function run()
     {

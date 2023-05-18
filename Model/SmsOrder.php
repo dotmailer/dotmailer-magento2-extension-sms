@@ -13,7 +13,7 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     protected $_idFieldName = 'id';
 
     /**
-     * Initialize resource.
+     * Initialize resource model.
      *
      * @return void
      */
@@ -24,6 +24,8 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
+     * Get website id.
+     *
      * @return int|mixed|null
      */
     public function getWebsiteId()
@@ -32,6 +34,8 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
+     * Get store id.
+     *
      * @return int|mixed|null
      */
     public function getStoreId()
@@ -40,6 +44,8 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
+     * Get status.
+     *
      * @return int|mixed|null
      */
     public function getStatus()
@@ -48,7 +54,9 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
-     * @return int/mixed|null
+     * Get type id.
+     *
+     * @return int|mixed|null
      */
     public function getTypeId()
     {
@@ -56,6 +64,8 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
+     * Get order id.
+     *
      * @return int|mixed|null
      */
     public function getOrderId()
@@ -64,6 +74,8 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
+     * Get phone number.
+     *
      * @return mixed|string|null
      */
     public function getPhoneNumber()
@@ -72,6 +84,8 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
+     * Get email.
+     *
      * @return string
      */
     public function getEmail()
@@ -80,6 +94,8 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
+     * Get message.
+     *
      * @return string|void
      */
     public function getMessage()
@@ -88,6 +104,8 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
+     * Get message id.
+     *
      * @return string|void
      */
     public function getMessageId()
@@ -96,6 +114,8 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
+     * Get additional data.
+     *
      * @return string|null
      */
     public function getAdditionalData()
@@ -104,6 +124,8 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
+     * Get sent at.
+     *
      * @return string|null
      */
     public function getSentAt()
@@ -112,6 +134,8 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
+     * Get created at.
+     *
      * @return string
      */
     public function getContent()
@@ -120,7 +144,9 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
-     * @param $websiteId
+     * Set website id.
+     *
+     * @param int|string $websiteId
      * @return SmsOrder
      */
     public function setWebsiteId($websiteId)
@@ -130,7 +156,9 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
-     * @param $storeId
+     * Set store id.
+     *
+     * @param int|string $storeId
      * @return SmsOrder
      */
     public function setStoreId($storeId)
@@ -140,7 +168,9 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
-     * @param $status
+     * Set status.
+     *
+     * @param string $status
      * @return SmsOrder
      */
     public function setStatus($status)
@@ -150,7 +180,9 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
-     * @param $typeId
+     * Set type id.
+     *
+     * @param int|string $typeId
      * @return SmsOrder
      */
     public function setTypeId($typeId)
@@ -160,7 +192,9 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
-     * @param $orderId
+     * Set order id.
+     *
+     * @param int|string $orderId
      * @return SmsOrder
      */
     public function setOrderId($orderId)
@@ -170,7 +204,9 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
-     * @param $phoneNumber
+     * Set phone number.
+     *
+     * @param int|string $phoneNumber
      * @return SmsOrder
      */
     public function setPhoneNumber($phoneNumber)
@@ -180,7 +216,9 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
-     * @param $email
+     * Set email.
+     *
+     * @param string $email
      * @return $this
      */
     public function setEmail($email)
@@ -190,7 +228,9 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
-     * @param $message
+     * Set message.
+     *
+     * @param string $message
      * @return SmsOrder
      */
     public function setMessage($message)
@@ -200,7 +240,9 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
-     * @param $messageId
+     * Set message id.
+     *
+     * @param int|string $messageId
      * @return SmsOrder
      */
     public function setMessageId($messageId)
@@ -210,7 +252,9 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
-     * @param $data
+     * Set additional data.
+     *
+     * @param array $data
      * @return SmsOrder
      */
     public function setAdditionalData($data)
@@ -220,7 +264,9 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
-     * @param $sentAt
+     * Set sent at.
+     *
+     * @param mixed $sentAt
      * @return $this|SmsOrder
      */
     public function setSentAt($sentAt)
@@ -230,7 +276,9 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
-     * @param $content
+     * Set content.
+     *
+     * @param string $content
      * @return $this
      */
     public function setContent($content)

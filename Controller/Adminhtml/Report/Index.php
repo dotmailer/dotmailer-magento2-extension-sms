@@ -12,7 +12,7 @@ class Index extends \Magento\Backend\App\Action
      *
      * @see _isAllowed()
      */
-    const ADMIN_RESOURCE = 'Dotdigitalgroup_Sms::report';
+    public const ADMIN_RESOURCE = 'Dotdigitalgroup_Sms::report';
 
     /**
      * @var PageFactory

@@ -44,10 +44,19 @@ class ConsentManager extends EmailConsentManager
         ScopeConfigInterface $scopeConfig,
         StringUtils $stringUtils,
         Configuration $config
-    )
-    {
+    ) {
         $this->config = $config;
-        parent::__construct($http, $header, $redirect, $consentFactory, $consentResource, $consent, $storeManager, $scopeConfig, $stringUtils);
+        parent::__construct(
+            $http,
+            $header,
+            $redirect,
+            $consentFactory,
+            $consentResource,
+            $consent,
+            $storeManager,
+            $scopeConfig,
+            $stringUtils
+        );
     }
 
     /**

@@ -1,22 +1,27 @@
 <?php
 
-namespace Dotdigitalgroup\Email\Test\Unit\Model\Message\Text;
+namespace Dotdigitalgroup\Sms\Test\Unit\Model\Message\Text;
 
-use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterface;
 use Dotdigitalgroup\Sms\Model\Message\Text\Compiler;
 use Dotdigitalgroup\Sms\Model\Message\Variable\Resolver;
 use Dotdigitalgroup\Sms\Model\SmsOrder;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class CompilerTest extends TestCase
 {
     /**
-     * @var Resolver
+     * @var SmsOrder|MockObject
+     */
+    private $smsOrderMock;
+
+    /**
+     * @var Resolver|MockObject
      */
     private $variableResolverMock;
 
     /**
-     * @var Compiler
+     * @var Compiler|MockObject
      */
     private $compiler;
 

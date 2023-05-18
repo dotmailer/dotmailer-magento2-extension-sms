@@ -17,7 +17,10 @@ class NewOrder extends AbstractOrderItem
     protected $smsConfigPath  = ConfigInterface::XML_PATH_SMS_NEW_ORDER_ENABLED;
 
     /**
-     * @param $order
+     * Build additional data for the order.
+     *
+     * @param mixed $order
+     * @return NewOrder
      */
     public function buildAdditionalData($order)
     {

@@ -43,6 +43,8 @@ class OrderSaveAfter implements \Magento\Framework\Event\ObserverInterface
     }
 
     /**
+     * Execute observer.
+     *
      * @param Observer $observer
      *
      * @return void
@@ -73,6 +75,8 @@ class OrderSaveAfter implements \Magento\Framework\Event\ObserverInterface
     }
 
     /**
+     * Check if order is canceled or holded.
+     *
      * @param OrderInterface $order
      * @return bool
      */
@@ -82,6 +86,8 @@ class OrderSaveAfter implements \Magento\Framework\Event\ObserverInterface
     }
 
     /**
+     * Check if order is new.
+     *
      * @param OrderInterface $order
      * @return bool
      */

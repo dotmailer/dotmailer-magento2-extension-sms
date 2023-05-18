@@ -31,7 +31,7 @@ class AfterSendProcessorTest extends TestCase
     /**
      * @var SearchResultsInterface
      */
-    private $searchResultsInterface;
+    private $searchResultsInterfaceMock;
 
     /**
      * @var AfterSendProcessor

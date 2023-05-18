@@ -177,8 +177,11 @@ class NewsletterControllerPlugin
      *
      * @return bool
      */
-    private function contactHasJustOptedIn(Contact $contact, ?bool $hasProvidedConsent, string $consentMobileNumber): bool
-    {
+    private function contactHasJustOptedIn(
+        Contact $contact,
+        ?bool $hasProvidedConsent,
+        string $consentMobileNumber
+    ): bool {
         return $contact->getSmsSubscriberStatus() != Subscriber::STATUS_SUBSCRIBED &&
             $hasProvidedConsent &&
             $consentMobileNumber;

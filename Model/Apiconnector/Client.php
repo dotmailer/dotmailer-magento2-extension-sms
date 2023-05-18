@@ -4,17 +4,22 @@ namespace Dotdigitalgroup\Sms\Model\Apiconnector;
 
 use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Email\Model\Apiconnector\Rest;
+use Exception;
+use stdClass;
 
 class Client extends Rest
 {
-    const REST_CPAAS_MESSAGES_API_URL = 'https://api-cpaas.dotdigital.com/cpaas/messages';
-    const REST_CPAAS_DEDICATED_NUMBERS = 'https://api-cpaas.dotdigital.com/cpaas/sms/dedicatedNumbers';
-    const REST_CPAAS_KEYWORDS = 'https://api-cpaas.dotdigital.com/cpaas/sms/keywords';
-    const REST_CPAAS_SHORTCODES = 'https://api-cpaas.dotdigital.com/cpaas/sms/shortcodes';
+    public const REST_CPAAS_MESSAGES_API_URL = 'https://api-cpaas.dotdigital.com/cpaas/messages';
+    public const REST_CPAAS_DEDICATED_NUMBERS = 'https://api-cpaas.dotdigital.com/cpaas/sms/dedicatedNumbers';
+    public const REST_CPAAS_KEYWORDS = 'https://api-cpaas.dotdigital.com/cpaas/sms/keywords';
+    public const REST_CPAAS_SHORTCODES = 'https://api-cpaas.dotdigital.com/cpaas/sms/shortcodes';
 
     /**
-     * @param $data
-     * @return mixed|null
+     * Send a single SMS message request.
+     *
+     * @param mixed $data
+     * @return array|stdClass|null
+     * @throws Exception
      */
     public function sendSmsSingle($data)
     {
@@ -39,8 +44,8 @@ class Client extends Rest
      *
      * @param string $messageId
      *
-     * @return null
-     * @throws \Exception
+     * @return \stdClass
+     * @throws Exception
      */
     public function getMessageByMessageId($messageId)
     {
@@ -60,8 +65,11 @@ class Client extends Rest
     }
 
     /**
-     * @param $data
+     * Send a batch of SMS messages.
+     *
+     * @param mixed $data
      * @return mixed|null
+     * @throws Exception
      */
     public function sendSmsBatch($data)
     {
@@ -86,8 +94,10 @@ class Client extends Rest
     }
 
     /**
+     * Get a list of dedicated numbers for the account.
+     *
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function getDedicatedNumbers()
     {
@@ -105,8 +115,10 @@ class Client extends Rest
     }
 
     /**
+     * Get a list of keywords for the account.
+     *
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function getKeywords()
     {
@@ -124,8 +136,10 @@ class Client extends Rest
     }
 
     /**
+     * Get a list of shortcodes for the account.
+     *
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function getShortCodes()
     {

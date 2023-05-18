@@ -10,12 +10,12 @@ use Magento\Store\Model\StoreManagerInterface;
 
 class OrderQueueManager
 {
-    const SMS_STATUS_PENDING = 0;
-    const SMS_STATUS_IN_PROGRESS = 1;
-    const SMS_STATUS_DELIVERED = 2;
-    const SMS_STATUS_FAILED = 3;
-    const SMS_STATUS_EXPIRED = 4;
-    const SMS_STATUS_UNKNOWN = 5;
+    public const SMS_STATUS_PENDING = 0;
+    public const SMS_STATUS_IN_PROGRESS = 1;
+    public const SMS_STATUS_DELIVERED = 2;
+    public const SMS_STATUS_FAILED = 3;
+    public const SMS_STATUS_EXPIRED = 4;
+    public const SMS_STATUS_UNKNOWN = 5;
 
     /**
      * @var SmsOrderRepositoryInterface
@@ -44,6 +44,7 @@ class OrderQueueManager
 
     /**
      * OrderQueueManager constructor.
+     *
      * @param SmsOrderRepositoryInterface $smsOrderRepository
      * @param Configuration $moduleConfig
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
@@ -82,6 +83,8 @@ class OrderQueueManager
     }
 
     /**
+     * Get the in progress queue for the given store ids.
+     *
      * @param array $storeIds
      * @return \Magento\Framework\Api\SearchResults
      */
@@ -95,6 +98,8 @@ class OrderQueueManager
     }
 
     /**
+     * Get expired sends.
+     *
      * @return void
      */
     public function expirePendingSends()

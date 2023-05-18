@@ -38,8 +38,11 @@ class Enabled extends \Magento\Config\Block\System\Config\Form\Field
     }
 
     /**
+     * Get element html.
+     *
      * @param AbstractElement $element
      * @return string
+     * @throws \Exception
      */
     public function _getElementHtml(AbstractElement $element)
     {

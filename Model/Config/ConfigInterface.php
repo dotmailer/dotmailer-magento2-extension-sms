@@ -4,13 +4,9 @@ namespace Dotdigitalgroup\Sms\Model\Config;
 
 interface ConfigInterface
 {
-    /*
-     * Config paths for SMS config fields
-     */
+    public const XML_PATH_TRANSACTIONAL_SMS_ALPHANUMERIC_FROM_NAME = 'transactional_sms/sms_settings/alphanumeric_from_name';// phpcs:ignore
     public const XML_PATH_TRANSACTIONAL_SMS_ENABLED = 'transactional_sms/sms_settings/enabled';
     public const XML_PATH_TRANSACTIONAL_SMS_DEFAULT_FROM_NAME = 'transactional_sms/sms_settings/default_sms_from_name';
-    public const XML_PATH_TRANSACTIONAL_SMS_ALPHANUMERIC_FROM_NAME =
-        'transactional_sms/sms_settings/alphanumeric_from_name';
     public const XML_PATH_SMS_PHONE_NUMBER_VALIDATION = 'transactional_sms/sms_settings/phone_number_validation';
     public const XML_PATH_TRANSACTIONAL_SMS_BATCH_SIZE = 'transactional_sms/sms_settings/batch_size';
 

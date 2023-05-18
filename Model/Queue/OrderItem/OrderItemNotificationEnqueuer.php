@@ -6,12 +6,12 @@ use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterfaceFactory;
 use Dotdigitalgroup\Sms\Api\SmsOrderRepositoryInterface;
 use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\StoreManagerInterface;
 
 class OrderItemNotificationEnqueuer
 {
-    const SMS_ENABLED = ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_ENABLED;
-
     /**
      * @var SmsOrderInterfaceFactory
      */
@@ -34,6 +34,7 @@ class OrderItemNotificationEnqueuer
 
     /**
      * AbstractQueueManager constructor.
+     *
      * @param SmsOrderInterfaceFactory $smsOrderInterfaceFactory
      * @param SmsOrderRepositoryInterface $smsOrderRepositoryInterface
      * @param Configuration $moduleConfig
@@ -52,12 +53,14 @@ class OrderItemNotificationEnqueuer
     }
 
     /**
-     * @param $order
-     * @param $additionalData
-     * @param $smsConfigPath
-     * @param $smsType
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * Queue the SMS Order.
+     *
+     * @param mixed $order
+     * @param array $additionalData
+     * @param string $smsConfigPath
+     * @param string|int $smsType
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function queue($order, $additionalData, $smsConfigPath, $smsType)
     {

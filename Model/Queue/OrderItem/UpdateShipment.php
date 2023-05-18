@@ -17,9 +17,12 @@ class UpdateShipment extends AbstractOrderItem
     protected $smsConfigPath = ConfigInterface::XML_PATH_SMS_SHIPMENT_UPDATE_ENABLED;
 
     /**
-     * @param $order
-     * @param $trackingNumber
-     * @param $carrierCode
+     * Build additional data for the shipment.
+     *
+     * @param mixed $order
+     * @param string|int $trackingNumber
+     * @param string|int $carrierCode
+     * @return UpdateShipment
      */
     public function buildAdditionalData($order, $trackingNumber, $carrierCode)
     {

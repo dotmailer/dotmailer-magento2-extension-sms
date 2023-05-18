@@ -16,6 +16,7 @@ class ConfigProviderPlugin
 
     /**
      * ConfigProviderPlugin constructor.
+     *
      * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
@@ -25,8 +26,10 @@ class ConfigProviderPlugin
     }
 
     /**
+     * Add SMS configuration to the list of available configurations.
+     *
      * @param DotdigitalConfig $subject
-     * @param $result
+     * @param array $result
      * @param string|int $storeId
      * @return array
      */

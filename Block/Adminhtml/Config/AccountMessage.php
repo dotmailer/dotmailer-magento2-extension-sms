@@ -23,6 +23,7 @@ class AccountMessage extends Field
 
     /**
      * AccountMessage constructor.
+     *
      * @param Context $context
      * @param Account $account
      * @param array $data
@@ -37,6 +38,8 @@ class AccountMessage extends Field
     }
 
     /**
+     * Render element value.
+     *
      * @param AbstractElement $element
      * @return string
      * @throws \Exception
@@ -47,7 +50,10 @@ class AccountMessage extends Field
     }
 
     /**
+     * Should display account message
+     *
      * @return bool
+     * @throws \Exception
      */
     public function shouldDisplayAccountMessage()
     {

@@ -3,6 +3,7 @@
 namespace Dotdigitalgroup\Sms\Block\Adminhtml\Config;
 
 use Magento\Config\Block\System\Config\Form\Field;
+use Magento\Framework\Data\Form\Element\AbstractElement;
 
 class FrontendAssets extends Field
 {
@@ -14,10 +15,12 @@ class FrontendAssets extends Field
     protected $_template = 'Dotdigitalgroup_Sms::frontend_assets.phtml';
 
     /**
-     * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
+     * Render element value.
+     *
+     * @param AbstractElement $element
      * @return string
      */
-    public function render(\Magento\Framework\Data\Form\Element\AbstractElement $element)
+    public function render(AbstractElement $element)
     {
         return $this->_toHtml();
     }

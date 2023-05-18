@@ -4,6 +4,8 @@ namespace Dotdigitalgroup\Sms\Plugin\Order\Shipment;
 
 use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\NewShipment;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Shipping\Controller\Adminhtml\Order\Shipment\Save as NewShipmentAction;
 
@@ -26,6 +28,7 @@ class NewShipmentPlugin
 
     /**
      * NewShipmentPlugin constructor.
+     *
      * @param Logger $logger
      * @param OrderRepositoryInterface $orderRepository
      * @param NewShipment $newShipment
@@ -41,8 +44,13 @@ class NewShipmentPlugin
     }
 
     /**
+     * After execute.
+     *
      * @param NewShipmentAction $subject
-     * @param $result
+     * @param mixed $result
+     * @return mixed
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function afterExecute(
         NewShipmentAction $subject,

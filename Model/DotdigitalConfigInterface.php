@@ -6,7 +6,7 @@ use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
 
 interface DotdigitalConfigInterface
 {
-    const CONFIGURATION_PATHS = [
+    public const CONFIGURATION_PATHS = [
         ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_ENABLED,
         ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_DEFAULT_FROM_NAME,
         ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_ALPHANUMERIC_FROM_NAME,

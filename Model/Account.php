@@ -27,6 +27,8 @@ class Account
     }
 
     /**
+     * Can send sms in current scope.
+     *
      * @return bool
      * @throws \Exception
      */
@@ -44,6 +46,8 @@ class Account
     }
 
     /**
+     * Account can send sms.
+     *
      * @param \StdClass $accountInfo
      * @return bool
      */
@@ -61,6 +65,8 @@ class Account
     }
 
     /**
+     * Is using sms PAYG.
+     *
      * @param \StdClass $property
      * @return bool
      */
@@ -70,6 +76,8 @@ class Account
     }
 
     /**
+     * Is DDG admin.
+     *
      * @param \StdClass $property
      * @return bool
      */

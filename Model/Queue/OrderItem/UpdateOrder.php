@@ -17,7 +17,9 @@ class UpdateOrder extends AbstractOrderItem
     protected $smsType = ConfigInterface::SMS_TYPE_UPDATE_ORDER;
 
     /**
-     * @param $order
+     * Build additional data for the order.
+     *
+     * @param mixed $order
      * @return $this
      */
     public function buildAdditionalData($order)

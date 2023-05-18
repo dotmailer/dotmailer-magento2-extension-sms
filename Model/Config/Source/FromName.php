@@ -7,12 +7,12 @@ use Dotdigitalgroup\Sms\Model\Apiconnector\SmsClientFactory;
 
 class FromName implements \Magento\Framework\Option\ArrayInterface
 {
-    const SHARED_POOL_NUMBER = 'shared_pool_number';
+    public const SHARED_POOL_NUMBER = 'shared_pool_number';
 
     /**
      * @note this value is hard dependent to transactional_sms/sms_settings/alphanumeric_from_name
      */
-    const ALPHANUMERIC_NUMBER = 'alphanumeric_number';
+    public const ALPHANUMERIC_NUMBER = 'alphanumeric_number';
 
     /**
      * @var SmsClientFactory
@@ -26,6 +26,7 @@ class FromName implements \Magento\Framework\Option\ArrayInterface
 
     /**
      * FromName constructor.
+     *
      * @param SmsClientFactory $smsClientFactory
      * @param Data $helper
      */
@@ -38,7 +39,10 @@ class FromName implements \Magento\Framework\Option\ArrayInterface
     }
 
     /**
+     * Get options.
+     *
      * @return array
+     * @throws \Exception
      */
     public function toOptionArray()
     {

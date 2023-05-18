@@ -2,9 +2,10 @@
 
 namespace Dotdigitalgroup\Sms\Block\Adminhtml;
 
+use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 
-class AppendNote extends \Magento\Config\Block\System\Config\Form\Field
+class AppendNote extends Field
 {
     /**
      * @var AbstractElement
@@ -17,16 +18,20 @@ class AppendNote extends \Magento\Config\Block\System\Config\Form\Field
     protected $_template = 'Dotdigitalgroup_Sms::append_note.phtml';
 
     /**
-     * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
+     * Render element value.
+     *
+     * @param AbstractElement $element
      * @return string
      */
-    public function render(\Magento\Framework\Data\Form\Element\AbstractElement $element)
+    public function render(AbstractElement $element)
     {
         $this->element = $element;
         return parent::render($element);
     }
 
     /**
+     * Get element.
+     *
      * @return AbstractElement
      */
     public function getElement()
@@ -35,22 +40,24 @@ class AppendNote extends \Magento\Config\Block\System\Config\Form\Field
     }
 
     /**
-     * Return element html
+     * Return element html.
      *
-     * @param  \Magento\Framework\Data\Form\Element\AbstractElement $element
+     * @param AbstractElement $element
      * @return string
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    protected function _getElementHtml(\Magento\Framework\Data\Form\Element\AbstractElement $element)
+    protected function _getElementHtml(AbstractElement $element)
     {
         return $this->_toHtml();
     }
 
     /**
+     * Render element value.
+     *
      * @param AbstractElement $element
      * @return string
      */
-    protected function _renderValue(\Magento\Framework\Data\Form\Element\AbstractElement $element)
+    protected function _renderValue(AbstractElement $element)
     {
         if ($element->getTooltip()) {
             $html = '<td class="value with-tooltip">';

@@ -17,9 +17,12 @@ class NewShipment extends AbstractOrderItem
     protected $smsType = ConfigInterface::SMS_TYPE_NEW_SHIPMENT;
 
     /**
-     * @param $order
-     * @param $trackingNumber
-     * @param $carrierCode
+     * Build additional data for the New Shipment.
+     *
+     * @param mixed $order
+     * @param string|int $trackingNumber
+     * @param string|int $carrierCode
+     * @return NewShipment
      */
     public function buildAdditionalData($order, $trackingNumber, $carrierCode)
     {

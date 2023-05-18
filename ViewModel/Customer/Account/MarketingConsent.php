@@ -7,6 +7,7 @@ use Dotdigitalgroup\Email\ViewModel\Customer\AccountSubscriptions;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\Model\Subscriber;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
@@ -66,7 +67,7 @@ class MarketingConsent implements ArgumentInterface
      * Get SMS signup text.
      *
      * @return string
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getSmsSignUpText()
     {
@@ -78,7 +79,7 @@ class MarketingConsent implements ArgumentInterface
      * Get SMS marketing consent text.
      *
      * @return string
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getSmsMarketingConsentText()
     {
@@ -114,7 +115,7 @@ class MarketingConsent implements ArgumentInterface
      * Is validation enabled.
      *
      * @return string
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function isPhoneNumberValidationEnabled()
     {
@@ -123,8 +124,10 @@ class MarketingConsent implements ArgumentInterface
     }
 
     /**
+     * Should validate phone number with checkbox.
+     *
      * @return bool
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function shouldValidatePhoneNumberWithCheckbox()
     {

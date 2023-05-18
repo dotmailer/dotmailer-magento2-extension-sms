@@ -3,6 +3,8 @@
 namespace Dotdigitalgroup\Sms\Plugin\Order\Shipment;
 
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\UpdateShipment;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\ShipmentRepositoryInterface;
 use Magento\Shipping\Controller\Adminhtml\Order\Shipment\AddTrack as UpdateShipmentAction;
@@ -26,6 +28,7 @@ class ShipmentUpdatePlugin
 
     /**
      * ShipmentUpdatePlugin constructor.
+     *
      * @param OrderRepositoryInterface $orderRepository
      * @param UpdateShipment $updateShipment
      * @param ShipmentRepositoryInterface $shipmentRepository
@@ -41,8 +44,13 @@ class ShipmentUpdatePlugin
     }
 
     /**
+     * After execute.
+     *
      * @param UpdateShipmentAction $subject
-     * @param $result
+     * @param mixed $result
+     * @return mixed
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function afterExecute(
         UpdateShipmentAction $subject,

@@ -3,6 +3,9 @@
 namespace Dotdigitalgroup\Sms\Model\Queue\OrderItem;
 
 use Dotdigitalgroup\Email\Logger\Logger;
+use InvalidArgumentException;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Serialize\SerializerInterface;
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\Data\OrderData;
 use Magento\Sales\Api\Data\OrderInterface;
@@ -46,6 +49,7 @@ abstract class AbstractOrderItem
 
     /**
      * AbstractOrderItem constructor.
+     *
      * @param OrderItemNotificationEnqueuer $orderItemNotificationEnqueuer
      * @param SerializerInterface $serializer
      * @param Logger $logger
@@ -64,8 +68,11 @@ abstract class AbstractOrderItem
     }
 
     /**
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * Queue order item notification.
+     *
+     * @return void
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function queue()
     {
@@ -79,13 +86,15 @@ abstract class AbstractOrderItem
     }
 
     /**
+     * Serialize the data.
+     *
      * @return string
      */
     private function serialiseData()
     {
         try {
             return $this->serializer->serialize($this->additionalData);
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $this->logger->debug((string) $e);
             return '';
         }
