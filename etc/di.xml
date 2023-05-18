@@ -41,4 +41,7 @@
         <plugin name="ddg_sms_sync_provider_plugin"
                 type="Dotdigitalgroup\Sms\Plugin\SyncProviderPlugin"/>
     </type>
+    <type name="Dotdigitalgroup\Email\Model\Sync\Importer\ImporterQueueManager">
+        <plugin name="dd_sms_importer_queue_manager_plugin" type="Dotdigitalgroup\Sms\Plugin\Importer\ImporterQueueManagerPlugin"/>
+    </type>
 </config>

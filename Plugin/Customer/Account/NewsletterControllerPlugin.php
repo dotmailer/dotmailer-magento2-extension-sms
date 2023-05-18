@@ -9,6 +9,7 @@ use Dotdigitalgroup\Email\Model\Contact;
 use Dotdigitalgroup\Email\Model\ContactFactory;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact\CollectionFactory;
+use Dotdigitalgroup\Sms\Model\Importer\Enqueuer;
 use Dotdigitalgroup\Sms\Model\Subscriber;
 use Dotdigitalgroup\Sms\Model\Consent\ConsentManager;
 use Magento\Customer\Model\Session;
@@ -60,6 +61,11 @@ class NewsletterControllerPlugin
     private $storeManager;
 
     /**
+     * @var Enqueuer
+     */
+    private $importerEnqueuer;
+
+    /**
      * @var ConsentManager
      */
     private $consentManager;
@@ -73,6 +79,7 @@ class NewsletterControllerPlugin
      * @param Session $customerSession
      * @param FormKeyValidator $formKeyValidator
      * @param StoreManagerInterface $storeManager
+     * @param Enqueuer $importerEnqueuer
      * @param ConsentManager $consentManager
      */
     public function __construct(
@@ -84,6 +91,7 @@ class NewsletterControllerPlugin
         Session $customerSession,
         FormKeyValidator $formKeyValidator,
         StoreManagerInterface $storeManager,
+        Enqueuer $importerEnqueuer,
         ConsentManager $consentManager
     ) {
         $this->dataHelper = $dataHelper;
@@ -94,6 +102,7 @@ class NewsletterControllerPlugin
         $this->customerSession = $customerSession;
         $this->formKeyValidator = $formKeyValidator;
         $this->storeManager = $storeManager;
+        $this->importerEnqueuer = $importerEnqueuer;
         $this->consentManager = $consentManager;
     }
 
@@ -150,8 +159,12 @@ class NewsletterControllerPlugin
                     $contactModel,
                     $hasProvidedConsent
                 )) {
+                    $this->importerEnqueuer->enqueueUnsubscribe(
+                        $contactModel->getContactId(),
+                        $customerEmail,
+                        $websiteId
+                    );
                     $contactModel->setSmsSubscriberStatus(Subscriber::STATUS_UNSUBSCRIBED);
-                    $contactModel->setSmsSubscriberImported(Contact::EMAIL_CONTACT_NOT_IMPORTED);
                     $this->contactResource->save($contactModel);
 
                 } elseif ($contactModel->getMobileNumber() != $consentMobileNumber) {

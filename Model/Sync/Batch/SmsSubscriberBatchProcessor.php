@@ -9,6 +9,7 @@ use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Email\Model\Apiconnector\V3\ClientFactory;
 use Dotdigitalgroup\Email\Model\Importer;
 use Dotdigitalgroup\Email\Model\ImporterFactory;
+use Dotdigitalgroup\Sms\Model\Importer as SmsImporter;
 use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContactFactory as SmsContactResourceFactory;
 use Http\Client\Exception;
 use Magento\Framework\Exception\LocalizedException;
@@ -194,7 +195,7 @@ class SmsSubscriberBatchProcessor
     {
         $this->importerFactory->create()
             ->registerQueue(
-                self::IMPORT_TYPE_SMS_SUBSCRIBERS,
+                SmsImporter::IMPORT_TYPE_SMS_SUBSCRIBERS,
                 $batch,
                 Importer::MODE_BULK,
                 $websiteId,
