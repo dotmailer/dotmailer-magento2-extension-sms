@@ -126,8 +126,8 @@ class NewsletterControllerPlugin
         if (!$this->dataHelper->isEnabled($websiteId)) {
             return $result;
         }
-        $hasProvidedConsent = $subject->getRequest()->getParam('is_sms_subscribed');
-        $consentMobileNumber = $subject->getRequest()->getParam('mobile_number');
+        $hasProvidedConsent = $subject->getRequest()->getParam('is_sms_subscribed') ?: false;
+        $consentMobileNumber = $subject->getRequest()->getParam('mobile_number') ?: '';
         if ($hasProvidedConsent && !$consentMobileNumber) {
             return $result;
         }
