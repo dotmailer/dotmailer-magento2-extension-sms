@@ -2,6 +2,7 @@
 
 namespace Dotdigitalgroup\Sms\Model\Importer;
 
+use Dotdigitalgroup\Email\Model\Importer;
 use Dotdigitalgroup\Email\Model\ImporterFactory;
 use Dotdigitalgroup\Sms\Model\Importer as SmsImporter;
 
@@ -36,7 +37,7 @@ class Enqueuer
             ->registerQueue(
                 SmsImporter::IMPORT_TYPE_SMS_SUBSCRIBER,
                 ['id' => $contactId, 'email' => $email],
-                SmsImporter::MODE_SUBSCRIBER_UNSUBSCRIBE,
+                Importer::MODE_SUBSCRIBER_UNSUBSCRIBE,
                 $websiteId
             );
     }
