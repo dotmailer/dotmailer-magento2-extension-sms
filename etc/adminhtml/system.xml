@@ -154,11 +154,11 @@
                 <field id="enabled" translate="label" sortOrder="10" type="select" showInStore="1" showInWebsite="1" showInDefault="1">
                     <label>Ask for SMS marketing consent</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment><![CDATA[Enable this to capture and record consent for SMS marketing.]]></comment>
+                    <comment><![CDATA[Enable this to capture mobile numbers and record consent for SMS marketing.]]></comment>
                 </field>
                 <field id="signup_text" translate="label" sortOrder="20" type="textarea" showInWebsite="1" showInStore="1" showInDefault="1">
                     <label>Sign up text</label>
-                    <comment><![CDATA[The text here is displayed next to the checkbox in checkout.]]></comment>
+                    <comment><![CDATA[The text here is displayed next to the checkbox when opting in.]]></comment>
                 </field>
                 <field id="marketing_consent_text" translate="label" sortOrder="20" type="textarea" showInWebsite="1" showInStore="1" showInDefault="1">
                     <label>SMS marketing consent text</label>
