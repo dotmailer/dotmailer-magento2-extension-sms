@@ -3,9 +3,9 @@
 namespace Dotdigitalgroup\Sms\Plugin\Customer\Controller\Adminhtml\Index;
 
 use Dotdigitalgroup\Email\Model\Contact;
-use Dotdigitalgroup\Email\Model\ResourceModel\Contact\CollectionFactory as ContactCollectionFactory;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
 use Dotdigitalgroup\Sms\Model\Importer\Enqueuer;
+use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory as ContactCollectionFactory;
 use Dotdigitalgroup\Sms\Model\Subscriber;
 use Magento\Backend\Model\View\Result\Redirect;
 use Magento\Framework\Exception\AlreadyExistsException;

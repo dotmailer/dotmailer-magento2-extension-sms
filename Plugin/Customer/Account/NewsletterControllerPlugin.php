@@ -8,7 +8,7 @@ use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Email\Model\Contact;
 use Dotdigitalgroup\Email\Model\ContactFactory;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
-use Dotdigitalgroup\Email\Model\ResourceModel\Contact\CollectionFactory;
+use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory;
 use Dotdigitalgroup\Sms\Model\Importer\Enqueuer;
 use Dotdigitalgroup\Sms\Model\Subscriber;
 use Dotdigitalgroup\Sms\Model\Consent\ConsentManager;

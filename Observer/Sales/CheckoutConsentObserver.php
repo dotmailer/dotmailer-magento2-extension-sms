@@ -4,9 +4,9 @@ namespace Dotdigitalgroup\Sms\Observer\Sales;
 
 use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Email\Model\Contact;
-use Dotdigitalgroup\Email\Model\ContactFactory;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
-use Dotdigitalgroup\Email\Model\ResourceModel\Contact\CollectionFactory;
+use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory;
+use Dotdigitalgroup\Sms\Model\SmsContactFactory;
 use Dotdigitalgroup\Sms\Model\Subscriber;
 use Dotdigitalgroup\Sms\Model\Consent\ConsentManager;
 use Magento\Checkout\Model\Session as CheckoutSession;
@@ -26,7 +26,7 @@ class CheckoutConsentObserver implements ObserverInterface
     private $logger;
 
     /**
-     * @var ContactFactory
+     * @var SmsContactFactory
      */
     private $contactFactory;
 
@@ -57,7 +57,7 @@ class CheckoutConsentObserver implements ObserverInterface
 
     /**
      * @param Logger $logger
-     * @param ContactFactory $contactFactory
+     * @param SmsContactFactory $contactFactory
      * @param ContactResource $contactResource
      * @param CollectionFactory $contactCollectionFactory
      * @param CheckoutSession $checkoutSession
@@ -66,7 +66,7 @@ class CheckoutConsentObserver implements ObserverInterface
      */
     public function __construct(
         Logger $logger,
-        ContactFactory $contactFactory,
+        SmsContactFactory $contactFactory,
         ContactResource $contactResource,
         CollectionFactory $contactCollectionFactory,
         CheckoutSession $checkoutSession,
@@ -108,7 +108,7 @@ class CheckoutConsentObserver implements ObserverInterface
                     $websiteId
                 );
 
-            if ($contactModel) {
+            if ($contactModel->getId()) {
                 $contactModel->setMobileNumber($consentMobileNumber);
                 $contactModel->setSmsSubscriberStatus(Subscriber::STATUS_SUBSCRIBED);
             } else {

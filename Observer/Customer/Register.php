@@ -2,17 +2,19 @@
 
 namespace Dotdigitalgroup\Sms\Observer\Customer;
 
-use Dotdigitalgroup\Email\Model\ContactFactory;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
 use Dotdigitalgroup\Sms\Model\Consent\ConsentManager;
+use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory as ContactCollectionFactory;
+use Dotdigitalgroup\Sms\Model\Subscriber;
 use Magento\Framework\Event\Observer;
+use Magento\Framework\Event\ObserverInterface;
 
-class Register implements \Magento\Framework\Event\ObserverInterface
+class Register implements ObserverInterface
 {
     /**
-     * @var ContactFactory
+     * @var ContactCollectionFactory
      */
-    private $contactFactory;
+    private $contactCollectionFactory;
 
     /**
      * @var ContactResource
@@ -25,17 +27,17 @@ class Register implements \Magento\Framework\Event\ObserverInterface
     private $consentManager;
 
     /**
-     * @param ContactFactory $contactFactory
+     * @param ContactCollectionFactory $contactCollectionFactory
      * @param ContactResource $contactResource
      * @param ConsentManager $consentManager
      */
     public function __construct(
-        ContactFactory $contactFactory,
+        ContactCollectionFactory $contactCollectionFactory,
         ContactResource $contactResource,
         ConsentManager $consentManager
     ) {
         $this->consentManager = $consentManager;
-        $this->contactFactory = $contactFactory;
+        $this->contactCollectionFactory = $contactCollectionFactory;
         $this->contactResource = $contactResource;
     }
 
@@ -53,15 +55,15 @@ class Register implements \Magento\Framework\Event\ObserverInterface
         $storeId = $customer->getStoreId();
 
         if ($request->get('is_sms_subscribed')) {
-            $contactModel = $this->contactFactory->create()
+            $contactModel = $this->contactCollectionFactory->create()
                 ->loadByCustomerEmail(
                     $customer->getEmail(),
                     $customer->getWebsiteId()
                 );
 
-            if ($contactModel) {
+            if ($contactModel->getId()) {
                 $contactModel->setMobileNumber($request->get('mobile_number'));
-                $contactModel->setSmsSubscriberStatus($request->get('is_sms_subscribed'));
+                $contactModel->setSmsSubscriberStatus(Subscriber::STATUS_SUBSCRIBED);
                 $this->contactResource->save($contactModel);
             }
             $this->consentManager->createConsentRecord($contactModel->getId(), $storeId);
