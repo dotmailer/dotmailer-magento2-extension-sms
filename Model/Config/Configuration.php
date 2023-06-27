@@ -198,9 +198,9 @@ class Configuration
      * @param string|int $storeId
      * @return string
      */
-    public function getSmsMarketingConsentText($storeId)
+    public function getSmsMarketingConsentText($storeId): string
     {
-        return $this->scopeConfig->getValue(
+        return (string) $this->scopeConfig->getValue(
             ConfigInterface::XML_PATH_CONSENT_SMS_MARKETING_TEXT,
             ScopeInterface::SCOPE_STORES,
             $storeId
