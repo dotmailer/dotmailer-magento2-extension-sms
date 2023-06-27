@@ -2,7 +2,7 @@
 
 namespace Dotdigitalgroup\Sms\Block\Adminhtml\Customer\Edit\Tab;
 
-use Dotdigitalgroup\Email\Model\ResourceModel\Contact\CollectionFactory as ContactCollectionFactory;
+use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory as ContactCollectionFactory;
 use Dotdigitalgroup\Sms\Model\Subscriber;
 use Magento\Backend\Block\Template\Context;
 use Magento\Customer\Controller\RegistryConstants;

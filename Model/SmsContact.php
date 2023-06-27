@@ -2,7 +2,6 @@
 
 namespace Dotdigitalgroup\Sms\Model;
 
-use DateTimeInterface;
 use Dotdigitalgroup\Email\Model\Contact;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact\CollectionFactory as ContactCollectionFactory;
@@ -13,17 +12,12 @@ use Magento\Framework\Stdlib\DateTime;
 class SmsContact extends Contact
 {
     /**
-     * @var ContactResource
-     */
-    private $contactResource;
-
-    /**
      * @var DateTime
      */
     private $dateTime;
 
     /**
-     * Contact constructor.
+     * SmsContact constructor.
      *
      * @param Context $context
      * @param Registry $registry
@@ -38,7 +32,6 @@ class SmsContact extends Contact
         ContactCollectionFactory $contactCollectionFactory,
         DateTime $dateTime
     ) {
-        $this->contactResource = $contactResource;
         $this->dateTime = $dateTime;
 
         parent::__construct(
@@ -62,5 +55,41 @@ class SmsContact extends Contact
             $this->setSmsChangeStatusAt($this->dateTime->formatDate(true));
         }
         return $this;
+    }
+
+    /**
+     * Set mobile number.
+     *
+     * If we have a number to set, remove spaces and the +.
+     * If we don't (e.g. number is being removed), use native behaviour.
+     *
+     * @param string|int $mobileNumber
+     *
+     * @return void
+     */
+    public function setMobileNumber($mobileNumber)
+    {
+        if (!$mobileNumber) {
+            parent::setMobileNumber();
+            return;
+        }
+
+        $mobileNumber = str_replace(' ', '', $mobileNumber);
+        parent::setMobileNumber((int) $mobileNumber);
+    }
+
+    /**
+     * Get mobile number.
+     *
+     * @return string
+     */
+    public function getMobileNumber(): string
+    {
+        if (! parent::getMobileNumber()) {
+            return '';
+        }
+        $mobileNumber = str_replace(' ', '', parent::getMobileNumber());
+
+        return '+' . (int) $mobileNumber;
     }
 }

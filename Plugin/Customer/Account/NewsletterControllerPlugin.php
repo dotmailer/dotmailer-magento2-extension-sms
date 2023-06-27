@@ -127,7 +127,9 @@ class NewsletterControllerPlugin
             return $result;
         }
         $hasProvidedConsent = $subject->getRequest()->getParam('is_sms_subscribed') ?: false;
-        $consentMobileNumber = $subject->getRequest()->getParam('mobile_number') ?: '';
+        $consentMobileNumber = $subject->getRequest()->getParam('mobile_number') ?
+            str_replace(' ', '', $subject->getRequest()->getParam('mobile_number')) :
+            '';
         if ($hasProvidedConsent && !$consentMobileNumber) {
             return $result;
         }
@@ -164,10 +166,14 @@ class NewsletterControllerPlugin
                         $customerEmail,
                         $websiteId
                     );
+                    $contactModel->setMobileNumber($consentMobileNumber);
                     $contactModel->setSmsSubscriberStatus(Subscriber::STATUS_UNSUBSCRIBED);
                     $this->contactResource->save($contactModel);
 
-                } elseif ($contactModel->getMobileNumber() != $consentMobileNumber) {
+                } elseif ($this->contactMobileNumberIsUpdated(
+                    $contactModel,
+                    $consentMobileNumber
+                )) {
                     $contactModel->setMobileNumber($consentMobileNumber);
                     $contactModel->setSmsSubscriberImported(Contact::EMAIL_CONTACT_NOT_IMPORTED);
                     $this->contactResource->save($contactModel);
@@ -211,5 +217,18 @@ class NewsletterControllerPlugin
     private function contactHasJustOptedOut(Contact $contact, ?bool $hasProvidedConsent): bool
     {
         return $contact->getSmsSubscriberStatus() == Subscriber::STATUS_SUBSCRIBED && !$hasProvidedConsent;
+    }
+
+    /**
+     * Status has not changed, but mobile number has been updated.
+     *
+     * @param Contact $contact
+     * @param string $consentMobileNumber
+     *
+     * @return bool
+     */
+    private function contactMobileNumberIsUpdated(Contact $contact, string $consentMobileNumber): bool
+    {
+        return $contact->getMobileNumber() != $consentMobileNumber;
     }
 }

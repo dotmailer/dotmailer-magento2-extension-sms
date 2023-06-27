@@ -52,20 +52,20 @@ class Exporter
         $exportedData = [];
         $smsAddressBookListId = $this->configuration->getListId($website->getId());
 
-        foreach ($smsSubscribers as $smsSubscriberResource) {
+        foreach ($smsSubscribers as $smsSubscriber) {
             $contact = new DotdigitalContact([
                 'matchIdentifier' => 'email'
             ]);
             $contact->setIdentifiers([
-                'email' => $smsSubscriberResource->getEmail(),
-                'mobileNumber' => $smsSubscriberResource->getMobileNumber()
+                'email' => $smsSubscriber->getEmail(),
+                'mobileNumber' => $smsSubscriber->getMobileNumber()
             ]);
             $contact->setLists([$smsAddressBookListId]);
             $contact->setDataFields(
-                $this->mapFields($smsSubscriberResource->getData())
+                $this->mapFields($smsSubscriber->getData())
             );
 
-            $exportedData["{$smsSubscriberResource->getEmailContactId()}"] = $contact;
+            $exportedData["{$smsSubscriber->getEmailContactId()}"] = $contact;
         }
 
         return $exportedData;

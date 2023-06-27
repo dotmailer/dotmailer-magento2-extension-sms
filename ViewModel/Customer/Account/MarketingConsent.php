@@ -6,6 +6,7 @@ use Dotdigitalgroup\Email\Model\Consent;
 use Dotdigitalgroup\Email\ViewModel\Customer\AccountSubscriptions;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\Model\Subscriber;
+use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory as ContactCollectionFactory;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
@@ -29,6 +30,11 @@ class MarketingConsent implements ArgumentInterface
     private $moduleConfig;
 
     /**
+     * @var ContactCollectionFactory
+     */
+    private $contactCollectionFactory;
+
+    /**
      * @var StoreManagerInterface
      */
     private $storeManager;
@@ -37,17 +43,20 @@ class MarketingConsent implements ArgumentInterface
      * @param Consent $consent
      * @param AccountSubscriptions $containerViewModel
      * @param Configuration $moduleConfig
+     * @param ContactCollectionFactory $contactCollectionFactory
      * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         Consent $consent,
         AccountSubscriptions $containerViewModel,
         Configuration $moduleConfig,
+        ContactCollectionFactory $contactCollectionFactory,
         StoreManagerInterface $storeManager
     ) {
         $this->consent = $consent;
         $this->containerViewModel = $containerViewModel;
         $this->moduleConfig = $moduleConfig;
+        $this->contactCollectionFactory = $contactCollectionFactory;
         $this->storeManager = $storeManager;
     }
 
@@ -102,13 +111,22 @@ class MarketingConsent implements ArgumentInterface
     /**
      * Get stored mobile number from contact table.
      *
+     * The SmsContact does the transformation of mobile number from the table. Therefore
+     * we can't rely on the Email-based contact from table, we need a new one from our
+     * overloaded collection.
+     *
      * @return string
      * @throws LocalizedException
      */
     public function getStoredMobileNumber()
     {
-        $contact = $this->containerViewModel->getContactFromTable();
-        return $contact ? $contact->getMobileNumber() : '';
+        $emailContactModel = $this->containerViewModel->getContactFromTable();
+        $smsContactModel = $this->contactCollectionFactory->create()
+            ->loadByCustomerEmail(
+                $emailContactModel->getEmail(),
+                $emailContactModel->getWebsiteId()
+            );
+        return $smsContactModel->getMobileNumber();
     }
 
     /**

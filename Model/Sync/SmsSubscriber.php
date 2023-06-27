@@ -3,13 +3,15 @@
 namespace Dotdigitalgroup\Sms\Model\Sync;
 
 use DateTime;
-use Dotdigitalgroup\Email\Model\ResourceModel\Contact\CollectionFactory as ContactCollectionFactory;
+use Dotdigitalgroup\Email\Model\Contact;
+use Dotdigitalgroup\Email\Model\Importer;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact\Collection;
 use Dotdigitalgroup\Email\Helper\Config;
 use Dotdigitalgroup\Email\Helper\Data;
 use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Email\Model\Sync\SyncInterface;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
+use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory as ContactCollectionFactory;
 use Dotdigitalgroup\Sms\Model\Sync\Batch\SmsSubscriberBatchProcessor;
 use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\Exporter;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -23,7 +25,6 @@ use Magento\Store\Model\ScopeInterface;
 
 class SmsSubscriber implements SyncInterface
 {
-
     /**
      * @var Logger
      */
@@ -219,7 +220,7 @@ class SmsSubscriber implements SyncInterface
         $smsSubscriberCollection = $this->contactCollectionFactory->create()
             ->addFieldToFilter('main_table.website_id', ['eq' => $website->getId()])
             ->addFieldToFilter('sms_subscriber_status', Subscriber::STATUS_SUBSCRIBED)
-            ->addFieldToFilter('sms_subscriber_imported', Subscriber::STATUS_PENDING_IMPORT)
+            ->addFieldToFilter('sms_subscriber_imported', Contact::EMAIL_CONTACT_NOT_IMPORTED)
             ->addFieldToFilter('mobile_number', ['notnull' => true ])
             ->addFieldToFilter('mobile_number', ['neq' => '']);
 

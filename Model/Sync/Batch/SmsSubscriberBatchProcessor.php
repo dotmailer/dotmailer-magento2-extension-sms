@@ -4,7 +4,6 @@ namespace Dotdigitalgroup\Sms\Model\Sync\Batch;
 
 use Dotdigital\Exception\ResponseValidationException;
 use Dotdigital\V3\Models\ContactCollection as DotdigitalContactCollection;
-use Dotdigital\V3\Resources\Contacts;
 use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Email\Model\Apiconnector\V3\ClientFactory;
 use Dotdigitalgroup\Email\Model\Importer;
@@ -84,7 +83,7 @@ class SmsSubscriberBatchProcessor
         $this->logger->info('SMS Subscriber Batch Processor: ' . count($batch));
 
         try {
-            $importId = $this->pushBatch($batch);
+            $importId = $this->pushBatch($batch, $websiteId);
             if ($importId) {
                 $this->addInProgressBatchToImportTable($batch, $websiteId, $importId);
             }
@@ -104,20 +103,20 @@ class SmsSubscriberBatchProcessor
      * Push batch to Dotdigital.
      *
      * @param array $batch
+     * @param int $websiteId
      *
      * @return string
      * @throws ResponseValidationException
      * @throws Exception
      */
-    private function pushBatch(array $batch): string
+    private function pushBatch(array $batch, $websiteId): string
     {
         $importId = '';
 
         $contactCollection = new DotdigitalContactCollection(
             $this->resetArrayPointers($batch)
         );
-        /** @var Contacts $contactsResource */
-        $contactsResource = $this->clientFactory->create()->contacts;
+        $contactsResource = $this->clientFactory->create(['data' => ['websiteId' => $websiteId]])->contacts;
         $importResponse = $contactsResource->import($contactCollection);
 
         if ($importResponse) {

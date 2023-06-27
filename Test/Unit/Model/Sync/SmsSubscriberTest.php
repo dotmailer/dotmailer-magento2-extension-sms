@@ -3,7 +3,7 @@
 namespace Dotdigitalgroup\Sms\Test\Unit\Model\Sync;
 
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact\Collection;
-use Dotdigitalgroup\Email\Model\ResourceModel\Contact\CollectionFactory;
+use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory;
 use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\Exporter;
 use Dotdigital\V3\Models\ContactCollection;
 use Dotdigitalgroup\Email\Helper\Data;
