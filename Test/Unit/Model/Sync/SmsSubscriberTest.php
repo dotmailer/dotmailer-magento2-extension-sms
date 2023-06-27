@@ -211,7 +211,7 @@ class SmsSubscriberTest extends TestCase
 
         $this->emailHelperMock->expects($this->once())
             ->method('isEnabled')
-            ->with($this->websiteInterfaceMock)
+            ->with($this->websiteInterfaceMock->getId())
             ->willReturn(true);
 
         $this->smsConfigMock->expects($this->once())

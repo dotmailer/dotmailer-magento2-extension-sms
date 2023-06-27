@@ -169,6 +169,10 @@
         <section id="connector_developer_settings" translate="label" sortOrder="500" showInStore="0" showInWebsite="1" showInDefault="1">
             <tab>ddg_automation</tab>
             <group id="sync_settings" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="sms_subscriber_sync" translate="label" sortOrder="85" showInStore="0" showInWebsite="1" showInDefault="1">
+                    <label>SMS Subscriber Sync</label>
+                    <frontend_model>Dotdigitalgroup\Sms\Block\Adminhtml\Config\Developer\SmsSubscriberSync</frontend_model>
+                </field>
                 <field id="reset_sms_subscribers" translate="label" sortOrder="165" showInStore="0" showInWebsite="1"
                        showInDefault="1">
                     <label>Reset SMS Subscribers</label>

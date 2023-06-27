@@ -9,12 +9,14 @@ use Dotdigitalgroup\Email\Model\ResourceModel\Contact\Collection;
 use Dotdigitalgroup\Email\Helper\Config;
 use Dotdigitalgroup\Email\Helper\Data;
 use Dotdigitalgroup\Email\Logger\Logger;
+use Dotdigitalgroup\Email\Model\Sync\AbstractContactSyncer;
 use Dotdigitalgroup\Email\Model\Sync\SyncInterface;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory as ContactCollectionFactory;
 use Dotdigitalgroup\Sms\Model\Sync\Batch\SmsSubscriberBatchProcessor;
 use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\Exporter;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Dotdigitalgroup\Sms\Model\Subscriber;
@@ -23,7 +25,7 @@ use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\ExporterFactory;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Store\Model\ScopeInterface;
 
-class SmsSubscriber implements SyncInterface
+class SmsSubscriber extends DataObject implements SyncInterface
 {
     /**
      * @var Logger
@@ -79,6 +81,7 @@ class SmsSubscriber implements SyncInterface
      * @param ResourceConnection $resource
      * @param SmsSubscriberBatchProcessor $batchProcessor
      * @param ScopeConfigInterface $scopeConfig
+     * @param array $data
      */
     public function __construct(
         Logger $logger,
@@ -88,7 +91,8 @@ class SmsSubscriber implements SyncInterface
         ExporterFactory $exporterFactory,
         ResourceConnection $resource,
         SmsSubscriberBatchProcessor $batchProcessor,
-        ScopeConfigInterface $scopeConfig
+        ScopeConfigInterface $scopeConfig,
+        array $data = []
     ) {
         $this->logger = $logger;
         $this->emailHelper = $emailHelper;
@@ -98,6 +102,17 @@ class SmsSubscriber implements SyncInterface
         $this->resource = $resource;
         $this->batchProcessor = $batchProcessor;
         $this->scopeConfig = $scopeConfig;
+        parent::__construct($data);
+    }
+
+    /**
+     * Determines whether the sync was triggered from Configuration > Dotdigital > Developer > Sync Settings.
+     *
+     * @return bool
+     */
+    protected function isRunFromDeveloperButton(): bool
+    {
+        return (bool)$this->_getData('web');
     }
 
     /**
@@ -111,9 +126,9 @@ class SmsSubscriber implements SyncInterface
     public function sync(DateTime $from = null): array
     {
         $start = microtime(true);
-        $breakValue = (int) $this->scopeConfig->getValue(
-            Config::XML_PATH_CONNECTOR_SYNC_BREAK_VALUE
-        );
+        $breakValue = $this->isRunFromDeveloperButton() ?
+            (int) $this->scopeConfig->getValue(Config::XML_PATH_CONNECTOR_SYNC_LIMIT):
+            (int) $this->scopeConfig->getValue(Config::XML_PATH_CONNECTOR_SYNC_BREAK_VALUE);
         $megaBatchSize = (int) $this->scopeConfig->getValue(
             Config::XML_PATH_CONNECTOR_MEGA_BATCH_SIZE_CONTACT
         );
@@ -202,7 +217,8 @@ class SmsSubscriber implements SyncInterface
     private function fetchWebsitesForSync(): array
     {
         return array_filter($this->emailHelper->getWebsites(), function ($website) {
-            return $this->emailHelper->isEnabled($website) && $this->smsConfig->isSmsSyncEnabled($website->getId());
+            return $this->emailHelper->isEnabled($website->getId())
+                && $this->smsConfig->isSmsSyncEnabled($website->getId());
         });
     }
 
@@ -219,8 +235,8 @@ class SmsSubscriber implements SyncInterface
     {
         $smsSubscriberCollection = $this->contactCollectionFactory->create()
             ->addFieldToFilter('main_table.website_id', ['eq' => $website->getId()])
-            ->addFieldToFilter('sms_subscriber_status', Subscriber::STATUS_SUBSCRIBED)
-            ->addFieldToFilter('sms_subscriber_imported', Contact::EMAIL_CONTACT_NOT_IMPORTED)
+            ->addFieldToFilter('sms_subscriber_status', (string) Subscriber::STATUS_SUBSCRIBED)
+            ->addFieldToFilter('sms_subscriber_imported', (string) Contact::EMAIL_CONTACT_NOT_IMPORTED)
             ->addFieldToFilter('mobile_number', ['notnull' => true ])
             ->addFieldToFilter('mobile_number', ['neq' => '']);
 
