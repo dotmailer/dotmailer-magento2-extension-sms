@@ -45,6 +45,9 @@
     <type name="Dotdigitalgroup\Email\Model\Sync\Importer\ImporterQueueManager">
         <plugin name="dd_sms_importer_queue_manager_plugin" type="Dotdigitalgroup\Sms\Plugin\Importer\ImporterQueueManagerPlugin"/>
     </type>
+    <type name="Dotdigitalgroup\Email\Model\Sync\Importer\ImporterProgressHandler">
+        <plugin name="dd_sms_importer_progress_handler_plugin" type="Dotdigitalgroup\Sms\Plugin\Importer\ImporterProgressHandlerPlugin"/>
+    </type>
     <type name="Dotdigitalgroup\Email\Model\Contact\ContactUpdaterPool">
         <arguments>
             <argument name="updaters" xsi:type="array">

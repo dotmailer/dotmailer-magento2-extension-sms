@@ -16,8 +16,6 @@ use Magento\Framework\Serialize\SerializerInterface;
 
 class SmsSubscriberBatchProcessor
 {
-    private const IMPORT_TYPE_SMS_SUBSCRIBERS = 'SMS_Subscribers';
-
     /**
      * @var ClientFactory
      */
@@ -170,7 +168,7 @@ class SmsSubscriberBatchProcessor
     {
         $this->importerFactory->create()
             ->registerQueue(
-                self::IMPORT_TYPE_SMS_SUBSCRIBERS,
+                SmsImporter::IMPORT_TYPE_SMS_SUBSCRIBERS,
                 $batch,
                 Importer::MODE_BULK,
                 $websiteId,
