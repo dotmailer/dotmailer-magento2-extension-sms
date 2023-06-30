@@ -121,6 +121,9 @@ class MarketingConsent implements ArgumentInterface
     public function getStoredMobileNumber()
     {
         $emailContactModel = $this->containerViewModel->getContactFromTable();
+        if (!$emailContactModel) {
+            return '';
+        }
         $smsContactModel = $this->contactCollectionFactory->create()
             ->loadByCustomerEmail(
                 $emailContactModel->getEmail(),
