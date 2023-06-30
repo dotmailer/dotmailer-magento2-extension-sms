@@ -43,7 +43,7 @@ define([
                     errorCode,
                     hasProvidedConsent = $('#dd_sms_consent_checkbox').is(':checked');
 
-                if (!hasProvidedConsent) {
+                if (!hasProvidedConsent && !value) {
                     return true;
                 }
 
