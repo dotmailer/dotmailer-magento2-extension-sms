@@ -56,4 +56,10 @@
             </argument>
         </arguments>
     </type>
+    <type name="Dotdigitalgroup\Email\Setup\Install\DataMigrationHelper">
+        <plugin name="dd_sms_data_migration_helper_plugin" type="Dotdigitalgroup\Sms\Plugin\Setup\Install\DataMigrationHelper"/>
+    </type>
+    <type name="Dotdigitalgroup\Email\Setup\Install\DataMigrationTypeProvider">
+        <plugin name="dd_sms_data_migration_type_provider_plugin" type="Dotdigitalgroup\Sms\Plugin\Setup\Install\DataMigrationTypeProvider"/>
+    </type>
 </config>
