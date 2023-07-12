@@ -50,7 +50,7 @@ class LayoutProcessor
         Session $customerSession,
         CurrentCustomerAddress $currentCustomerAddress,
         StoreManagerInterface $storeManager,
-        ConsentCollapseGroup $consentCollapseGroup,
+        ConsentCollapseGroup $consentCollapseGroup
     ) {
         $this->moduleConfig = $moduleConfig;
         $this->customerSession = $customerSession;
