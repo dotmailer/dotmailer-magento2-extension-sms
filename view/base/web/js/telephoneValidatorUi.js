@@ -25,21 +25,20 @@ define([
                     isValid = false,
                     errorCode;
 
-                if (countryCodeClass === undefined || countryCodeClass.indexOf(' ') === -1) {
+                try {
+                    isValid = phoneValidate(value, countryCodeClass);
+
+                    if (!isValid) {
+                        countryCodeClass = countryCodeClass.split(' ')[1];
+                        countryCode = countryCodeClass.split('__')[1];
+                        errorCode = phoneErrorHandler.getErrorCode(value, countryCode);
+                        this.message = typeof errorMap[errorCode] === 'undefined' ?
+                            errorMap[0] :
+                            errorMap[errorCode];
+                    }
+                } catch (e) {
                     this.message = errorMap[1];
-
-                    return false;
-                }
-
-                isValid = phoneValidate(value, countryCodeClass);
-
-                if (!isValid) {
-                    countryCodeClass = countryCodeClass.split(' ')[1];
-                    countryCode = countryCodeClass.split('__')[1];
-                    errorCode = phoneErrorHandler.getErrorCode(value, countryCode);
-                    this.message = typeof errorMap[errorCode] === 'undefined' ?
-                        errorMap[0] :
-                        errorMap[errorCode];
+                    isValid = false;
                 }
 
                 // Ensure that changing the flag always updates the model

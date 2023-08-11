@@ -14,22 +14,21 @@ define([
                     isValid,
                     errorCode;
 
-                countryCodeClass = countryCodeClass.split(' ')[1];
+                try {
+                    isValid = phoneValidate(value, countryCodeClass);
 
-                if (countryCodeClass === undefined) {
+                    if (!isValid) {
+                        countryCodeClass = countryCodeClass.split(' ')[1];
+                        countryCode = countryCodeClass.split('__')[1];
+                        errorCode = phoneErrorHandler.getErrorCode(value, countryCode);
+
+                        $.validator.messages['validate-phone-number'] = typeof errorMap[errorCode] === 'undefined' ?
+                            errorMap[0] :
+                            errorMap[errorCode];
+                    }
+                } catch (e) {
                     $.validator.messages['validate-phone-number'] = errorMap[1];
-
-                    return false;
-                }
-
-                isValid = phoneValidate(value, countryCodeClass);
-                if (!isValid) {
-                    countryCode = countryCodeClass.split('__')[1];
-                    errorCode = phoneErrorHandler.getErrorCode(value, countryCode);
-
-                    $.validator.messages['validate-phone-number'] = typeof errorMap[errorCode] === 'undefined' ?
-                        errorMap[0] :
-                        errorMap[errorCode];
+                    isValid = false;
                 }
 
                 return isValid;
@@ -47,14 +46,13 @@ define([
                     return true;
                 }
 
-                countryCodeClass = countryCodeClass.split(' ')[1];
-
-                if (countryCodeClass === undefined) {
+                if (countryCodeClass === undefined || countryCodeClass.indexOf(' ') === -1) {
                     $.validator.messages['validate-phone-number-with-checkbox'] = errorMap[1];
 
                     return false;
                 }
 
+                countryCodeClass = countryCodeClass.split(' ')[1];
                 countryCode = countryCodeClass.split('__')[1];
                 isValid = window.intlTelInputUtils.isValidNumber(value, countryCode);
 

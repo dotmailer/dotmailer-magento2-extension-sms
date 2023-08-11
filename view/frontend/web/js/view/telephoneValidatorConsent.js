@@ -19,16 +19,20 @@ define([
             countryCodeClass = consentForm.find('.iti__selected-flag .iti__flag').attr('class');
 
             if (consentFormUiClass().isChecked() && typeof countryCodeClass !== 'undefined') {
-                isValid = validate(
-                    consentFormUiClass().consentPhoneInput().value(),
-                    countryCodeClass
-                );
+                try {
+                    isValid = validate(
+                        consentFormUiClass().consentPhoneInput().value(),
+                        countryCodeClass
+                    );
+                } catch (e) {
+                    return false;
+                }
             }
             if (isValid) {
                 return this._super(arguments);
             }
-                return false;
 
+            return false;
         }
     };
 

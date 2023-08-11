@@ -5,7 +5,7 @@ define([], function () {
         let countryCode;
 
         if (countryCodeClass === undefined || countryCodeClass.indexOf(' ') === -1) {
-            return false;
+            throw new Error("Cannot find country code");
         }
 
         countryCodeClass = countryCodeClass.split(' ')[1];
