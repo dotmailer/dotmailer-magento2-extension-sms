@@ -6,7 +6,7 @@
             <group id="addressbook" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
                 <field id="sms_subscribers" translate="label" type="select" sortOrder="35" showInDefault="1" showInStore="0" showInWebsite="1">
                     <label>Add SMS Subscribers To</label>
-                    <source_model>Dotdigitalgroup\Email\Model\Config\Source\Settings\Addressbooks</source_model>
+                    <source_model>Dotdigitalgroup\Email\Model\Config\Source\Sync\Lists</source_model>
                 </field>
             </group>
             <group id="sync" translate="label" type="text" sortOrder="30" showInDefault="1" showInStore="0" showInWebsite="1">
