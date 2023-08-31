@@ -38,7 +38,7 @@
             <actionGroup ref="EnableSms" stepKey="DisableSmsOptions">
                 <argument name="enabled" value="No"/>
             </actionGroup>
-            <actionGroup ref="EnableSms" stepKey="DisablePhoneNumberValidationOptions">
+            <actionGroup ref="SetPhoneNumberValidation" stepKey="DisablePhoneNumberValidationOptions">
                 <argument name="enabled" value="No"/>
             </actionGroup>
             <actionGroup ref="ResetDotmailerAccountData" stepKey="resetAccountData"/>
