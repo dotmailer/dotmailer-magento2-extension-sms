@@ -17,7 +17,6 @@ use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Select;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Magento\Store\Api\Data\WebsiteInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -30,11 +29,6 @@ class SmsSubscriberTest extends TestCase
     public const LIMIT = 2000;
 
     public const BATCH_SIZE = 500;
-
-    /**
-     * @var ObjectManager
-     */
-    private $objectManager;
 
     /**
      * @var SmsSubscriber
@@ -105,13 +99,12 @@ class SmsSubscriberTest extends TestCase
      * @var (ContactCollection&MockObject)|MockObject $contactCollectionMock
      */
     private $contactCollectionMock;
+
     /**
      * @inheritDoc
      */
     protected function setUp(): void
     {
-        $this->objectManager = new ObjectManager($this);
-
         $this->loggerMock = $this->createMock(Logger::class);
         $this->resourceMock = $this->createMock(ResourceConnection::class);
         $this->exporterFactoryMock = $this->createMock(ExporterFactory::class);

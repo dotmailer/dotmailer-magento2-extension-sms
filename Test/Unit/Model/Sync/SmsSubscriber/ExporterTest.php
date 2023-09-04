@@ -5,10 +5,8 @@ namespace Dotdigitalgroup\Sms\Test\Unit\Model\Sync\SmsSubscriber;
 use Dotdigitalgroup\Email\Model\Contact;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\Exporter;
-use Dotdigitalgroup\Sms\Test\Unit\Traits\TestInteractsWithV3ApiModels;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Magento\Store\Api\Data\WebsiteInterface;
 use PHPUnit\Framework\TestCase;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact\Collection as EmailContactCollection;
@@ -38,7 +36,6 @@ class ExporterTest extends TestCase
 
     protected function setUp(): void
     {
-        $objectManager = new ObjectManager($this);
         $this->configurationMock = $this->createMock(Configuration::class);
         $this->smsSubscriberCollectionMock = $this->createMock(EmailContactCollection::class);
         $this->websiteMock = $this->createMock(WebsiteInterface::class);
@@ -46,9 +43,9 @@ class ExporterTest extends TestCase
             ->method('getId')
             ->willReturn(1);
 
-        $this->exporter = $objectManager->getObject(Exporter::class, [
-            'configuration' => $this->configurationMock
-        ]);
+        $this->exporter = new Exporter(
+            $this->configurationMock
+        );
     }
 
     /**
