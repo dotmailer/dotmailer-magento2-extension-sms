@@ -1,6 +1,24 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
+        <section id="sync_settings" translate="label" type="text" sortOrder="150" showInWebsite="1" showInStore="0" showInDefault="1">
+            <tab>ddg_automation</tab>
+            <group id="addressbook" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="sms_subscribers" translate="label" type="select" sortOrder="35" showInDefault="1" showInStore="0" showInWebsite="1">
+                    <label>Add SMS Subscribers To</label>
+                    <source_model>Dotdigitalgroup\Email\Model\Config\Source\Sync\Lists</source_model>
+                </field>
+            </group>
+            <group id="sync" translate="label" type="text" sortOrder="30" showInDefault="1" showInStore="0" showInWebsite="1">
+                <field id="sms_subscriber_enabled" type="select" sortOrder="61" showInDefault="1" showInStore="0" showInWebsite="1">
+                    <label>SMS Subscriber Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="sms_subscriber_report" type="button" sortOrder="62" showInDefault="1" showInStore="0" showInWebsite="1">
+                    <frontend_model>Dotdigitalgroup\Email\Block\Adminhtml\Config\Report\Contact</frontend_model>
+                </field>
+            </group>
+        </section>
         <section id="transactional_sms" translate="label" sortOrder="191" showInDefault="1" showInWebsite="1" showInStore="1">
             <class>separator-top</class>
             <label>Transactional SMS</label>
@@ -127,6 +145,38 @@
                     <label>Message</label>
                     <tooltip><![CDATA[Variables: {{ first_name }}, {{ last_name }}, {{ email }}, {{ store_name }}, {{ order_id }}, {{ order_status }}, {{ refund_amount }}.]]></tooltip>
                     <frontend_model>Dotdigitalgroup\Sms\Block\Adminhtml\AppendNote</frontend_model>
+                </field>
+            </group>
+        </section>
+        <section id="connector_consent" translate="label" sortOrder="195" showInStore="1" showInWebsite="1" showInDefault="1">
+            <group id="sms" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>SMS</label>
+                <field id="enabled" translate="label" sortOrder="10" type="select" showInStore="1" showInWebsite="1" showInDefault="1">
+                    <label>Ask for SMS marketing consent</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Enable this to capture mobile numbers and record consent for SMS marketing.]]></comment>
+                </field>
+                <field id="signup_text" translate="label" sortOrder="20" type="textarea" showInWebsite="1" showInStore="1" showInDefault="1">
+                    <label>Sign up text</label>
+                    <comment><![CDATA[The text here is displayed next to the checkbox when opting in.]]></comment>
+                </field>
+                <field id="marketing_consent_text" translate="label" sortOrder="20" type="textarea" showInWebsite="1" showInStore="1" showInDefault="1">
+                    <label>SMS marketing consent text</label>
+                    <comment><![CDATA[Explain what you will do with consent, how customers can withdraw consent, and where they can learn more.]]></comment>
+                </field>
+            </group>
+        </section>
+        <section id="connector_developer_settings" translate="label" sortOrder="500" showInStore="0" showInWebsite="1" showInDefault="1">
+            <tab>ddg_automation</tab>
+            <group id="sync_settings" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="sms_subscriber_sync" translate="label" sortOrder="85" showInStore="0" showInWebsite="1" showInDefault="1">
+                    <label>SMS Subscriber Sync</label>
+                    <frontend_model>Dotdigitalgroup\Sms\Block\Adminhtml\Config\Developer\SmsSubscriberSync</frontend_model>
+                </field>
+                <field id="reset_sms_subscribers" translate="label" sortOrder="165" showInStore="0" showInWebsite="1"
+                       showInDefault="1">
+                    <label>Reset SMS Subscribers</label>
+                    <frontend_model>resetSmsSubscribersVirtualType</frontend_model>
                 </field>
             </group>
         </section>

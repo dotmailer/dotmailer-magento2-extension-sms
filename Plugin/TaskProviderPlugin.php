@@ -22,6 +22,8 @@ class TaskProviderPlugin
     }
 
     /**
+     * Add SMS tasks to the list of available tasks.
+     *
      * @param TaskProvider $taskProvider
      * @param array $additionalSyncs
      * @return array

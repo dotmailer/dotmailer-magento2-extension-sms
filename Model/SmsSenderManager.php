@@ -5,7 +5,7 @@ namespace Dotdigitalgroup\Sms\Model;
 use Dotdigitalgroup\Email\Helper\Data;
 use Dotdigitalgroup\Email\Model\Task\TaskRunInterface;
 use Dotdigitalgroup\Sms\Model\Apiconnector\SmsClientFactory;
-use Dotdigitalgroup\Sms\Model\Config\TransactionalSms;
+use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\Model\Message\MessageBuilder;
 use Dotdigitalgroup\Sms\Model\Queue\AfterSendProcessor;
 use Dotdigitalgroup\Sms\Model\Queue\OrderQueueManager;
@@ -26,9 +26,9 @@ class SmsSenderManager implements TaskRunInterface
     private $smsClientFactory;
 
     /**
-     * @var TransactionalSms
+     * @var Configuration
      */
-    private $transactionalSmsConfig;
+    private $moduleConfig;
 
     /**
      * @var AfterSendProcessor
@@ -62,9 +62,10 @@ class SmsSenderManager implements TaskRunInterface
 
     /**
      * SmsSenderManager constructor.
+     *
      * @param Data $helper
      * @param SmsClientFactory $smsClientFactory
-     * @param TransactionalSms $transactionalSmsConfig
+     * @param Configuration $moduleConfig
      * @param AfterSendProcessor $afterSendProcessor
      * @param OrderQueueManager $orderQueueManager
      * @param SenderProgressHandlerFactory $senderProgressHandlerFactory
@@ -75,7 +76,7 @@ class SmsSenderManager implements TaskRunInterface
     public function __construct(
         Data $helper,
         SmsClientFactory $smsClientFactory,
-        TransactionalSms $transactionalSmsConfig,
+        Configuration $moduleConfig,
         AfterSendProcessor $afterSendProcessor,
         OrderQueueManager $orderQueueManager,
         SenderProgressHandlerFactory $senderProgressHandlerFactory,
@@ -85,7 +86,7 @@ class SmsSenderManager implements TaskRunInterface
     ) {
         $this->helper = $helper;
         $this->smsClientFactory = $smsClientFactory;
-        $this->transactionalSmsConfig = $transactionalSmsConfig;
+        $this->moduleConfig = $moduleConfig;
         $this->afterSendProcessor = $afterSendProcessor;
         $this->orderQueueManager = $orderQueueManager;
         $this->senderProgressHandlerFactory = $senderProgressHandlerFactory;
@@ -95,6 +96,7 @@ class SmsSenderManager implements TaskRunInterface
     }
 
     /**
+     * @inheritdoc
      */
     public function run()
     {
@@ -152,7 +154,7 @@ class SmsSenderManager implements TaskRunInterface
             if ($this->helper->isEnabled($websiteId)) {
                 $apiUser = $this->helper->getApiUsername($websiteId);
                 foreach ($website->getStoreIds() as $storeId) {
-                    if ($this->transactionalSmsConfig->isSmsEnabled($storeId)) {
+                    if ($this->moduleConfig->isSmsEnabled($storeId)) {
                         if (!isset($apiUsers[$apiUser]['firstWebsiteId'])) {
                             $apiUsers[$apiUser]['firstWebsiteId'] = $websiteId;
                         }

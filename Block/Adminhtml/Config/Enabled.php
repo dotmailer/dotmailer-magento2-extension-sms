@@ -3,7 +3,7 @@
 namespace Dotdigitalgroup\Sms\Block\Adminhtml\Config;
 
 use Dotdigitalgroup\Sms\Model\Account;
-use Dotdigitalgroup\Sms\Model\Config\TransactionalSms;
+use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Magento\Backend\Block\Template\Context;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 
@@ -15,7 +15,7 @@ class Enabled extends \Magento\Config\Block\System\Config\Form\Field
     private $account;
 
     /**
-     * @var TransactionalSms
+     * @var Configuration
      */
     private $config;
 
@@ -23,13 +23,13 @@ class Enabled extends \Magento\Config\Block\System\Config\Form\Field
      * Enabled constructor.
      * @param Context $context
      * @param Account $account
-     * @param TransactionalSms $config
+     * @param Configuration $config
      * @param array $data
      */
     public function __construct(
         Context $context,
         Account $account,
-        TransactionalSms $config,
+        Configuration $config,
         array $data = []
     ) {
         $this->account = $account;
@@ -38,8 +38,11 @@ class Enabled extends \Magento\Config\Block\System\Config\Form\Field
     }
 
     /**
+     * Get element html.
+     *
      * @param AbstractElement $element
      * @return string
+     * @throws \Exception
      */
     public function _getElementHtml(AbstractElement $element)
     {

@@ -51,7 +51,10 @@ class SenderProgressHandler extends DataObject
     }
 
     /**
+     * Update sends in progress.
+     *
      * @param array $storeIds
+     * @throws \Exception
      */
     public function updateSendsInProgress(array $storeIds)
     {
@@ -86,6 +89,8 @@ class SenderProgressHandler extends DataObject
     }
 
     /**
+     * Get client.
+     *
      * @return Client
      */
     private function getClient()

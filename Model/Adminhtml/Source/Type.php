@@ -2,9 +2,13 @@
 
 namespace Dotdigitalgroup\Sms\Model\Adminhtml\Source;
 
-class Type implements \Magento\Framework\Data\OptionSourceInterface
+use Magento\Framework\Data\OptionSourceInterface;
+
+class Type implements OptionSourceInterface
 {
     /**
+     * Return a list of types.
+     *
      * @return array
      */
     public function toOptionArray()

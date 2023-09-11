@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-2columns-left"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Dotdigitalgroup_Sms::css/admin.css"/>
+    </head>
+    <body>
+        <referenceBlock name="customer_form">
+            <block class="Dotdigitalgroup\Sms\Block\Adminhtml\Customer\Edit\Tab\Dotdigital" name="dd.customer.edit.tab" />
+        </referenceBlock>
+        <referenceContainer name="js">
+            <block ifconfig="transactional_sms/sms_settings/phone_number_validation"
+                   template="Dotdigitalgroup_Sms::customer/js-marketing-consent-on-ready.phtml"
+                   name="international.telephone.input">
+                <arguments>
+                    <argument name="config" xsi:type="object">Dotdigitalgroup\Sms\ViewModel\TelephoneInputConfig</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

@@ -66,26 +66,29 @@ class NewShipmentPluginTest extends TestCase
 
     public function testAfterExecuteMethodIfTrackingDefined()
     {
+        $orderId = 1;
+        $tracking = [[
+            'number' => 35589,
+            'carrier_code' => 'chaz',
+            'title' => 'Chaz Express'
+        ]];
+
         $this->newShipmentActionMock
             ->expects($this->exactly(2))
             ->method('getRequest')
             ->willReturn($this->requestInterfaceMock);
 
         $this->requestInterfaceMock
-            ->expects($this->at(0))
+            ->expects($this->exactly(2))
             ->method('getParam')
-            ->with('order_id')
-            ->willReturn($orderId = 1);
-
-        $this->requestInterfaceMock
-            ->expects($this->at(1))
-            ->method('getParam')
-            ->with('tracking')
-            ->willReturn($tracking = [[
-                'number' => 35589,
-                'carrier_code' => 'chaz',
-                'title' => 'Chaz Express'
-            ]]);
+            ->withConsecutive(
+                ['order_id'],
+                ['tracking']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $orderId,
+                $tracking
+            );
 
         $this->orderRepositoryInterfaceMock
             ->expects($this->once())
@@ -112,22 +115,25 @@ class NewShipmentPluginTest extends TestCase
 
     public function testAfterExecuteMethodIfTrackingDidntDefined()
     {
+        $orderId = 1;
+        $tracking = null;
+
         $this->newShipmentActionMock
             ->expects($this->exactly(2))
             ->method('getRequest')
             ->willReturn($this->requestInterfaceMock);
 
         $this->requestInterfaceMock
-            ->expects($this->at(0))
+            ->expects($this->exactly(2))
             ->method('getParam')
-            ->with('order_id')
-            ->willReturn($orderId = 1);
-
-        $this->requestInterfaceMock
-            ->expects($this->at(1))
-            ->method('getParam')
-            ->with('tracking')
-            ->willReturn($tracking = null);
+            ->withConsecutive(
+                ['order_id'],
+                ['tracking']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $orderId,
+                $tracking
+            );
 
         $this->orderRepositoryInterfaceMock
             ->expects($this->once())

@@ -1,4 +1,4 @@
-# Dotdigital SMS for Magento 2
+# Dotdigital SMS for Magento 2 (Magento Open Source and Adobe Commerce)
 [![Packagist Version](https://img.shields.io/packagist/v/dotdigital/dotdigital-magento2-extension-sms?color=green&label=stable)](https://github.com/dotmailer/dotmailer-magento2-extension-sms/releases)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE.md)
 
@@ -7,10 +7,12 @@ This module provides support for Transactional SMS notifications to Magento merc
   
 ## Requirements
 - An active Dotdigital account with the SMS pay-as-you-go service enabled.
-- Available from Magento 2.3+
-- Requires Dotdigital extension versions:
-  - `Dotdigitalgroup_Email` 4.20.0+
-  
+- Dotdigital extension versions:
+  - `Dotdigitalgroup_Email` 4.22.0+
+- PHP 7.4+
+- Magento 2.3.7+
+  - Magento 2.3.0-2.3.6 are compatible up to version 1.5.x
+
 ## Activation
 - This module is included in our core extension. Please refer to [these instructions](https://github.com/dotmailer/dotmailer-magento2-extension#installation) to install via the Magento Marketplace.
 - Ensure you have set valid API credentials in **Configuration > Dotdigital > Account Settings**
@@ -21,10 +23,28 @@ This module features an option to enable international telephone number validati
 
 ## Changelog
 
+### 1.6.0
+
+##### What's new
+- Customers and guests can now subscribe using mobile numbers at registration and checkout.
+- Customers can manage their subscription and subscribed mobile number in their account.
+- Magento admins can manage customer SMS subscriptions and mobile numbers in the customer admin view.
+- Consent can be captured for SMS subscriptions.
+- SMS subscribers are synced to a specific list in Dotdigital via the new V3 API.
+- SMS subscribers who unsubscribe or resubscribe outside of Magento will have their subscription status updated in Magento.
+- The module now requires PHP 7.4+ and Magento 2.3.7+.
+
+##### Improvements
+- The module's code has been fully aligned with Magento's latest coding standards.
+- We've removed some Magento license headers from places in our code.
+
+##### Bug fixes
+- We fixed a problem with the character counter for transactional SMS templates.
+- We fixed an action group reference in the TelephoneNumberPreValidationTest MFTF test.
+
 ### 1.5.0
 
 ##### Improvements
-
 - We replaced usages of `SearchResultsFactory` and `SearchResults` classes with `SearchResultsInterfaceFactory` and `SearchResultsInterface` respectively.
 
 ### 1.4.2

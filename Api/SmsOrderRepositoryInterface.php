@@ -8,18 +8,24 @@ use Magento\Framework\Api\SearchCriteriaInterface;
 interface SmsOrderRepositoryInterface
 {
     /**
+     * Save.
+     *
      * @param SmsOrderInterface $orderSms
      */
     public function save(SmsOrderInterface $orderSms);
 
     /**
-     * @param $id
+     * Get by id.
+     *
+     * @param string|int $id
      * @return SmsOrderInterface
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getById($id);
 
     /**
+     * Get Lists.
+     *
      * @param SearchCriteriaInterface $searchCriteria
      * @return \Magento\Framework\Api\SearchResults
      */

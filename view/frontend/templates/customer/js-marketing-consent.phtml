@@ -1,0 +1,29 @@
+<?php
+/**
+ * @var $block \Magento\Framework\View\Element\Template
+ * @var $telephoneInputConfig \Dotdigitalgroup\Sms\ViewModel\TelephoneInputConfig
+ * @var $consentConfig \Dotdigitalgroup\Sms\ViewModel\Customer\Account\MarketingConsent
+ */
+
+// @codingStandardsIgnoreFile
+$telephoneInputConfig = $block->getData('telephoneInputConfig');
+$consentConfig = $block->getData('consentConfig');
+?>
+<?php if ($consentConfig->shouldValidatePhoneNumberWithCheckbox()) { ?>
+<script type="text/x-magento-init">
+    {
+        "input[name='mobile_number']": {
+            "Dotdigitalgroup_Sms/js/internationalTelephoneInput": <?= $telephoneInputConfig->getConfig(); ?>
+        },
+        "#connector-newsletter-form-validate, #form-validate": {
+            "validation": {
+                "rules": {
+                    "mobile_number": {
+                        "validate-phone-number-with-checkbox": true
+                    }
+                }
+            }
+        }
+    }
+</script>
+<?php } ?>

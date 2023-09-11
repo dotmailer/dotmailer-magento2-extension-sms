@@ -6,9 +6,11 @@ use Magento\Framework\App\Config\Value;
 
 class AlphanumericValidator extends Value
 {
-    const ACCEPTANCE_REGEX = '/[^a-z0-9\._\-\s\#\!\&]/i';
+    public const ACCEPTANCE_REGEX = '/[^a-z0-9\._\-\s\#\!\&]/i';
 
     /**
+     * Validate From Name before saving.
+     *
      * @return AlphanumericValidator
      * @throws \Magento\Framework\Exception\LocalizedException
      */

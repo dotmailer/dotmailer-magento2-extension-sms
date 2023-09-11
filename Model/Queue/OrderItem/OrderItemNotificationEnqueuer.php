@@ -5,13 +5,13 @@ namespace Dotdigitalgroup\Sms\Model\Queue\OrderItem;
 use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterfaceFactory;
 use Dotdigitalgroup\Sms\Api\SmsOrderRepositoryInterface;
 use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
-use Dotdigitalgroup\Sms\Model\Config\TransactionalSms;
+use Dotdigitalgroup\Sms\Model\Config\Configuration;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\StoreManagerInterface;
 
 class OrderItemNotificationEnqueuer
 {
-    const SMS_ENABLED = ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_ENABLED;
-
     /**
      * @var SmsOrderInterfaceFactory
      */
@@ -23,9 +23,9 @@ class OrderItemNotificationEnqueuer
     private $smsOrderRepositoryInterface;
 
     /**
-     * @var TransactionalSms
+     * @var Configuration
      */
-    private $transactionalSms;
+    private $moduleConfig;
 
     /**
      * @var StoreManagerInterface
@@ -34,37 +34,40 @@ class OrderItemNotificationEnqueuer
 
     /**
      * AbstractQueueManager constructor.
+     *
      * @param SmsOrderInterfaceFactory $smsOrderInterfaceFactory
      * @param SmsOrderRepositoryInterface $smsOrderRepositoryInterface
-     * @param TransactionalSms $transactionalSms
+     * @param Configuration $moduleConfig
      * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         SmsOrderInterfaceFactory $smsOrderInterfaceFactory,
         SmsOrderRepositoryInterface $smsOrderRepositoryInterface,
-        TransactionalSms $transactionalSms,
+        Configuration $moduleConfig,
         StoreManagerInterface $storeManager
     ) {
         $this->storeManager = $storeManager;
         $this->smsOrderInterfaceFactory = $smsOrderInterfaceFactory;
         $this->smsOrderRepositoryInterface = $smsOrderRepositoryInterface;
-        $this->transactionalSms = $transactionalSms;
+        $this->moduleConfig = $moduleConfig;
     }
 
     /**
-     * @param $order
-     * @param $additionalData
-     * @param $smsConfigPath
-     * @param $smsType
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * Queue the SMS Order.
+     *
+     * @param mixed $order
+     * @param array $additionalData
+     * @param string $smsConfigPath
+     * @param string|int $smsType
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function queue($order, $additionalData, $smsConfigPath, $smsType)
     {
         $storeId = $this->storeManager->getStore()->getId();
 
-        if (!$this->transactionalSms->isSmsEnabled($storeId) ||
-            !$this->transactionalSms->isSmsTypeEnabled($storeId, $smsConfigPath)) {
+        if (!$this->moduleConfig->isSmsEnabled($storeId) ||
+            !$this->moduleConfig->isSmsTypeEnabled($storeId, $smsConfigPath)) {
             return;
         }
 

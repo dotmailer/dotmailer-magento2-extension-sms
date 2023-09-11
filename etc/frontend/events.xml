@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="layout_generate_blocks_after">
+        <observer name="dd_sms_layout_generate_blocks_after" instance="Dotdigitalgroup\Sms\Observer\Frontend\RemoveBlocks"/>
+    </event>
+    <event name="customer_register_success">
+        <observer name="ddg_customer_register_success_sms" instance="Dotdigitalgroup\Sms\Observer\Customer\Register"/>
+    </event>
+</config>

@@ -14,12 +14,19 @@ class SmsOrder extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      */
     private $logger;
 
+    /**
+     * Initialize resource model
+     *
+     * @return void
+     */
     public function _construct()
     {
         $this->_init(SchemaInterface::EMAIL_SMS_ORDER_QUEUE_TABLE, 'id');
     }
 
     /**
+     * SmsOrder constructor.
+     *
      * @param Context $context
      * @param Logger $logger
      */

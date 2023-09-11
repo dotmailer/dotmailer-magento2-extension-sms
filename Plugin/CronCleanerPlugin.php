@@ -15,11 +15,13 @@ class CronCleanerPlugin
     ];
 
     /**
+     * Add SMS tables to the list of tables to be cleaned up.
+     *
      * @param Cleaner $cleaner
-     * @param array $additionalSyncs
+     * @param array $additionalTables
      * @return array
      */
-    public function beforeGetTablesForCleanUp(Cleaner $cleaner, array $additionalTables = [])
+    public function beforeGetTablesForCleanUp(Cleaner $cleaner, array $additionalTables = []): array
     {
         return [
             '$additionalTables' => $this->tables,

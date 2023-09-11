@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Dotdigitalgroup\Email\Model\Contact" type="Dotdigitalgroup\Sms\Model\SmsContact" />
     <preference for="Dotdigitalgroup\Sms\Api\SmsOrderRepositoryInterface" type="Dotdigitalgroup\Sms\Model\SmsOrderRepository" />
     <preference for="Dotdigitalgroup\Sms\Api\Data\SmsOrderInterface" type="Dotdigitalgroup\Sms\Model\SmsOrder" />
     <type name="Magento\Shipping\Controller\Adminhtml\Order\Shipment\Save">
@@ -26,5 +27,39 @@
     </type>
     <type name="Magento\Checkout\Block\Checkout\LayoutProcessor">
         <plugin name="ddg_sms_international_telephone_layout_processor_plugin" type="Dotdigitalgroup\Sms\Plugin\Block\Checkout\LayoutProcessor"/>
+    </type>
+    <type name="Magento\Checkout\Model\ShippingInformationManagement">
+        <plugin name="ddg_sms_shipping__plugin" type="Dotdigitalgroup\Sms\Plugin\Checkout\ShippingInformationManagementPlugin"/>
+    </type>
+    <type name="Magento\Newsletter\Controller\Manage\Index">
+        <plugin name="dd_sms_newsletter_plugin" type="Dotdigitalgroup\Sms\Plugin\Customer\Account\NewsletterManageIndexPlugin"/>
+    </type>
+    <type name="Dotdigitalgroup\Email\Controller\Customer\Newsletter">
+        <plugin name="dd_sms_newsletter_controller_plugin"
+                type="Dotdigitalgroup\Sms\Plugin\Customer\Account\NewsletterControllerPlugin"/>
+    </type>
+    <type name="Dotdigitalgroup\Email\Console\Command\Provider\SyncProvider">
+        <plugin name="ddg_sms_sync_provider_plugin"
+                type="Dotdigitalgroup\Sms\Plugin\SyncProviderPlugin"/>
+    </type>
+    <type name="Dotdigitalgroup\Email\Model\Sync\Importer\ImporterQueueManager">
+        <plugin name="dd_sms_importer_queue_manager_plugin" type="Dotdigitalgroup\Sms\Plugin\Importer\ImporterQueueManagerPlugin"/>
+    </type>
+    <type name="Dotdigitalgroup\Email\Model\Sync\Importer\ImporterProgressHandler">
+        <plugin name="dd_sms_importer_progress_handler_plugin" type="Dotdigitalgroup\Sms\Plugin\Importer\ImporterProgressHandlerPlugin"/>
+    </type>
+    <type name="Dotdigitalgroup\Email\Model\Contact\ContactUpdaterPool">
+        <arguments>
+            <argument name="updaters" xsi:type="array">
+                <item name="smsSubscriberUnsubscriber" xsi:type="object">Dotdigitalgroup\Sms\Model\SmsSubscriber\Unsubscriber</item>
+                <item name="smsSubscriberResubscriber" xsi:type="object">Dotdigitalgroup\Sms\Model\SmsSubscriber\Resubscriber</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Dotdigitalgroup\Email\Setup\Install\DataMigrationHelper">
+        <plugin name="dd_sms_data_migration_helper_plugin" type="Dotdigitalgroup\Sms\Plugin\Setup\Install\DataMigrationHelper"/>
+    </type>
+    <type name="Dotdigitalgroup\Email\Setup\Install\DataMigrationTypeProvider">
+        <plugin name="dd_sms_data_migration_type_provider_plugin" type="Dotdigitalgroup\Sms\Plugin\Setup\Install\DataMigrationTypeProvider"/>
     </type>
 </config>

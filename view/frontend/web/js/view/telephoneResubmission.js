@@ -13,7 +13,7 @@ define([
         onSubmit: function () {
             this.source.set('params.invalid', false);
             this.source.trigger('telephoneResubmission.data.validate');
-            // trigger form validation
+            // Trigger form validation
             if (!this.source.get('params.invalid')) {
                 const formData = this.source.get('telephoneResubmission'),
                     shippingAddress = quote.shippingAddress(),

@@ -33,6 +33,8 @@ class OrderCreditmemoSaveAfter implements \Magento\Framework\Event\ObserverInter
     }
 
     /**
+     * Execute observer.
+     *
      * @param Observer $observer
      *
      * @return void

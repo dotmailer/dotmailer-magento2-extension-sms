@@ -28,6 +28,7 @@ class MessageBuilder
 
     /**
      * MessageBuilder constructor.
+     *
      * @param ScopeConfigInterface $scopeConfig
      * @param Compiler $messageCompiler
      */
@@ -40,6 +41,8 @@ class MessageBuilder
     }
 
     /**
+     * Batch message text.
+     *
      * @param SmsOrderInterface[] $items
      * @return array
      */
@@ -79,6 +82,8 @@ class MessageBuilder
     }
 
     /**
+     * Get compiled message text.
+     *
      * @param SmsOrderInterface $item
      * @return string
      */
@@ -94,8 +99,10 @@ class MessageBuilder
     }
 
     /**
-     * @param $storeId
-     * @param $typeId
+     * Set raw message text.
+     *
+     * @param string|int $storeId
+     * @param string|int $typeId
      */
     private function setRawMessageText($storeId, $typeId)
     {
@@ -107,7 +114,9 @@ class MessageBuilder
     }
 
     /**
-     * @param $storeId
+     * Get from number.
+     *
+     * @param string|int $storeId
      * @return string|null
      */
     private function getFromNumber($storeId)

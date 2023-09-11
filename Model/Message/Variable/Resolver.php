@@ -4,6 +4,7 @@ namespace Dotdigitalgroup\Sms\Model\Message\Variable;
 
 use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -65,6 +66,8 @@ class Resolver
     }
 
     /**
+     * Resolve variable from SMS template.
+     *
      * @param string $variable
      * @param SmsOrderInterface $sms
      * @return string
@@ -80,6 +83,8 @@ class Resolver
     }
 
     /**
+     * Get first name.
+     *
      * @param SmsOrderInterface $sms
      * @return string|null
      */
@@ -95,6 +100,8 @@ class Resolver
     }
 
     /**
+     * Get last name.
+     *
      * @param SmsOrderInterface $sms
      * @return string|null
      */
@@ -110,6 +117,8 @@ class Resolver
     }
 
     /**
+     * Get email.
+     *
      * @param SmsOrderInterface $sms
      */
     private function getEmail($sms)
@@ -119,8 +128,11 @@ class Resolver
     }
 
     /**
+     * Get store name.
+     *
      * @param SmsOrderInterface $sms
      * @return string
+     * @throws NoSuchEntityException
      */
     private function getStoreName($sms)
     {
@@ -129,8 +141,10 @@ class Resolver
     }
 
     /**
+     * Get order id.
+     *
      * @param SmsOrderInterface $sms
-     * @return mixed
+     * @return float|string|null
      */
     private function getOrderId($sms)
     {
@@ -139,6 +153,8 @@ class Resolver
     }
 
     /**
+     * Get order status.
+     *
      * @param SmsOrderInterface $sms
      * @return string
      */
@@ -148,6 +164,8 @@ class Resolver
     }
 
     /**
+     * Get tracking number.
+     *
      * @param SmsOrderInterface $sms
      * @return string
      */
@@ -157,6 +175,8 @@ class Resolver
     }
 
     /**
+     * Get tracking carrier.
+     *
      * @param SmsOrderInterface $sms
      * @return string
      */
@@ -166,6 +186,8 @@ class Resolver
     }
 
     /**
+     * Get refund amount.
+     *
      * @param SmsOrderInterface $sms
      * @return string
      */
@@ -177,7 +199,7 @@ class Resolver
     /**
      * Transform a variable like 'first_name' into the method name 'getFirstName'.
      *
-     * @param $variable
+     * @param string $variable
      * @return string
      */
     private function getMethodFromVariable($variable)
@@ -186,6 +208,8 @@ class Resolver
     }
 
     /**
+     * Get additional data by key.
+     *
      * @param SmsOrderInterface $sms
      * @param string $key
      * @return string
@@ -196,9 +220,7 @@ class Resolver
             $additionalData = $this->serializer->unserialize(
                 $sms->getAdditionalData()
             );
-            return isset($additionalData[$key]) ?
-                $additionalData[$key] :
-                '';
+            return $additionalData[$key] ?? '';
         } catch (\InvalidArgumentException $e) {
             $this->logger->debug(
                 'Could not unserialize ' . $key . ' for SMS id ' . $sms->getId(),

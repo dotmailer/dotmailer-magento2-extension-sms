@@ -13,7 +13,6 @@ class Compiler
     private $variableResolver;
 
     /**
-     * Parser constructor.
      * @param Resolver $variableResolver
      */
     public function __construct(
@@ -23,6 +22,8 @@ class Compiler
     }
 
     /**
+     * Compile text with variables
+     *
      * @param string $text
      * @param SmsOrderInterface $sms
      * @return string
@@ -43,6 +44,8 @@ class Compiler
     }
 
     /**
+     * Get regular expression for matching variables.
+     *
      * @return string
      */
     private function getRegularExpression(): string

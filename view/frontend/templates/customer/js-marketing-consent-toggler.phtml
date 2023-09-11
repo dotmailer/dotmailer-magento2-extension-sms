@@ -1,0 +1,12 @@
+<script type="application/javascript">
+    require([
+        'jquery'
+    ], function ($) {
+        $(".telephone").hide();
+        $("#dd_sms_consent_text").hide();
+        $("#dd_sms_consent_checkbox").change(function () {
+            $(".telephone").toggle();
+            $("#dd_sms_consent_text").toggle();
+        });
+    });
+</script>

@@ -1,0 +1,35 @@
+<?php
+/**
+ * @var $block \Magento\Framework\View\Element\Template
+ * @var $view \Dotdigitalgroup\Sms\ViewModel\TelephoneInputConfig
+ */
+// @codingStandardsIgnoreFile
+$view = $block->getData('config');
+?>
+<script type="application/javascript">
+    require([
+        'jquery',
+        'Dotdigitalgroup_Sms/js/intlTelInput',
+        'domReady!'
+    ], function ($, intlTelInput) {
+        'use strict';
+
+        // knockoutJS event listener on wasActivated ???
+        // see Magento_Ui/js/form/components/tab
+        let telephoneInput = $('#dd_sms_consent_mobile_number')[0];
+        if (!telephoneInput) {
+            return;
+        }
+        let iti = window.intlTelInput(telephoneInput, <?= $view->getConfig(); ?>);
+
+        telephoneInput.addEventListener('blur', function() {
+            telephoneInput.value = iti.getNumber();
+        });
+
+        document.addEventListener('numberIsInvalid', function(event) {
+            telephoneInput.value = event.detail.number;
+            telephoneInput.value = iti.getNumber();
+            telephoneInput.dispatchEvent(new Event('change'));
+        });
+    });
+</script>

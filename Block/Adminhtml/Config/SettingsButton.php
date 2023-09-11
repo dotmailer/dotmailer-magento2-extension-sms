@@ -5,11 +5,14 @@ namespace Dotdigitalgroup\Sms\Block\Adminhtml\Config;
 use Dotdigitalgroup\Email\Helper\Config as EmailConfig;
 use Dotdigitalgroup\Email\Helper\OauthValidator;
 use Magento\Backend\Block\Template\Context;
+use Magento\Backend\Block\Widget\Button;
+use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
+use Magento\Framework\Exception\LocalizedException;
 
-class SettingsButton extends \Magento\Config\Block\System\Config\Form\Field
+class SettingsButton extends Field
 {
-    const SMS_SETTINGS_URL = 'account/settings/sms';
+    public const SMS_SETTINGS_URL = 'account/settings/sms';
 
     /**
      * @var EmailConfig
@@ -23,6 +26,7 @@ class SettingsButton extends \Magento\Config\Block\System\Config\Form\Field
 
     /**
      * SettingsButton constructor.
+     *
      * @param Context $context
      * @param OauthValidator $oauthValidator
      * @param EmailConfig $emailConfig
@@ -40,14 +44,16 @@ class SettingsButton extends \Magento\Config\Block\System\Config\Form\Field
     }
 
     /**
+     * Get element html.
+     *
      * @param AbstractElement $element
      * @return string
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function _getElementHtml(AbstractElement $element)
     {
         return $this->getLayout()
-            ->createBlock(\Magento\Backend\Block\Widget\Button::class)
+            ->createBlock(Button::class)
             ->setType('button')
             ->setLabel(__('Edit SMS settings'))
             ->setOnClick(sprintf("window.open('%s','_blank')", $this->getButtonUrl()))
@@ -55,7 +61,8 @@ class SettingsButton extends \Magento\Config\Block\System\Config\Form\Field
     }
 
     /**
-     * Removes use Default Checkbox
+     * Removes use Default Checkbox.
+     *
      * @param AbstractElement $element
      * @return string
      */
@@ -66,7 +73,10 @@ class SettingsButton extends \Magento\Config\Block\System\Config\Form\Field
     }
 
     /**
+     * Get button url.
+     *
      * @return string
+     * @throws LocalizedException
      */
     private function getButtonUrl()
     {
@@ -74,7 +84,10 @@ class SettingsButton extends \Magento\Config\Block\System\Config\Form\Field
     }
 
     /**
+     * Get SMS settings url.
+     *
      * @return string
+     * @throws LocalizedException
      */
     private function getSmsSettingsUrl()
     {

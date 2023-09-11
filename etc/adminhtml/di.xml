@@ -9,4 +9,20 @@
     <type name="Dotdigitalgroup\Email\Model\Connector\Module">
         <plugin name="module_plugin_sms" type="Dotdigitalgroup\Sms\Plugin\ModulePlugin" sortOrder="4"/>
     </type>
+    <type name="Magento\Customer\Controller\Adminhtml\Index\Save">
+        <plugin name="dd_sms_admin_customer_save" type="Dotdigitalgroup\Sms\Plugin\Customer\Controller\Adminhtml\Index\Save" sortOrder="1"/>
+    </type>
+    <virtualType name="resetSmsSubscribersVirtualType" type="Dotdigitalgroup\Email\Block\Adminhtml\Config\Developer\ButtonReset">
+        <arguments>
+            <argument name="resetType" xsi:type="string">sms_subscriber</argument>
+            <argument name="modulePath" xsi:type="string">dotdigitalgroup_sms</argument>
+        </arguments>
+    </virtualType>
+    <type name="Dotdigitalgroup\Email\Model\Resetter">
+        <arguments>
+            <argument name="resetModels" xsi:type="array">
+                <item name="sms_subscriber" xsi:type="object">Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

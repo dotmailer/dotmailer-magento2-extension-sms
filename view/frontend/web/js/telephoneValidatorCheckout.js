@@ -1,21 +1,16 @@
 define([
     'jquery',
     'ko',
-    'intlTelInput'
-], function ($, ko, intlTelInput) {
+    'ddTelephoneValidation',
+    'ddTelephoneValidationError'
+], function ($, ko, phoneValidate, phoneErrorHandler) {
     'use strict';
 
     return function (validator) {
 
-        var errorMap = [
-            'Invalid telephone number',
-            'Invalid country code',
-            'Telephone number is too short',
-            'Telephone number is too long',
-            'Invalid telephone number'
-        ];
+        var errorMap = phoneErrorHandler.getErrorMap(),
 
-        var validatorObj = {
+         validatorObj = {
             message: '',
 
             /**
@@ -30,21 +25,20 @@ define([
                     isValid = false,
                     errorCode;
 
-                if (countryCodeClass === undefined || countryCodeClass.indexOf(' ') === -1) {
+                try {
+                    isValid = phoneValidate(value, countryCodeClass);
+
+                    if (!isValid) {
+                        countryCodeClass = countryCodeClass.split(' ')[1];
+                        countryCode = countryCodeClass.split('__')[1];
+                        errorCode = phoneErrorHandler.getErrorCode(value, countryCode);
+                        this.message = typeof errorMap[errorCode] === 'undefined' ?
+                            errorMap[0] :
+                            errorMap[errorCode];
+                    }
+                } catch (e) {
                     this.message = errorMap[1];
-
-                    return false;
-                }
-
-                countryCodeClass = countryCodeClass.split(' ')[1];
-                countryCode = countryCodeClass.split('__')[1];
-                isValid = window.intlTelInputUtils.isValidNumber(value, countryCode);
-
-                if (!isValid) {
-                    errorCode = window.intlTelInputUtils.getValidationError(value, countryCode);
-                    this.message = typeof errorMap[errorCode] === 'undefined' ?
-                        errorMap[0] :
-                        errorMap[errorCode];
+                    isValid = false;
                 }
 
                 // Ensure that changing the flag always updates the model

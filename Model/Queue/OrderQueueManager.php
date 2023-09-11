@@ -3,19 +3,19 @@
 namespace Dotdigitalgroup\Sms\Model\Queue;
 
 use Dotdigitalgroup\Sms\Api\SmsOrderRepositoryInterface;
-use Dotdigitalgroup\Sms\Model\Config\TransactionalSms;
+use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Intl\DateTimeFactory;
 use Magento\Store\Model\StoreManagerInterface;
 
 class OrderQueueManager
 {
-    const SMS_STATUS_PENDING = 0;
-    const SMS_STATUS_IN_PROGRESS = 1;
-    const SMS_STATUS_DELIVERED = 2;
-    const SMS_STATUS_FAILED = 3;
-    const SMS_STATUS_EXPIRED = 4;
-    const SMS_STATUS_UNKNOWN = 5;
+    public const SMS_STATUS_PENDING = 0;
+    public const SMS_STATUS_IN_PROGRESS = 1;
+    public const SMS_STATUS_DELIVERED = 2;
+    public const SMS_STATUS_FAILED = 3;
+    public const SMS_STATUS_EXPIRED = 4;
+    public const SMS_STATUS_UNKNOWN = 5;
 
     /**
      * @var SmsOrderRepositoryInterface
@@ -23,9 +23,9 @@ class OrderQueueManager
     private $smsOrderRepository;
 
     /**
-     * @var TransactionalSms
+     * @var Configuration
      */
-    private $transactionalSmsConfig;
+    private $moduleConfig;
 
     /**
      * @var SearchCriteriaBuilder
@@ -44,21 +44,22 @@ class OrderQueueManager
 
     /**
      * OrderQueueManager constructor.
+     *
      * @param SmsOrderRepositoryInterface $smsOrderRepository
-     * @param TransactionalSms $transactionalSmsConfig
+     * @param Configuration $moduleConfig
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param DateTimeFactory $dateTimeFactory
      * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         SmsOrderRepositoryInterface $smsOrderRepository,
-        TransactionalSms $transactionalSmsConfig,
+        Configuration $moduleConfig,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         DateTimeFactory $dateTimeFactory,
         StoreManagerInterface $storeManager
     ) {
         $this->smsOrderRepository = $smsOrderRepository;
-        $this->transactionalSmsConfig = $transactionalSmsConfig;
+        $this->moduleConfig = $moduleConfig;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->dateTimeFactory = $dateTimeFactory;
         $this->storeManager = $storeManager;
@@ -76,12 +77,14 @@ class OrderQueueManager
             ->addFilter('status', self::SMS_STATUS_PENDING)
             ->addFilter('store_id', [$storeIds], 'in')
             ->addFilter('phone_number', null, 'neq')
-            ->setPageSize($this->transactionalSmsConfig->getBatchSize());
+            ->setPageSize($this->moduleConfig->getBatchSize());
 
         return $this->smsOrderRepository->getList($searchCriteria->create());
     }
 
     /**
+     * Get the in progress queue for the given store ids.
+     *
      * @param array $storeIds
      * @return \Magento\Framework\Api\SearchResults
      */
@@ -95,6 +98,8 @@ class OrderQueueManager
     }
 
     /**
+     * Get expired sends.
+     *
      * @return void
      */
     public function expirePendingSends()

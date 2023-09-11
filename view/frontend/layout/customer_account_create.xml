@@ -1,0 +1,31 @@
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="fieldset.create.info.additional">
+            <block
+                ifconfig="connector_consent/sms/enabled"
+                name="dd.account.create.sms.marketingconsent"
+                template="Dotdigitalgroup_Sms::customer/marketing-consent.phtml"
+            >
+                <arguments>
+                    <argument name="config" xsi:type="object">Dotdigitalgroup\Sms\ViewModel\Customer\Account\MarketingConsent</argument>
+                    <argument name="printLegend" xsi:type="boolean">false</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+        <referenceContainer name="content">
+            <block
+                template="Dotdigitalgroup_Sms::customer/js-marketing-consent.phtml"
+                name="dd.account.create.sms.marketingconsent.js">
+                <arguments>
+                    <argument name="telephoneInputConfig" xsi:type="object">Dotdigitalgroup\Sms\ViewModel\TelephoneInputConfig</argument>
+                    <argument name="consentConfig" xsi:type="object">Dotdigitalgroup\Sms\ViewModel\Customer\Account\MarketingConsent</argument>
+                </arguments>
+            </block>
+            <block
+                ifconfig="connector_consent/sms/enabled"
+                template="Dotdigitalgroup_Sms::customer/js-marketing-consent-toggler.phtml"
+                name="dd.account.create.sms.marketingconsent.checkbox.js">
+            </block>
+        </referenceContainer>
+    </body>
+</page>

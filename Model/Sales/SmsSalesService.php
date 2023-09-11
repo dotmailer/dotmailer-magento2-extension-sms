@@ -15,7 +15,9 @@ class SmsSalesService
     private $orderCreditmemoSaveAfterExecuted = false;
 
     /**
+     * Set flag to indicate that order save after event has been executed
      *
+     * @return void
      */
     public function setIsOrderSaveAfterExecuted()
     {
@@ -23,6 +25,8 @@ class SmsSalesService
     }
 
     /**
+     * Check if order save after event has been executed.
+     *
      * @return bool
      */
     public function isOrderSaveAfterExecuted()
@@ -31,7 +35,9 @@ class SmsSalesService
     }
 
     /**
+     * Set flag to indicate that order credit memo save after event has been executed
      *
+     * @return void
      */
     public function setIsOrderCreditmemoSaveAfterExecuted()
     {
@@ -39,6 +45,8 @@ class SmsSalesService
     }
 
     /**
+     * Check if order credit memo save after event has been executed.
+     *
      * @return bool
      */
     public function isOrderCreditmemoSaveAfterExecuted()

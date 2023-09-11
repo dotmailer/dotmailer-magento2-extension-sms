@@ -6,8 +6,8 @@ use Dotdigitalgroup\Email\Model\Connector\Module;
 
 class ModulePlugin
 {
-    const MODULE_NAME = 'Dotdigitalgroup_Sms';
-    const MODULE_DESCRIPTION = 'Dotdigital SMS for Magento 2';
+    public const MODULE_NAME = 'Dotdigitalgroup_Sms';
+    public const MODULE_DESCRIPTION = 'Dotdigital SMS for Magento 2';
 
     /**
      * @var Module
@@ -23,6 +23,8 @@ class ModulePlugin
     }
 
     /**
+     * Add SMS module to the list of active modules.
+     *
      * @param Module $module
      * @param array $modules
      * @return array

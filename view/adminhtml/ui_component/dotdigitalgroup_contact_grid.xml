@@ -1,0 +1,26 @@
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <columns name="dotdigitalgroup_contact_columns">
+        <column name="mobile_number" sortOrder="25">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Mobile number</label>
+            </settings>
+        </column>
+        <column name="sms_subscriber_status" component="Magento_Ui/js/grid/columns/select" sortOrder="55">
+            <settings>
+                <options class="Dotdigitalgroup\Sms\Model\Adminhtml\Source\SubscriberStatus"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">SMS Subscriber Status</label>
+            </settings>
+        </column>
+        <column name="sms_subscriber_imported" component="Magento_Ui/js/grid/columns/select" sortOrder="85">
+            <settings>
+                <options class="Dotdigitalgroup\Email\Model\Adminhtml\Source\Contact\Imported"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">SMS Subscriber Imported</label>
+            </settings>
+        </column>
+    </columns>
+</listing>

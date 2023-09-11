@@ -27,6 +27,7 @@ class NewCreditMemo extends AbstractOrderItem
 
     /**
      * NewCreditMemo constructor.
+     *
      * @param OrderItemNotificationEnqueuer $orderItemNotificationEnqueuer
      * @param SerializerInterface $serializer
      * @param Logger $logger
@@ -45,8 +46,11 @@ class NewCreditMemo extends AbstractOrderItem
     }
 
     /**
-     * @param $order
-     * @param $creditMemo
+     * Build additional data for the credit memo.
+     *
+     * @param mixed $order
+     * @param mixed $creditMemo
+     * @return NewCreditMemo
      */
     public function buildAdditionalData($order, $creditMemo)
     {
