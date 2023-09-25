@@ -5,6 +5,7 @@ namespace Dotdigitalgroup\Sms\Test\Unit\Plugin\Order\Shipment;
 use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\NewShipment;
 use Dotdigitalgroup\Sms\Plugin\Order\Shipment\NewShipmentPlugin;
+use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -56,11 +57,17 @@ class NewShipmentPluginTest extends TestCase
         $this->newShipmentMock = $this->createMock(NewShipment::class);
         $this->requestInterfaceMock = $this->createMock(RequestInterface::class);
         $this->orderInterfaceMock = $this->createMock(OrderInterface::class);
+        $contextMock = $this->createMock(Context::class);
+
+        $contextMock->expects($this->any())
+            ->method('getRequest')
+            ->willReturn($this->requestInterfaceMock);
 
         $this->plugin = new NewShipmentPlugin(
             $this->loggerMock,
             $this->orderRepositoryInterfaceMock,
-            $this->newShipmentMock
+            $this->newShipmentMock,
+            $contextMock
         );
     }
 
@@ -72,11 +79,6 @@ class NewShipmentPluginTest extends TestCase
             'carrier_code' => 'chaz',
             'title' => 'Chaz Express'
         ]];
-
-        $this->newShipmentActionMock
-            ->expects($this->exactly(2))
-            ->method('getRequest')
-            ->willReturn($this->requestInterfaceMock);
 
         $this->requestInterfaceMock
             ->expects($this->exactly(2))
@@ -117,11 +119,6 @@ class NewShipmentPluginTest extends TestCase
     {
         $orderId = 1;
         $tracking = null;
-
-        $this->newShipmentActionMock
-            ->expects($this->exactly(2))
-            ->method('getRequest')
-            ->willReturn($this->requestInterfaceMock);
 
         $this->requestInterfaceMock
             ->expects($this->exactly(2))

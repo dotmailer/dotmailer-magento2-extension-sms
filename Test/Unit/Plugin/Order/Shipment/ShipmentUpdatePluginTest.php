@@ -4,7 +4,9 @@ namespace Dotdigitalgroup\Sms\Test\Unit\Plugin\Order\Shipment;
 
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\UpdateShipment;
 use Dotdigitalgroup\Sms\Plugin\Order\Shipment\ShipmentUpdatePlugin;
+use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Controller\ResultInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\ShipmentInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -63,21 +65,22 @@ class ShipmentUpdatePluginTest extends TestCase
         $this->requestInterfaceMock = $this->createMock(RequestInterface::class);
         $this->shipmentInterfaceMock = $this->createMock(ShipmentInterface::class);
         $this->orderInterfaceMock = $this->createMock(OrderInterface::class);
+        $contextMock = $this->createMock(Context::class);
+
+        $contextMock->expects($this->any())
+            ->method('getRequest')
+            ->willReturn($this->requestInterfaceMock);
 
         $this->plugin = new ShipmentUpdatePlugin(
             $this->orderRepositoryInterfaceMock,
             $this->updateShipmentMock,
-            $this->shipmentRepositoryInterfaceMock
+            $this->shipmentRepositoryInterfaceMock,
+            $contextMock
         );
     }
 
     public function testAfterExecuteMethod()
     {
-        $this->updateShipmentActionMock
-            ->expects($this->atLeastOnce())
-            ->method('getRequest')
-            ->willReturn($this->requestInterfaceMock);
-
         $this->requestInterfaceMock
             ->expects($this->at(0))
             ->method('getParam')
@@ -128,7 +131,7 @@ class ShipmentUpdatePluginTest extends TestCase
 
         $this->plugin->afterExecute(
             $this->updateShipmentActionMock,
-            []
+            $this->createMock(ResultInterface::class)
         );
     }
 }
