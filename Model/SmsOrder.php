@@ -24,6 +24,16 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     }
 
     /**
+     * Get id.
+     *
+     * @return array|mixed|null
+     */
+    public function getId()
+    {
+        return $this->getData(self::ID);
+    }
+
+    /**
      * Get website id.
      *
      * @return int|mixed|null

@@ -4,7 +4,7 @@ namespace Dotdigitalgroup\Sms\Model\Queue\OrderItem;
 
 use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
-use Dotdigitalgroup\Sms\Model\Queue\OrderItem\Data\CreditMemoData;
+use Dotdigitalgroup\Sms\Model\Queue\OrderItem\Data\AdditionalData;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 
@@ -32,14 +32,14 @@ class NewCreditMemo extends AbstractOrderItem
      * @param SerializerInterface $serializer
      * @param Logger $logger
      * @param PriceCurrencyInterface $currencyInterface
-     * @param CreditMemoData $additionalData
+     * @param AdditionalData $additionalData
      */
     public function __construct(
         OrderItemNotificationEnqueuer $orderItemNotificationEnqueuer,
         SerializerInterface $serializer,
         Logger $logger,
         PriceCurrencyInterface $currencyInterface,
-        CreditMemoData $additionalData
+        AdditionalData $additionalData
     ) {
         $this->currencyInterface = $currencyInterface;
         parent::__construct($orderItemNotificationEnqueuer, $serializer, $logger, $additionalData);
@@ -55,14 +55,16 @@ class NewCreditMemo extends AbstractOrderItem
     public function buildAdditionalData($order, $creditMemo)
     {
         $this->order = $order;
-        $this->additionalData->orderStatus = $order->getStatus();
+        $this->additionalData->setOrderStatus($order->getStatus());
 
-        $this->additionalData->creditMemoAmount = $this->currencyInterface->format(
-            $creditMemo->getGrandTotal(),
-            false,
-            PriceCurrencyInterface::DEFAULT_PRECISION,
-            $creditMemo->getStoreId(),
-            $creditMemo->getOrderCurrencyCode()
+        $this->additionalData->setCreditMemoAmount(
+            $this->currencyInterface->format(
+                $creditMemo->getGrandTotal(),
+                false,
+                PriceCurrencyInterface::DEFAULT_PRECISION,
+                $creditMemo->getStoreId(),
+                $creditMemo->getOrderCurrencyCode()
+            )
         );
 
         return $this;

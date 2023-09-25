@@ -90,6 +90,7 @@ class Resolver
      */
     private function getFirstName($sms)
     {
+        /** @var \Magento\Sales\Model\Order $order */
         $order = $this->orderRepository->get($sms->getOrderId());
 
         if ($order->getCustomerFirstname() === null) {
@@ -107,6 +108,7 @@ class Resolver
      */
     private function getLastName($sms)
     {
+        /** @var \Magento\Sales\Model\Order $order */
         $order = $this->orderRepository->get($sms->getOrderId());
 
         if ($order->getCustomerLastname() === null) {
@@ -123,8 +125,9 @@ class Resolver
      */
     private function getEmail($sms)
     {
-        return $this->orderRepository->get($sms->getOrderId())
-            ->getCustomerEmail();
+        /** @var \Magento\Sales\Model\Order $order */
+        $order = $this->orderRepository->get($sms->getOrderId());
+        return $order->getCustomerEmail();
     }
 
     /**
@@ -148,8 +151,9 @@ class Resolver
      */
     private function getOrderId($sms)
     {
-        return $this->orderRepository->get($sms->getOrderId())
-            ->getRealOrderId();
+        /** @var \Magento\Sales\Model\Order $order */
+        $order = $this->orderRepository->get($sms->getOrderId());
+        return $order->getRealOrderId();
     }
 
     /**

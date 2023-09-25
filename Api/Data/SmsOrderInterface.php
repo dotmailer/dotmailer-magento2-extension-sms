@@ -4,6 +4,7 @@ namespace Dotdigitalgroup\Sms\Api\Data;
 
 interface SmsOrderInterface
 {
+    public const ID = 'id';
     public const WEBSITE_ID = 'website_id';
     public const STORE_ID = 'store_id';
     public const STATUS = 'status';
@@ -16,6 +17,13 @@ interface SmsOrderInterface
     public const ADDITIONAL_DATA = 'additional_data';
     public const SENT_AT = 'sent_at';
     public const CONTENT = 'content';
+
+    /**
+     * Get id.
+     *
+     * @return mixed
+     */
+    public function getId();
 
     /**
      * Get website id.
@@ -192,7 +200,7 @@ interface SmsOrderInterface
     /**
      * Set content.
      *
-     * @param mixed $content
+     * @param string $content
      * @return $this
      */
     public function setContent($content);

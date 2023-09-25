@@ -31,7 +31,7 @@ class TaskProviderPlugin
     public function beforeGetAvailableTasks(TaskProvider $taskProvider, array $additionalSyncs = [])
     {
         return [
-            'additionalSyncs' => get_object_vars($this),
+            'additionalSyncs' => $additionalSyncs + get_object_vars($this),
         ];
     }
 }

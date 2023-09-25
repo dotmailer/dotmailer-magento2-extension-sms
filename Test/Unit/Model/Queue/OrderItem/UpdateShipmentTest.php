@@ -4,7 +4,7 @@ namespace Dotdigitalgroup\Sms\Test\Unit\Model\Queue\OrderItem;
 
 use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
-use Dotdigitalgroup\Sms\Model\Queue\OrderItem\Data\ShipmentData;
+use Dotdigitalgroup\Sms\Model\Queue\OrderItem\Data\AdditionalData;
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\OrderItemNotificationEnqueuer;
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\UpdateShipment;
 use Magento\Framework\Serialize\SerializerInterface;
@@ -39,9 +39,9 @@ class UpdateShipmentTest extends TestCase
     private $serializerMock;
 
     /**
-     * @var ShipmentData|\PHPUnit\Framework\MockObject\MockObject
+     * @var AdditionalData|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $shipmentDataMock;
+    private $additionalDataMock;
 
     protected function setUp() :void
     {
@@ -49,13 +49,13 @@ class UpdateShipmentTest extends TestCase
         $this->orderInterfaceMock = $this->createMock(OrderInterface::class);
         $this->serializerMock = $this->createMock(SerializerInterface::class);
         $this->loggerMock = $this->createMock(Logger::class);
-        $this->shipmentDataMock = $this->createMock(ShipmentData::class);
+        $this->additionalDataMock = $this->createMock(AdditionalData::class);
 
         $this->updateShipment = new UpdateShipment(
             $this->smsOrderNotificationEnqueuerMock,
             $this->serializerMock,
             $this->loggerMock,
-            $this->shipmentDataMock
+            $this->additionalDataMock
         );
     }
 
@@ -68,7 +68,6 @@ class UpdateShipmentTest extends TestCase
 
         $this->serializerMock->expects($this->once())
             ->method('serialize')
-            ->with($this->shipmentDataMock)
             ->willReturn(
                 $jsonData = '{"orderStatus": "processing", "trackingNumber": 123456, "trackingCode": Chaz}'
             );
