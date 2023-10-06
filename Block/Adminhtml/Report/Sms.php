@@ -9,10 +9,5 @@ class Sms extends AbstractConfigField
     /**
      * @var string
      */
-    public $buttonLabel = 'SMS Report';
-
-    /**
-     * @var string
-     */
     protected $linkUrlPath = 'dotdigitalgroup_sms/report/index';
 }

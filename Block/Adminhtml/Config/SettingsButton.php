@@ -52,9 +52,11 @@ class SettingsButton extends Field
      */
     public function _getElementHtml(AbstractElement $element)
     {
-        return $this->getLayout()
-            ->createBlock(Button::class)
-            ->setType('button')
+        /** @var Button $block */
+        $block = $this->getLayout()
+            ->createBlock(Button::class);
+
+        return $block->setType('button')
             ->setLabel(__('Edit SMS settings'))
             ->setOnClick(sprintf("window.open('%s','_blank')", $this->getButtonUrl()))
             ->toHtml();

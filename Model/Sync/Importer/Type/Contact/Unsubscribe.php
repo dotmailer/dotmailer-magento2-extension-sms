@@ -25,22 +25,21 @@ class Unsubscribe extends AbstractItemSyncer
     private $smsConfig;
 
     /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
      * Update constructor.
      *
-     * @param Data $helper
-     * @param File $fileHelper
      * @param SerializerInterface $serializer
-     * @param Importer $importerResource
      * @param Logger $logger
      * @param SingleItemPostProcessorFactory $postProcessor
      * @param Configuration $smsConfig
      * @param array $data
      */
     public function __construct(
-        Data $helper,
-        File $fileHelper,
         SerializerInterface $serializer,
-        Importer $importerResource,
         Logger $logger,
         SingleItemPostProcessorFactory $postProcessor,
         Configuration $smsConfig,
@@ -48,7 +47,8 @@ class Unsubscribe extends AbstractItemSyncer
     ) {
         $this->postProcessor = $postProcessor;
         $this->smsConfig = $smsConfig;
-        parent::__construct($helper, $fileHelper, $serializer, $importerResource, $logger, $data);
+        $this->serializer = $serializer;
+        parent::__construct($logger, $data);
     }
 
     /**

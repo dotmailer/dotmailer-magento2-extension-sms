@@ -3,6 +3,9 @@
 namespace Dotdigitalgroup\Sms\Plugin\Order\Shipment;
 
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\UpdateShipment;
+use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -27,28 +30,36 @@ class ShipmentUpdatePlugin
     private $shipmentRepository;
 
     /**
+     * @var RequestInterface
+     */
+    private $request;
+
+    /**
      * ShipmentUpdatePlugin constructor.
      *
      * @param OrderRepositoryInterface $orderRepository
      * @param UpdateShipment $updateShipment
      * @param ShipmentRepositoryInterface $shipmentRepository
+     * @param Context $context
      */
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         UpdateShipment $updateShipment,
-        ShipmentRepositoryInterface $shipmentRepository
+        ShipmentRepositoryInterface $shipmentRepository,
+        Context $context
     ) {
         $this->orderRepository = $orderRepository;
         $this->updateShipment = $updateShipment;
         $this->shipmentRepository = $shipmentRepository;
+        $this->request = $context->getRequest();
     }
 
     /**
      * After execute.
      *
      * @param UpdateShipmentAction $subject
-     * @param mixed $result
-     * @return mixed
+     * @param ResultInterface $result
+     * @return ResultInterface
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
@@ -57,9 +68,7 @@ class ShipmentUpdatePlugin
         $result
     ) {
         $shipment = $this->shipmentRepository->get(
-            $subject
-                ->getRequest()
-                ->getParam('shipment_id')
+            $this->request->getParam('shipment_id')
         );
 
         $orderId = $shipment->getOrderId();
@@ -71,8 +80,8 @@ class ShipmentUpdatePlugin
         $this->updateShipment
             ->buildAdditionalData(
                 $order,
-                $subject->getRequest()->getParam('number'),
-                $subject->getRequest()->getParam('title')
+                $this->request->getParam('number'),
+                $this->request->getParam('title')
             )->queue();
 
         return $result;

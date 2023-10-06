@@ -8,7 +8,7 @@ This module provides support for Transactional SMS notifications to Magento merc
 ## Requirements
 - An active Dotdigital account with the SMS pay-as-you-go service enabled.
 - Dotdigital extension versions:
-  - `Dotdigitalgroup_Email` 4.22.0+
+  - `Dotdigitalgroup_Email` 4.23.0+
 - PHP 7.4+
 - Magento 2.3.7+
   - Magento 2.3.0-2.3.6 are compatible up to version 1.5.x
@@ -22,6 +22,12 @@ This module provides support for Transactional SMS notifications to Magento merc
 This module features an option to enable international telephone number validation. Our supporting code uses a version of the [International Telephone Input](https://github.com/jackocnr/intl-tel-input) JavaScript plugin. We've also borrowed some components from this [MaxMage Magento module](https://github.com/MaxMage/international-telephone-input). Kudos and thanks!
 
 ## Changelog
+
+### 1.7.0
+
+##### Improvements
+- We fixed all outstanding PHPStan errors (level 2).
+- We refactored some controller classes (and controller plugins) to replace usage of `$this→getRequest()`.
 
 ### 1.6.0
 

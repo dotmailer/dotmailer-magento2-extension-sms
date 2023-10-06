@@ -2,13 +2,13 @@
 
 namespace Dotdigitalgroup\Sms\Test\Unit\Model\Queue\OrderItem;
 
+use Dotdigitalgroup\Sms\Model\Queue\OrderItem\Data\AdditionalData;
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\NewOrder;
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\OrderItemNotificationEnqueuer;
-use Magento\Sales\Api\Data\OrderInterface;
 use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
 use Dotdigitalgroup\Email\Logger\Logger;
-use Dotdigitalgroup\Sms\Model\Queue\OrderItem\Data\OrderData;
 use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Sales\Api\Data\OrderInterface;
 use PHPUnit\Framework\TestCase;
 
 class NewOrderTest extends TestCase
@@ -39,9 +39,9 @@ class NewOrderTest extends TestCase
     private $loggerMock;
 
     /**
-     * @var OrderData|\PHPUnit\Framework\MockObject\MockObject
+     * @var AdditionalData|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $orderDataMock;
+    private $additionalDataMock;
 
     protected function setUp() :void
     {
@@ -49,13 +49,13 @@ class NewOrderTest extends TestCase
         $this->orderInterfaceMock = $this->createMock(OrderInterface::class);
         $this->serializerMock = $this->createMock(SerializerInterface::class);
         $this->loggerMock = $this->createMock(Logger::class);
-        $this->orderDataMock = $this->createMock(OrderData::class);
+        $this->additionalDataMock = $this->createMock(AdditionalData::class);
 
         $this->newOrder = new NewOrder(
             $this->smsOrderNotificationEnqueuerMock,
             $this->serializerMock,
             $this->loggerMock,
-            $this->orderDataMock
+            $this->additionalDataMock
         );
     }
 
@@ -68,7 +68,6 @@ class NewOrderTest extends TestCase
 
         $this->serializerMock->expects($this->once())
             ->method('serialize')
-            ->with($this->orderDataMock)
             ->willReturn($jsonData = '{"order_status": "pending"}');
 
         $this->smsOrderNotificationEnqueuerMock

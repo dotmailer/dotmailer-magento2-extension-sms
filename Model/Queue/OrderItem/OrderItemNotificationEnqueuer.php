@@ -56,7 +56,7 @@ class OrderItemNotificationEnqueuer
      * Queue the SMS Order.
      *
      * @param mixed $order
-     * @param array $additionalData
+     * @param string $additionalData
      * @param string $smsConfigPath
      * @param string|int $smsType
      * @throws LocalizedException

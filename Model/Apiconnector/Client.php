@@ -55,9 +55,15 @@ class Client extends Rest
         $response = $this->execute();
 
         if (!isset($response->messageId)) {
+            $errorMessage = '';
+            if (isset($response->message)) {
+                $errorMessage = $response->message;
+            } elseif (is_string($response)) {
+                $errorMessage = $response;
+            }
             $this->addClientLog('Error fetching message by ID', [
                 'message_id' => $messageId,
-                'response' => (string) $response
+                'error' => $errorMessage
             ]);
         }
 

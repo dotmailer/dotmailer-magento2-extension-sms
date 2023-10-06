@@ -4,9 +4,9 @@ namespace Dotdigitalgroup\Sms\Model\Queue;
 
 use Dotdigitalgroup\Sms\Api\SmsOrderRepositoryInterface;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
+use Dotdigitalgroup\Sms\Model\ResourceModel\SmsOrderFactory as SmsOrderResourceFactory;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Intl\DateTimeFactory;
-use Magento\Store\Model\StoreManagerInterface;
 
 class OrderQueueManager
 {
@@ -38,9 +38,9 @@ class OrderQueueManager
     private $dateTimeFactory;
 
     /**
-     * @var StoreManagerInterface $storeManager
+     * @var SmsOrderResourceFactory
      */
-    private $storeManager;
+    private $smsOrderResourceFactory;
 
     /**
      * OrderQueueManager constructor.
@@ -49,20 +49,20 @@ class OrderQueueManager
      * @param Configuration $moduleConfig
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param DateTimeFactory $dateTimeFactory
-     * @param StoreManagerInterface $storeManager
+     * @param SmsOrderResourceFactory $smsOrderResourceFactory
      */
     public function __construct(
         SmsOrderRepositoryInterface $smsOrderRepository,
         Configuration $moduleConfig,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         DateTimeFactory $dateTimeFactory,
-        StoreManagerInterface $storeManager
+        SmsOrderResourceFactory $smsOrderResourceFactory
     ) {
         $this->smsOrderRepository = $smsOrderRepository;
         $this->moduleConfig = $moduleConfig;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->dateTimeFactory = $dateTimeFactory;
-        $this->storeManager = $storeManager;
+        $this->smsOrderResourceFactory = $smsOrderResourceFactory;
     }
 
     /**
@@ -107,6 +107,8 @@ class OrderQueueManager
         $now = $this->dateTimeFactory->create('now', new \DateTimeZone('UTC'));
         $oneDayAgo = $now->sub(new \DateInterval('PT24H'));
 
-        $this->smsOrderRepository->expirePendingRowsOlderThan($oneDayAgo);
+        $this->smsOrderResourceFactory
+            ->create()
+            ->expirePendingRowsOlderThan($oneDayAgo);
     }
 }

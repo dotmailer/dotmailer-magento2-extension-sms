@@ -25,7 +25,7 @@ class UpdateOrder extends AbstractOrderItem
     public function buildAdditionalData($order)
     {
         $this->order = $order;
-        $this->additionalData->orderStatus = $order->getStatus();
+        $this->additionalData->setOrderStatus($order->getStatus());
         return $this;
     }
 }

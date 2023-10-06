@@ -6,14 +6,15 @@ use Dotdigitalgroup\Email\Controller\Customer\Newsletter;
 use Dotdigitalgroup\Email\Helper\Data;
 use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Email\Model\Contact;
-use Dotdigitalgroup\Email\Model\ContactFactory;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
 use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory;
 use Dotdigitalgroup\Sms\Model\Importer\Enqueuer;
 use Dotdigitalgroup\Sms\Model\Subscriber;
 use Dotdigitalgroup\Sms\Model\Consent\ConsentManager;
 use Magento\Customer\Model\Session;
-use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Data\Form\FormKey\Validator as FormKeyValidator;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Store\Model\StoreManagerInterface;
@@ -31,11 +32,6 @@ class NewsletterControllerPlugin
     private $logger;
 
     /**
-     * @var ContactFactory
-     */
-    private $contactFactory;
-
-    /**
      * @var ContactResource
      */
     private $contactResource;
@@ -49,6 +45,11 @@ class NewsletterControllerPlugin
      * @var Session
      */
     private $customerSession;
+
+    /**
+     * @var RequestInterface
+     */
+    private $request;
 
     /**
      * @var FormKeyValidator
@@ -73,7 +74,6 @@ class NewsletterControllerPlugin
     /**
      * @param Data $dataHelper
      * @param Logger $logger
-     * @param ContactFactory $contactFactory
      * @param ContactResource $contactResource
      * @param CollectionFactory $contactCollectionFactory
      * @param Session $customerSession
@@ -81,22 +81,22 @@ class NewsletterControllerPlugin
      * @param StoreManagerInterface $storeManager
      * @param Enqueuer $importerEnqueuer
      * @param ConsentManager $consentManager
+     * @param Context $context
      */
     public function __construct(
         Data $dataHelper,
         Logger $logger,
-        ContactFactory $contactFactory,
         ContactResource $contactResource,
         CollectionFactory $contactCollectionFactory,
         Session $customerSession,
         FormKeyValidator $formKeyValidator,
         StoreManagerInterface $storeManager,
         Enqueuer $importerEnqueuer,
-        ConsentManager $consentManager
+        ConsentManager $consentManager,
+        Context $context
     ) {
         $this->dataHelper = $dataHelper;
         $this->logger = $logger;
-        $this->contactFactory = $contactFactory;
         $this->contactResource = $contactResource;
         $this->contactCollectionFactory = $contactCollectionFactory;
         $this->customerSession = $customerSession;
@@ -104,20 +104,21 @@ class NewsletterControllerPlugin
         $this->storeManager = $storeManager;
         $this->importerEnqueuer = $importerEnqueuer;
         $this->consentManager = $consentManager;
+        $this->request = $context->getRequest();
     }
 
     /**
      * After execute.
      *
      * @param Newsletter $subject
-     * @param ResponseInterface $result
+     * @param Redirect $result
      *
-     * @return \Magento\Framework\App\ResponseInterface
+     * @return Redirect
      * @throws LocalizedException
      */
-    public function afterExecute(Newsletter $subject, $result): ResponseInterface
+    public function afterExecute(Newsletter $subject, Redirect $result): Redirect
     {
-        if (! $this->formKeyValidator->validate($subject->getRequest())) {
+        if (! $this->formKeyValidator->validate($this->request)) {
             return $result;
         }
 
@@ -126,9 +127,9 @@ class NewsletterControllerPlugin
         if (!$this->dataHelper->isEnabled($websiteId)) {
             return $result;
         }
-        $hasProvidedConsent = $subject->getRequest()->getParam('is_sms_subscribed') ?: false;
-        $consentMobileNumber = $subject->getRequest()->getParam('mobile_number') ?
-            str_replace(' ', '', $subject->getRequest()->getParam('mobile_number')) :
+        $hasProvidedConsent = $this->request->getParam('is_sms_subscribed') ?: false;
+        $consentMobileNumber = $this->request->getParam('mobile_number') ?
+            str_replace(' ', '', $this->request->getParam('mobile_number')) :
             '';
         if ($hasProvidedConsent && !$consentMobileNumber) {
             return $result;

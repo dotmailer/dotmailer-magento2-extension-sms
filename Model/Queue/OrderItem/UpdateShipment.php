@@ -27,9 +27,9 @@ class UpdateShipment extends AbstractOrderItem
     public function buildAdditionalData($order, $trackingNumber, $carrierCode)
     {
         $this->order = $order;
-        $this->additionalData->orderStatus = $order->getStatus();
-        $this->additionalData->trackingNumber = $trackingNumber;
-        $this->additionalData->trackingCarrier = $carrierCode;
+        $this->additionalData->setOrderStatus($order->getStatus());
+        $this->additionalData->setTrackingNumber($trackingNumber);
+        $this->additionalData->setTrackingCarrier($carrierCode);
 
         return $this;
     }

@@ -6,11 +6,12 @@ use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\NewCreditMemo;
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\OrderItemNotificationEnqueuer;
+use Magento\Checkout\Controller\Cart\Add;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Api\Data\OrderInterface;
-use Dotdigitalgroup\Sms\Model\Queue\OrderItem\Data\CreditMemoData;
+use Dotdigitalgroup\Sms\Model\Queue\OrderItem\Data\AdditionalData;
 use PHPUnit\Framework\TestCase;
 
 class NewCreditMemoTest extends TestCase
@@ -48,9 +49,9 @@ class NewCreditMemoTest extends TestCase
     private $creditMemoMock;
 
     /**
-     * @var CreditMemoData|\PHPUnit\Framework\MockObject\MockObject
+     * @var AdditionalData|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $creditMemoDataMock;
+    private $additionalDataMock;
 
     protected function setUp() :void
     {
@@ -60,14 +61,14 @@ class NewCreditMemoTest extends TestCase
         $this->serializerMock = $this->createMock(SerializerInterface::class);
         $this->priceCurrencyInterfaceMock = $this->createMock(PriceCurrencyInterface::class);
         $this->creditMemoMock = $this->createMock(Creditmemo::class);
-        $this->creditMemoDataMock = $this->createMock(CreditMemoData::class);
+        $this->additionalDataMock = $this->createMock(AdditionalData::class);
 
         $this->newCreditMemo = new NewCreditMemo(
             $this->smsOrderNotificationEnqueuerMock,
             $this->serializerMock,
             $this->loggerMock,
             $this->priceCurrencyInterfaceMock,
-            $this->creditMemoDataMock
+            $this->additionalDataMock
         );
     }
 
@@ -107,7 +108,6 @@ class NewCreditMemoTest extends TestCase
 
         $this->serializerMock->expects($this->once())
             ->method('serialize')
-            ->with($this->creditMemoDataMock)
             ->willReturn($jsonData = '{"orderStatus": "complete","creditMemoAmount": "$25"}');
 
         $this->smsOrderNotificationEnqueuerMock
