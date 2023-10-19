@@ -59,23 +59,22 @@ class NewsletterManageIndexPlugin
     }
 
     /**
-     * Around execute.
+     * After execute.
      *
      * @param Index $subject
-     * @param callable $proceed
+     * @param void $result
      *
-     * @return callable|void
-     * @throws LocalizedException
+     * @return void
      */
-    public function aroundExecute(
+    public function afterExecute(
         Index $subject,
-        callable $proceed
+        $result
     ) {
         $websiteId = $this->customerSession->getCustomer()->getWebsiteId();
         $storeId = $this->customerSession->getCustomer()->getStoreId();
         if (!$this->config->isSmsConsentEnabled($storeId) ||
             !$this->dataHelper->isEnabled($websiteId)) {
-            return $proceed();
+            return $result;
         }
 
         $this->response->setRedirect(
