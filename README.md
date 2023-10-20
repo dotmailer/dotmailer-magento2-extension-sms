@@ -23,6 +23,11 @@ This module features an option to enable international telephone number validati
 
 ## Changelog
 
+### 1.7.1
+
+##### Bug fixes
+- `NewsletterManageIndexPlugin` has been changed to an 'after' plugin.
+
 ### 1.7.0
 
 ##### Improvements
