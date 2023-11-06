@@ -23,6 +23,11 @@ This module features an option to enable international telephone number validati
 
 ## Changelog
 
+### 1.7.2
+
+##### Improvements
+- Merchants will now be prevented from using the same list for SMS subscriber sync that they have used to sync customers, subscribers or guests.
+
 ### 1.7.1
 
 ##### Bug fixes
