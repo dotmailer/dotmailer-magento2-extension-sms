@@ -7,22 +7,22 @@ namespace Dotdigitalgroup\Sms\Model\Queue\OrderItem\Data;
 class AdditionalData
 {
     /**
-     * @var string
+     * @var string|null
      */
     public $trackingNumber;
 
     /**
-     * @var string
+     * @var string|null
      */
     public $trackingCarrier;
 
     /**
-     * @var string
+     * @var string|null
      */
     public $creditMemoAmount;
 
     /**
-     * @var string
+     * @var string|null
      */
     public $orderStatus;
 
@@ -39,9 +39,9 @@ class AdditionalData
     /**
      * Set credit memo amount.
      *
-     * @param string $creditMemoAmount
+     * @param string|null $creditMemoAmount
      */
-    public function setCreditMemoAmount(string $creditMemoAmount): void
+    public function setCreditMemoAmount(?string $creditMemoAmount): void
     {
         $this->creditMemoAmount = $creditMemoAmount;
     }
@@ -49,9 +49,9 @@ class AdditionalData
     /**
      * Set order status.
      *
-     * @param string $orderStatus
+     * @param string|null $orderStatus
      */
-    public function setOrderStatus(string $orderStatus): void
+    public function setOrderStatus(?string $orderStatus): void
     {
         $this->orderStatus = $orderStatus;
     }
@@ -59,9 +59,9 @@ class AdditionalData
     /**
      * Set tracking carrier.
      *
-     * @param string $trackingCarrier
+     * @param string|null $trackingCarrier
      */
-    public function setTrackingCarrier(string $trackingCarrier): void
+    public function setTrackingCarrier(?string $trackingCarrier): void
     {
         $this->trackingCarrier = $trackingCarrier;
     }
@@ -69,9 +69,9 @@ class AdditionalData
     /**
      * Set tracking number.
      *
-     * @param string $trackingNumber
+     * @param string|null $trackingNumber
      */
-    public function setTrackingNumber(string $trackingNumber): void
+    public function setTrackingNumber(?string $trackingNumber): void
     {
         $this->trackingNumber = $trackingNumber;
     }
