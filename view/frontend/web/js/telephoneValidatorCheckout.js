@@ -19,8 +19,6 @@ define([
              * @param {Object} additionalParams
              */
             validate: function (value, params, additionalParams) {
-                (async () => {
-                    while (!$('.iti').length) { await new Promise(resolve => setTimeout(resolve, 1)); }
                     var target = $('#' + additionalParams.uid),
                         countryCodeClass = target.parent().find('.iti__selected-flag .iti__flag').attr('class'),
                         countryCode,
@@ -47,15 +45,17 @@ define([
                     ko.utils.triggerEvent(target[0], 'change');
 
                     return isValid;
-                })();
             }
         };
 
-        validator.addRule(
-            'validate-phone-number',
-            validatorObj.validate,
-            $.mage.__(validatorObj.message)
-        );
+        (async () => {
+            while (!$('.iti').length) { await new Promise(resolve => setTimeout(resolve, 1)); }
+            validator.addRule(
+                'validate-phone-number',
+                validatorObj.validate,
+                $.mage.__(validatorObj.message)
+            );
+        })();
 
         return validator;
     };
