@@ -13,6 +13,10 @@
                 <batch_size>1000</batch_size>
             </sms_settings>
             <sms_templates>
+                <signup_enabled>0</signup_enabled>
+                <signup_message>Hi {{ first_name }}, you've signed up to marketing messages from {{ store_name }}.</signup_message>
+                <new_account_signup_enabled>0</new_account_signup_enabled>
+                <new_account_signup_message>{{ first_name }}, welcome to {{ store_name }}. Use WELCOME10 at checkout when placing your next order.</new_account_signup_message>
                 <new_order_confirmation_enabled>0</new_order_confirmation_enabled>
                 <new_order_confirmation_message>Thanks {{ first_name }}, your order has been placed on {{ store_name }}. We'll notify you when it ships. View order {{ order_id }}</new_order_confirmation_message>
                 <order_update_enabled>0</order_update_enabled>

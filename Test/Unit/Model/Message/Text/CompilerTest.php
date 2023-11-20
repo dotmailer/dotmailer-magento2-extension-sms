@@ -30,14 +30,18 @@ class CompilerTest extends TestCase
         $this->variableResolverMock = $this->createMock(Resolver::class);
         $this->smsOrderMock = $this->createMock(SmsOrder::class);
 
-        $this->compiler = new Compiler(
-            $this->variableResolverMock
-        );
+        $this->compiler = new Compiler([
+            "1" => $this->variableResolverMock
+        ]);
     }
 
     public function testThatMatchesAreIdentified()
     {
         $rawText = $this->getRawText();
+
+        $this->smsOrderMock->expects($this->exactly(6))
+            ->method('getTypeId')
+            ->willReturn("1");
 
         $this->variableResolverMock->expects($this->exactly(5))
             ->method('resolve')

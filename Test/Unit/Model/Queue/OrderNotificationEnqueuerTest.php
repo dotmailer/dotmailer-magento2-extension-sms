@@ -96,7 +96,7 @@ class OrderNotificationEnqueuerTest extends TestCase
             ->willReturn($storeId = 1);
 
         $this->moduleConfigMock->expects($this->once())
-            ->method('isSmsEnabled')
+            ->method('isTransactionalSmsEnabled')
             ->with($storeId)
             ->willReturn(true);
 
@@ -204,7 +204,7 @@ class OrderNotificationEnqueuerTest extends TestCase
             ->willReturn($storeId = 1);
 
         $this->moduleConfigMock->expects($this->once())
-            ->method('isSmsEnabled')
+            ->method('isTransactionalSmsEnabled')
             ->with($storeId)
             ->willReturn(false);
 

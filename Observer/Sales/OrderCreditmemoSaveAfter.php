@@ -62,7 +62,7 @@ class OrderCreditmemoSaveAfter implements \Magento\Framework\Event\ObserverInter
     public function execute(Observer $observer)
     {
         $storeId = $this->storeManager->getStore()->getId();
-        if (!$this->moduleConfig->isSmsEnabled($storeId)) {
+        if (!$this->moduleConfig->isTransactionalSmsEnabled($storeId)) {
             return;
         }
 

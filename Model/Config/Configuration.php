@@ -78,7 +78,7 @@ class Configuration
      * @param int $storeId
      * @return bool
      */
-    public function isSmsEnabled($storeId)
+    public function isTransactionalSmsEnabled($storeId)
     {
         return $this->scopeConfig->getValue(
             ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_ENABLED,
@@ -99,21 +99,6 @@ class Configuration
             ConfigInterface::XML_PATH_SMS_PHONE_NUMBER_VALIDATION,
             ScopeInterface::SCOPE_STORES,
             $storeId
-        );
-    }
-
-    /**
-     * SMS enabled at website level.
-     *
-     * @param string|int $websiteId
-     * @return bool
-     */
-    private function isSmsEnabledAtWebsiteLevel($websiteId)
-    {
-        return $this->scopeConfig->getValue(
-            ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_ENABLED,
-            ScopeInterface::SCOPE_WEBSITES,
-            $websiteId
         );
     }
 
@@ -257,7 +242,7 @@ class Configuration
     {
         $childStores = $this->storeWebsiteRelation->getStoreByWebsiteId($websiteId);
         foreach ($childStores as $storeId) {
-            if ($this->isSmsEnabled($storeId)) {
+            if ($this->isTransactionalSmsEnabled($storeId)) {
                 $this->switchOffAtStoreLevel($storeId);
             }
         }

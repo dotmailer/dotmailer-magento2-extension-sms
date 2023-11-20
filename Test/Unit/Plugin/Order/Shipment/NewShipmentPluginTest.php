@@ -182,7 +182,7 @@ class NewShipmentPluginTest extends TestCase
             ->willReturn(1);
 
         $this->moduleConfigMock->expects($this->once())
-            ->method('isSmsEnabled')
+            ->method('isTransactionalSmsEnabled')
             ->willReturn(1);
     }
 }

@@ -25,6 +25,12 @@ interface ConfigInterface
     public const XML_PATH_SMS_NEW_CREDIT_MEMO_ENABLED = 'transactional_sms/sms_templates/new_credit_memo_enabled';
     public const XML_PATH_SMS_NEW_CREDIT_MEMO_MESSAGE = 'transactional_sms/sms_templates/new_credit_memo_message';
 
+    public const XML_PATH_SMS_SIGNUP_ENABLED = 'transactional_sms/sms_templates/signup_enabled';
+    public const XML_PATH_SMS_SIGNUP_MESSAGE = 'transactional_sms/sms_templates/signup_message';
+
+    public const XML_PATH_SMS_NEW_ACCOUNT_SIGNUP_ENABLED = 'transactional_sms/sms_templates/new_account_signup_enabled';
+    public const XML_PATH_SMS_NEW_ACCOUNT_SIGNUP_MESSAGE = 'transactional_sms/sms_templates/new_account_signup_message';
+
     public const XML_PATH_CONSENT_SMS_ENABLED = 'connector_consent/sms/enabled';
     public const XML_PATH_CONSENT_SMS_SIGNUP_TEXT = 'connector_consent/sms/signup_text';
     public const XML_PATH_CONSENT_SMS_MARKETING_TEXT = 'connector_consent/sms/marketing_consent_text';
@@ -37,12 +43,16 @@ interface ConfigInterface
     public const SMS_TYPE_NEW_SHIPMENT = 3;
     public const SMS_TYPE_UPDATE_SHIPMENT = 4;
     public const SMS_TYPE_NEW_CREDIT_MEMO = 5;
+    public const SMS_TYPE_SIGN_UP = 6;
+    public const SMS_TYPE_NEW_ACCOUNT_SIGN_UP = 7;
 
     public const TRANSACTIONAL_SMS_MESSAGE_TYPES_MAP = [
         self::SMS_TYPE_NEW_ORDER => self::XML_PATH_SMS_NEW_ORDER_MESSAGE,
         self::SMS_TYPE_UPDATE_ORDER => self::XML_PATH_SMS_ORDER_UPDATE_MESSAGE,
         self::SMS_TYPE_NEW_SHIPMENT => self::XML_PATH_SMS_NEW_SHIPMENT_MESSAGE,
         self::SMS_TYPE_UPDATE_SHIPMENT => self::XML_PATH_SMS_SHIPMENT_UPDATE_MESSAGE,
-        self::SMS_TYPE_NEW_CREDIT_MEMO => self::XML_PATH_SMS_NEW_CREDIT_MEMO_MESSAGE
+        self::SMS_TYPE_NEW_CREDIT_MEMO => self::XML_PATH_SMS_NEW_CREDIT_MEMO_MESSAGE,
+        self::SMS_TYPE_SIGN_UP => self::XML_PATH_SMS_SIGNUP_MESSAGE,
+        self::SMS_TYPE_NEW_ACCOUNT_SIGN_UP => self::XML_PATH_SMS_NEW_ACCOUNT_SIGNUP_MESSAGE
     ];
 }

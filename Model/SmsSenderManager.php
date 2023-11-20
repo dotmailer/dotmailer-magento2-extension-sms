@@ -154,7 +154,7 @@ class SmsSenderManager implements TaskRunInterface
             if ($this->helper->isEnabled($websiteId)) {
                 $apiUser = $this->helper->getApiUsername($websiteId);
                 foreach ($website->getStoreIds() as $storeId) {
-                    if ($this->moduleConfig->isSmsEnabled($storeId)) {
+                    if ($this->moduleConfig->isTransactionalSmsEnabled($storeId)) {
                         if (!isset($apiUsers[$apiUser]['firstWebsiteId'])) {
                             $apiUsers[$apiUser]['firstWebsiteId'] = $websiteId;
                         }

@@ -35,5 +35,33 @@
             "sms_subscriber_imported": true,
             "sms_change_status_at": true
         }
+    },
+    "email_transactional_sms_queue": {
+        "column": {
+            "id": true,
+            "website_id": true,
+            "store_id": true,
+            "type_id": true,
+            "order_id": true,
+            "phone_number": true,
+            "email": true,
+            "additional_data": true,
+            "status": true,
+            "content": true,
+            "message_id": true,
+            "message": true,
+            "sent_at": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "EMAIL_TRANSACTIONAL_SMS_QUEUE_WEBSITE_ID": true,
+            "EMAIL_TRANSACTIONAL_SMS_QUEUE_STORE_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "EMAIL_TRANSACTIONAL_SMS_QUEUE_WS_ID_STORE_WS_WS_ID": true,
+            "EMAIL_TRANSACTIONAL_SMS_QUEUE_STORE_ID_STORE_STORE_ID": true
+        }
     }
 }

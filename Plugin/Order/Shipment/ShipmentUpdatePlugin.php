@@ -86,7 +86,7 @@ class ShipmentUpdatePlugin
         $result
     ) {
         $storeId = $this->storeManager->getStore()->getId();
-        if (!$this->moduleConfig->isSmsEnabled($storeId)) {
+        if (!$this->moduleConfig->isTransactionalSmsEnabled($storeId)) {
             return $result;
         }
 
