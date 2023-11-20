@@ -2,14 +2,21 @@
 
 namespace Dotdigitalgroup\Sms\Observer\Sales;
 
+use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\UpdateOrder;
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\NewOrder;
 use Dotdigitalgroup\Sms\Model\Sales\SmsSalesService;
 use Magento\Framework\Event\Observer;
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 class OrderSaveAfter implements \Magento\Framework\Event\ObserverInterface
 {
+    /**
+     * @var Configuration
+     */
+    private $moduleConfig;
+
     /**
      * @var UpdateOrder
      */
@@ -26,20 +33,31 @@ class OrderSaveAfter implements \Magento\Framework\Event\ObserverInterface
     private $smsSalesService;
 
     /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
      * OrderSaveAfter constructor.
      *
+     * @param Configuration $moduleConfig
      * @param UpdateOrder $updateOrder
      * @param NewOrder $newOrder
      * @param SmsSalesService $smsSalesService
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
+        Configuration $moduleConfig,
         UpdateOrder $updateOrder,
         NewOrder $newOrder,
-        SmsSalesService $smsSalesService
+        SmsSalesService $smsSalesService,
+        StoreManagerInterface $storeManager
     ) {
+        $this->moduleConfig = $moduleConfig;
         $this->updateOrder = $updateOrder;
         $this->newOrder = $newOrder;
         $this->smsSalesService = $smsSalesService;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -53,6 +71,11 @@ class OrderSaveAfter implements \Magento\Framework\Event\ObserverInterface
      */
     public function execute(Observer $observer)
     {
+        $storeId = $this->storeManager->getStore()->getId();
+        if (!$this->moduleConfig->isSmsEnabled($storeId)) {
+            return;
+        }
+
         if ($this->smsSalesService->isOrderSaveAfterExecuted()) {
             return;
         }

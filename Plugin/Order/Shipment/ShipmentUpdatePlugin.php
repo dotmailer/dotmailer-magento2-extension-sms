@@ -2,6 +2,7 @@
 
 namespace Dotdigitalgroup\Sms\Plugin\Order\Shipment;
 
+use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\UpdateShipment;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
@@ -11,9 +12,15 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\ShipmentRepositoryInterface;
 use Magento\Shipping\Controller\Adminhtml\Order\Shipment\AddTrack as UpdateShipmentAction;
+use Magento\Store\Model\StoreManagerInterface;
 
 class ShipmentUpdatePlugin
 {
+    /**
+     * @var Configuration
+     */
+    private $moduleConfig;
+
     /**
      * @var OrderRepositoryInterface
      */
@@ -35,23 +42,34 @@ class ShipmentUpdatePlugin
     private $request;
 
     /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
      * ShipmentUpdatePlugin constructor.
      *
+     * @param Configuration $moduleConfig
      * @param OrderRepositoryInterface $orderRepository
      * @param UpdateShipment $updateShipment
      * @param ShipmentRepositoryInterface $shipmentRepository
      * @param Context $context
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
+        Configuration $moduleConfig,
         OrderRepositoryInterface $orderRepository,
         UpdateShipment $updateShipment,
         ShipmentRepositoryInterface $shipmentRepository,
-        Context $context
+        Context $context,
+        StoreManagerInterface $storeManager
     ) {
+        $this->moduleConfig = $moduleConfig;
         $this->orderRepository = $orderRepository;
         $this->updateShipment = $updateShipment;
         $this->shipmentRepository = $shipmentRepository;
         $this->request = $context->getRequest();
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -67,6 +85,11 @@ class ShipmentUpdatePlugin
         UpdateShipmentAction $subject,
         $result
     ) {
+        $storeId = $this->storeManager->getStore()->getId();
+        if (!$this->moduleConfig->isSmsEnabled($storeId)) {
+            return $result;
+        }
+
         $shipment = $this->shipmentRepository->get(
             $this->request->getParam('shipment_id')
         );

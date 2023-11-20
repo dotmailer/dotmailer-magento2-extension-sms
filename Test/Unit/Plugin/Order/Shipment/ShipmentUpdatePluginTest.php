@@ -2,6 +2,7 @@
 
 namespace Dotdigitalgroup\Sms\Test\Unit\Plugin\Order\Shipment;
 
+use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\UpdateShipment;
 use Dotdigitalgroup\Sms\Plugin\Order\Shipment\ShipmentUpdatePlugin;
 use Magento\Framework\App\Action\Context;
@@ -12,10 +13,16 @@ use Magento\Sales\Api\Data\ShipmentInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\ShipmentRepositoryInterface;
 use Magento\Shipping\Controller\Adminhtml\Order\Shipment\AddTrack as UpdateShipmentAction;
+use Magento\Store\Model\StoreManagerInterface;
 use PHPUnit\Framework\TestCase;
 
 class ShipmentUpdatePluginTest extends TestCase
 {
+    /**
+     * @var Configuration|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $moduleConfigMock;
+
     /**
      * @var UpdateShipment|\PHPUnit\Framework\MockObject\MockObject
      */
@@ -56,8 +63,14 @@ class ShipmentUpdatePluginTest extends TestCase
      */
     private $orderInterfaceMock;
 
+    /**
+     * @var StoreManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $storeManagerMock;
+
     protected function setUp(): void
     {
+        $this->moduleConfigMock = $this->createMock(Configuration::class);
         $this->updateShipmentMock = $this->createMock(UpdateShipment::class);
         $this->orderRepositoryInterfaceMock = $this->createMock(OrderRepositoryInterface::class);
         $this->shipmentRepositoryInterfaceMock = $this->createMock(ShipmentRepositoryInterface::class);
@@ -65,6 +78,7 @@ class ShipmentUpdatePluginTest extends TestCase
         $this->requestInterfaceMock = $this->createMock(RequestInterface::class);
         $this->shipmentInterfaceMock = $this->createMock(ShipmentInterface::class);
         $this->orderInterfaceMock = $this->createMock(OrderInterface::class);
+        $this->storeManagerMock = $this->createMock(StoreManagerInterface::class);
         $contextMock = $this->createMock(Context::class);
 
         $contextMock->expects($this->any())
@@ -72,15 +86,31 @@ class ShipmentUpdatePluginTest extends TestCase
             ->willReturn($this->requestInterfaceMock);
 
         $this->plugin = new ShipmentUpdatePlugin(
+            $this->moduleConfigMock,
             $this->orderRepositoryInterfaceMock,
             $this->updateShipmentMock,
             $this->shipmentRepositoryInterfaceMock,
-            $contextMock
+            $contextMock,
+            $this->storeManagerMock
         );
     }
 
     public function testAfterExecuteMethod()
     {
+        $storeMock = $this->createMock(\Magento\Store\Model\Store::class);
+
+        $this->storeManagerMock->expects($this->once())
+            ->method('getStore')
+            ->willReturn($storeMock);
+
+        $storeMock->expects($this->once())
+            ->method('getId')
+            ->willReturn(1);
+
+        $this->moduleConfigMock->expects($this->once())
+            ->method('isSmsEnabled')
+            ->willReturn(1);
+
         $this->requestInterfaceMock
             ->expects($this->at(0))
             ->method('getParam')

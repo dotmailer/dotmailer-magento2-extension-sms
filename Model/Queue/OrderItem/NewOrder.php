@@ -3,6 +3,7 @@
 namespace Dotdigitalgroup\Sms\Model\Queue\OrderItem;
 
 use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
+use Magento\Sales\Api\Data\OrderInterface;
 
 class NewOrder extends AbstractOrderItem
 {
@@ -19,7 +20,7 @@ class NewOrder extends AbstractOrderItem
     /**
      * Build additional data for the order.
      *
-     * @param mixed $order
+     * @param OrderInterface $order
      * @return NewOrder
      */
     public function buildAdditionalData($order)

@@ -8,6 +8,7 @@ use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
 class OrderItemNotificationEnqueuer
@@ -33,7 +34,7 @@ class OrderItemNotificationEnqueuer
     private $storeManager;
 
     /**
-     * AbstractQueueManager constructor.
+     * OrderItemNotificationEnqueuer constructor.
      *
      * @param SmsOrderInterfaceFactory $smsOrderInterfaceFactory
      * @param SmsOrderRepositoryInterface $smsOrderRepositoryInterface
@@ -55,7 +56,7 @@ class OrderItemNotificationEnqueuer
     /**
      * Queue the SMS Order.
      *
-     * @param mixed $order
+     * @param OrderInterface $order
      * @param string $additionalData
      * @param string $smsConfigPath
      * @param string|int $smsType
@@ -71,6 +72,7 @@ class OrderItemNotificationEnqueuer
             return;
         }
 
+        /** @var \Magento\Sales\Model\Order $order */
         $address = $order->getShippingAddress() ?? $order->getBillingAddress();
         $orderId = (int) $order->getId();
         $smsOrder = $this->smsOrderInterfaceFactory
