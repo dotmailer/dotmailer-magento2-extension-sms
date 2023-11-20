@@ -3,6 +3,7 @@
 namespace Dotdigitalgroup\Sms\Plugin\Order\Shipment;
 
 use Dotdigitalgroup\Email\Logger\Logger;
+use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\NewShipment;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
@@ -11,6 +12,7 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Shipping\Controller\Adminhtml\Order\Shipment\Save as NewShipmentAction;
+use Magento\Store\Model\StoreManagerInterface;
 
 class NewShipmentPlugin
 {
@@ -18,6 +20,11 @@ class NewShipmentPlugin
      * @var Logger
      */
     private $logger;
+
+    /**
+     * @var Configuration
+     */
+    private $moduleConfig;
 
     /**
      * @var OrderRepositoryInterface
@@ -35,23 +42,34 @@ class NewShipmentPlugin
     private $request;
 
     /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
      * NewShipmentPlugin constructor.
      *
      * @param Logger $logger
+     * @param Configuration $moduleConfig
      * @param OrderRepositoryInterface $orderRepository
      * @param NewShipment $newShipment
      * @param Context $context
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         Logger $logger,
+        Configuration $moduleConfig,
         OrderRepositoryInterface $orderRepository,
         NewShipment $newShipment,
-        Context $context
+        Context $context,
+        StoreManagerInterface $storeManager
     ) {
         $this->logger = $logger;
+        $this->moduleConfig = $moduleConfig;
         $this->orderRepository = $orderRepository;
         $this->newShipment = $newShipment;
         $this->request = $context->getRequest();
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -67,6 +85,11 @@ class NewShipmentPlugin
         NewShipmentAction $subject,
         $result
     ) {
+        $storeId = $this->storeManager->getStore()->getId();
+        if (!$this->moduleConfig->isSmsEnabled($storeId)) {
+            return $result;
+        }
+
         try {
             $order = $this->orderRepository->get(
                 $this->request->getParam('order_id')

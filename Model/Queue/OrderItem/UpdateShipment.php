@@ -3,6 +3,7 @@
 namespace Dotdigitalgroup\Sms\Model\Queue\OrderItem;
 
 use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
+use Magento\Sales\Api\Data\OrderInterface;
 
 class UpdateShipment extends AbstractOrderItem
 {
@@ -19,7 +20,7 @@ class UpdateShipment extends AbstractOrderItem
     /**
      * Build additional data for the shipment.
      *
-     * @param mixed $order
+     * @param OrderInterface $order
      * @param string|int $trackingNumber
      * @param string|int $carrierCode
      * @return UpdateShipment

@@ -3,6 +3,7 @@
 namespace Dotdigitalgroup\Sms\Test\Unit\Plugin\Order\Shipment;
 
 use Dotdigitalgroup\Email\Logger\Logger;
+use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\NewShipment;
 use Dotdigitalgroup\Sms\Plugin\Order\Shipment\NewShipmentPlugin;
 use Magento\Framework\App\Action\Context;
@@ -10,6 +11,7 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Shipping\Controller\Adminhtml\Order\Shipment\Save as NewShipmentAction;
+use Magento\Store\Model\StoreManagerInterface;
 use PHPUnit\Framework\TestCase;
 
 class NewShipmentPluginTest extends TestCase
@@ -18,6 +20,11 @@ class NewShipmentPluginTest extends TestCase
      * @var Logger|\PHPUnit\Framework\MockObject\MockObject
      */
     private $loggerMock;
+
+    /**
+     * @var Configuration|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $moduleConfigMock;
 
     /**
      * @var OrderRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject
@@ -40,6 +47,11 @@ class NewShipmentPluginTest extends TestCase
     private $requestInterfaceMock;
 
     /**
+     * @var StoreManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $storeManagerMock;
+
+    /**
      * @var NewShipmentPlugin
      */
     private $plugin;
@@ -52,10 +64,12 @@ class NewShipmentPluginTest extends TestCase
     protected function setUp(): void
     {
         $this->loggerMock = $this->createMock(Logger::class);
+        $this->moduleConfigMock = $this->createMock(Configuration::class);
         $this->orderRepositoryInterfaceMock = $this->createMock(OrderRepositoryInterface::class);
         $this->newShipmentActionMock = $this->createMock(NewShipmentAction::class);
         $this->newShipmentMock = $this->createMock(NewShipment::class);
         $this->requestInterfaceMock = $this->createMock(RequestInterface::class);
+        $this->storeManagerMock = $this->createMock(StoreManagerInterface::class);
         $this->orderInterfaceMock = $this->createMock(OrderInterface::class);
         $contextMock = $this->createMock(Context::class);
 
@@ -65,9 +79,11 @@ class NewShipmentPluginTest extends TestCase
 
         $this->plugin = new NewShipmentPlugin(
             $this->loggerMock,
+            $this->moduleConfigMock,
             $this->orderRepositoryInterfaceMock,
             $this->newShipmentMock,
-            $contextMock
+            $contextMock,
+            $this->storeManagerMock
         );
     }
 
@@ -79,6 +95,8 @@ class NewShipmentPluginTest extends TestCase
             'carrier_code' => 'chaz',
             'title' => 'Chaz Express'
         ]];
+
+        $this->checkEnabled();
 
         $this->requestInterfaceMock
             ->expects($this->exactly(2))
@@ -115,10 +133,12 @@ class NewShipmentPluginTest extends TestCase
         $this->plugin->afterExecute($this->newShipmentActionMock, []);
     }
 
-    public function testAfterExecuteMethodIfTrackingDidntDefined()
+    public function testAfterExecuteMethodIfTrackingNotDefined()
     {
         $orderId = 1;
         $tracking = null;
+
+        $this->checkEnabled();
 
         $this->requestInterfaceMock
             ->expects($this->exactly(2))
@@ -147,5 +167,22 @@ class NewShipmentPluginTest extends TestCase
             ->method('queue');
 
         $this->plugin->afterExecute($this->newShipmentActionMock, []);
+    }
+
+    private function checkEnabled()
+    {
+        $storeMock = $this->createMock(\Magento\Store\Model\Store::class);
+
+        $this->storeManagerMock->expects($this->once())
+            ->method('getStore')
+            ->willReturn($storeMock);
+
+        $storeMock->expects($this->once())
+            ->method('getId')
+            ->willReturn(1);
+
+        $this->moduleConfigMock->expects($this->once())
+            ->method('isSmsEnabled')
+            ->willReturn(1);
     }
 }

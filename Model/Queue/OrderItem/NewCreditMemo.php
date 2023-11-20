@@ -7,6 +7,7 @@ use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\Data\AdditionalData;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Sales\Api\Data\OrderInterface;
 
 class NewCreditMemo extends AbstractOrderItem
 {
@@ -48,7 +49,7 @@ class NewCreditMemo extends AbstractOrderItem
     /**
      * Build additional data for the credit memo.
      *
-     * @param mixed $order
+     * @param OrderInterface $order
      * @param mixed $creditMemo
      * @return NewCreditMemo
      */
