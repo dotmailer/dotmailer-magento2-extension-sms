@@ -48,11 +48,14 @@ define([
             }
         };
 
-        validator.addRule(
-            'validate-phone-number',
-            validatorObj.validate,
-            $.mage.__(validatorObj.message)
-        );
+        (async () => {
+            while (!$('.iti').length) { await new Promise(resolve => setTimeout(resolve, 1)); }
+            validator.addRule(
+                'validate-phone-number',
+                validatorObj.validate,
+                $.mage.__(validatorObj.message)
+            );
+        })();
 
         return validator;
     };
