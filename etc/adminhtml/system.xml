@@ -178,18 +178,27 @@
             </group>
         </section>
         <section id="connector_consent" translate="label" sortOrder="195" showInStore="1" showInWebsite="1" showInDefault="1">
-            <group id="sms" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>SMS</label>
-                <field id="enabled" translate="label" sortOrder="10" type="select" showInStore="1" showInWebsite="1" showInDefault="1">
-                    <label>Ask for SMS marketing consent</label>
+            <group id="sms" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" >
+                <label>SMS Marketing</label>
+                <comment><![CDATA[Ask customers to share their mobile numbers and consent to receive SMS marketing messages at key touchpoints in your store.]]></comment>
+
+                <field id="registration_enabled" translate="label" sortOrder="15" type="select" showInStore="1" showInWebsite="1" showInDefault="1">
+                    <label>During Account Registration</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment><![CDATA[Enable this to capture mobile numbers and record consent for SMS marketing.]]></comment>
                 </field>
-                <field id="signup_text" translate="label" sortOrder="20" type="textarea" showInWebsite="1" showInStore="1" showInDefault="1">
+                <field id="checkout_enabled" translate="label" sortOrder="20" type="select" showInStore="1" showInWebsite="1" showInDefault="1">
+                    <label>During Checkout</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="account_enabled" translate="label" sortOrder="25" type="select" showInStore="1" showInWebsite="1" showInDefault="1">
+                    <label>In the My Account Section</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="signup_text" translate="label" sortOrder="30" type="textarea" showInWebsite="1" showInStore="1" showInDefault="1">
                     <label>Sign up text</label>
                     <comment><![CDATA[The text here is displayed next to the checkbox when opting in.]]></comment>
                 </field>
-                <field id="marketing_consent_text" translate="label" sortOrder="20" type="textarea" showInWebsite="1" showInStore="1" showInDefault="1">
+                <field id="marketing_consent_text" translate="label" sortOrder="35" type="textarea" showInWebsite="1" showInStore="1" showInDefault="1">
                     <label>SMS marketing consent text</label>
                     <comment><![CDATA[Explain what you will do with consent, how customers can withdraw consent, and where they can learn more.]]></comment>
                 </field>

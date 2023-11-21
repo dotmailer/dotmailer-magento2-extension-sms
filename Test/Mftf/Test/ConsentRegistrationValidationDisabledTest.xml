@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="ConsentRegistrationValidationDisabledTest">
+        <annotations>
+            <features value="Dotdigital module"/>
+            <stories value="Dotdigital SMS"/>
+            <title value="Consent at registration - validation disabled"/>
+            <description value="Confirm that the consent fieldset appears within the registration form, and that submitted mobile numbers are not validated."/>
+            <severity value="BLOCKER"/>
+            <group value="dotdigitalSms"/>
+        </annotations>
+
+        <before>
+            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup1"/>
+            <actionGroup ref="SetDotmailerAccountData" stepKey="SetDotmailerAccountData"/>
+            <actionGroup ref="SetPhoneNumberValidation" stepKey="EnablePhoneNumberValidation">
+                <argument name="enabled" value="No"/>
+            </actionGroup>
+            <actionGroup ref="SetSmsConsentOptions" stepKey="SetSmsConsentOptions">
+                <argument name="configSelector" value="{{AdminSmsConsentSection.consentEnabledRegistration}}"/>
+            </actionGroup>
+        </before>
+
+        <after>
+            <actionGroup ref="SetSmsConsentOptions" stepKey="DisableSmsConsent">
+                <argument name="enabled" value="No"/>
+                <argument name="configSelector" value="{{AdminSmsConsentSection.consentEnabledRegistration}}"/>
+            </actionGroup>
+
+            <actionGroup ref="ResetDotmailerAccountData" stepKey="resetAccountData"/>
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="logout"/>
+        </after>
+
+        <!-- Navigate to registration and complete form-->
+        <actionGroup ref="StorefrontOpenCustomerAccountCreatePageActionGroup" stepKey="openCreateAccountPage"/>
+        <actionGroup ref="StorefrontFillCustomerAccountCreationFormActionGroup" stepKey="fillCreateAccountForm">
+            <argument name="customer" value="Simple_US_Customer"/>
+        </actionGroup>
+
+        <wait stepKey="Wait" time="5"/>
+        <!-- Fill sms marketing consent form -->
+        <checkOption selector="{{RegistrationConsentFormSection.consentCheckbox}}" stepKey="checkSmsConsentCheckbox1"/>
+
+        <!--Fill in valid Mobile number -->
+        <waitForElement selector="{{RegistrationConsentFormSection.consentMobileNumber}}" stepKey="waitForConsentMobileNumber1"/>
+        <seeElement selector="{{RegistrationConsentFormSection.consentMobileNumber}}" stepKey="seeConsentMobileNumber"/>
+
+        <!-- Fill in valid number -->
+        <fillField selector="{{RegistrationConsentFormSection.consentMobileNumber}}" userInput="+27123456789" stepKey="setConsentValidMobileNumber"/>
+
+        <!-- Submit valid number -->
+        <actionGroup ref="StorefrontClickCreateAnAccountCustomerAccountCreationFormActionGroup" stepKey="submitCreateAccountFormForValidNumber"/>
+
+        <!-- Validate submission -->
+        <actionGroup ref="AssertMessageCustomerCreateAccountActionGroup" stepKey="seeSuccessMessage">
+            <argument name="messageType" value="success"/>
+            <argument name="message" value="Thank you for registering with Main Website Store."/>
+        </actionGroup>
+    </test>
+</tests>
+
+
+
+
+
+

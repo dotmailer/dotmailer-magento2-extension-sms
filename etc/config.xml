@@ -31,7 +31,9 @@
         </transactional_sms>
         <connector_consent>
             <sms>
-                <enabled>0</enabled>
+                <registration_enabled>0</registration_enabled>
+                <account_enabled>0</account_enabled>
+                <checkout_enabled>0</checkout_enabled>
                 <signup_text></signup_text>
                 <marketing_consent_text></marketing_consent_text>
             </sms>

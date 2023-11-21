@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="ConsentAccountSubscriptionValidationDisabledTest">
+        <annotations>
+            <features value="Dotdigital module"/>
+            <stories value="Dotdigital SMS"/>
+            <title value="Consent at my account subscription - validation disabled"/>
+            <description value="Confirm that the consent fieldset appears within the 'My Account' subscriptions form, but submitted mobile numbers are not validated if phone number validation is disabled."/>
+            <severity value="BLOCKER"/>
+            <group value="dotdigitalSms"/>
+        </annotations>
+
+        <before>
+            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup1"/>
+            <!-- Create a customer -->
+            <createData entity="Simple_US_Customer" stepKey="createCustomer"/>
+            <actionGroup ref="SetDotmailerAccountData" stepKey="SetDotmailerAccountData"/>
+            <actionGroup ref="SetPhoneNumberValidation" stepKey="EnablePhoneNumberValidation">
+                <argument name="enabled" value="No"/>
+            </actionGroup>
+            <actionGroup ref="SetSmsConsentOptions" stepKey="SetSmsConsentOptions">
+                <argument name="configSelector" value="{{AdminSmsConsentSection.consentEnabledAccount}}"/>
+            </actionGroup>
+        </before>
+
+        <after>
+            <actionGroup ref="SetPhoneNumberValidation" stepKey="DisablePhoneNumberValidation">
+                <argument name="enabled" value="No"/>
+            </actionGroup>
+            <actionGroup ref="SetSmsConsentOptions" stepKey="DisableSmsConsent">
+                <argument name="enabled" value="No"/>
+                <argument name="configSelector" value="{{AdminSmsConsentSection.consentEnabledAccount}}"/>
+            </actionGroup>
+            <deleteData createDataKey="createCustomer" stepKey="deleteCustomer"/>
+            <actionGroup ref="ResetDotmailerAccountData" stepKey="resetAccountData"/>
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="logout"/>
+        </after>
+
+        <!-- Login as the created customer -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginToStorefront">
+            <argument name="Customer" value="$$createCustomer$$"/>
+        </actionGroup>
+
+        <!-- Navigate to my account subscriptions page -->
+        <actionGroup ref="StorefrontOpenCustomerAccountSubscriptionsPageActionGroup" stepKey="openCustomerAccountSubscriptionsPage"/>
+
+        <!-- assert form is visible -->
+        <seeElement selector="{{StorefrontCustomerAccountSubscriptionsSection.consentForm}}" stepKey="seeConsentForm"/>
+        <seeElement selector="{{StorefrontCustomerAccountSubscriptionsSection.consentCheckbox}}" stepKey="seeConsentCheckbox"/>
+        <seeElement selector="//ul[@class='nav items']/li[contains(.,'Subscriptions')]" stepKey="seeSubscriptionsItem"/>
+
+        <!-- Checkbox and Fill sms marketing consent form -->
+        <checkOption selector="{{StorefrontCustomerAccountSubscriptionsSection.consentCheckbox}}" stepKey="checkSmsConsentCheckbox1"/>
+        <fillField selector="{{StorefrontCustomerAccountSubscriptionsSection.consentMobileNumber}}" userInput="im-not-a-number" stepKey="setConsentInvalidMobileNumber"/>
+
+        <!-- Submit valid number -->
+        <actionGroup ref="StorefrontClickSaveCustomerAccountSubscriptionsFormActionGroup" stepKey="submitCustomerAccountSubscriptionsFormForInvalidNumber"/>
+
+        <!-- Observes success message -->
+        <seeElement selector="//div[@class='messages']//div[contains(@class, 'message-success') and contains(., 'We have updated your subscription.')]" stepKey="seeUpdatedSubscriptionMessage"/>
+        <seeElement selector="//div[@class='messages']//div[contains(@class, 'message-success') and contains(., 'Your subscription preferences have been saved.')]" stepKey="seeSavedSubscriptionPreferencesMessage"/>
+    </test>
+</tests>

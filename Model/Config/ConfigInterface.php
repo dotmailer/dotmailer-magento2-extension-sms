@@ -30,8 +30,17 @@ interface ConfigInterface
 
     public const XML_PATH_SMS_NEW_ACCOUNT_SIGNUP_ENABLED = 'transactional_sms/sms_templates/new_account_signup_enabled';
     public const XML_PATH_SMS_NEW_ACCOUNT_SIGNUP_MESSAGE = 'transactional_sms/sms_templates/new_account_signup_message';
-
+    /**
+     * @deprecated Since version 1.7.3, use new paths instead.
+     * @see
+     * - \Dotdigitalgroup\Sms\Model\Config\ConfigInterface::XML_PATH_CONSENT_SMS_REGISTRATION_ENABLED
+     * - \Dotdigitalgroup\Sms\Model\Config\ConfigInterface::XML_PATH_CONSENT_SMS_CHECKOUT_ENABLED
+     * - \Dotdigitalgroup\Sms\Model\Config\ConfigInterface::XML_PATH_CONSENT_SMS_ACCOUNT_ENABLED
+     */
     public const XML_PATH_CONSENT_SMS_ENABLED = 'connector_consent/sms/enabled';
+    public const XML_PATH_CONSENT_SMS_REGISTRATION_ENABLED = 'connector_consent/sms/registration_enabled';
+    public const XML_PATH_CONSENT_SMS_CHECKOUT_ENABLED = 'connector_consent/sms/checkout_enabled';
+    public const XML_PATH_CONSENT_SMS_ACCOUNT_ENABLED = 'connector_consent/sms/account_enabled';
     public const XML_PATH_CONSENT_SMS_SIGNUP_TEXT = 'connector_consent/sms/signup_text';
     public const XML_PATH_CONSENT_SMS_MARKETING_TEXT = 'connector_consent/sms/marketing_consent_text';
 

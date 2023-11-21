@@ -5,11 +5,12 @@
     <actionGroup name="SetSmsConsentOptions">
         <arguments>
             <argument name="enabled" defaultValue="Yes" type="string"/>
+            <argument name="configSelector" type="string"/>
         </arguments>
         <amOnPage url="{{AdminSmsConsentPage.url}}" stepKey="amOnDotdigitalConsentPage"/>
         <waitForPageLoad stepKey="waitForPageLoad5"/>
         <conditionalClick stepKey="expandConsentTab" selector="{{AdminSmsConsentSection.consentFieldsetToggle}}" dependentSelector="{{AdminSmsConsentSection.consentFieldset}}" visible="false"/>
-        <selectOption selector="{{AdminSmsConsentSection.consentEnabled}}" userInput="{{enabled}}" stepKey="setSmsConsentEnabled"/>
+        <selectOption selector="{{configSelector}}" userInput="{{enabled}}" stepKey="setSmsConsentEnabled"/>
         <fillField selector="{{AdminSmsConsentSection.signUpText}}" userInput="Test signup text" stepKey="setSignupText"/>
         <fillField selector="{{AdminSmsConsentSection.marketingConsentText}}" userInput="Test SMS consent text" stepKey="setConsentText"/>
         <click selector="{{AdminMainActionsSection.save}}" stepKey="saveConfig2"/>

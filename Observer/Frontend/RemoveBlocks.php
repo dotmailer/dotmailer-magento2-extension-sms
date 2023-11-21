@@ -25,6 +25,8 @@ class RemoveBlocks implements ObserverInterface
     private $storeManager;
 
     /**
+     * RemoveBlocks constructor.
+     *
      * @param Data $dataHelper
      * @param Configuration $config
      * @param StoreManagerInterface $storeManager
@@ -52,10 +54,11 @@ class RemoveBlocks implements ObserverInterface
         $storeId = $this->storeManager->getStore()->getId();
         $websiteId = $this->storeManager->getWebsite()->getId();
 
-        if (!$this->config->isSmsConsentEnabled($storeId) ||
+        if (!$this->config->isSmsConsentAccountEnabled($storeId) ||
             !$this->dataHelper->isEnabled($websiteId)) {
             return;
         }
+        /** @var \Magento\Backend\Block\Template $observer */
         $layout = $observer->getLayout();
         $layout->unsetElement('customer-account-navigation-newsletter-subscriptions-link');
         $layout->unsetElement('customer-account-navigation-dd-email-subscriptions');

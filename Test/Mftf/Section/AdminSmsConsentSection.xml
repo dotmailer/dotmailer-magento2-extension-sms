@@ -5,7 +5,9 @@
     <section name="AdminSmsConsentSection">
         <element name="consentFieldsetToggle" type="button" selector="#connector_consent_sms-head"/>
         <element name="consentFieldset" type="button" selector="#connector_consent_sms"/>
-        <element name="consentEnabled" type="select" selector="#connector_consent_sms_enabled"/>
+        <element name="consentEnabledRegistration" type="select" selector="#connector_consent_sms_registration_enabled"/>
+        <element name="consentEnabledCheckout" type="select" selector="#connector_consent_sms_checkout_enabled"/>
+        <element name="consentEnabledAccount" type="select" selector="#connector_consent_sms_account_enabled"/>
         <element name="signUpText" type="textarea" selector="#connector_consent_sms_signup_text" />
         <element name="marketingConsentText" type="textarea" selector="#connector_consent_sms_marketing_consent_text" />
     </section>

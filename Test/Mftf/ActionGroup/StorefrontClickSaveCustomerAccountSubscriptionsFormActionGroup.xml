@@ -1,0 +1,7 @@
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="StorefrontClickSaveCustomerAccountSubscriptionsFormActionGroup">
+        <click stepKey="clickSaveCustomerAccountSubscriptionsForm" selector="{{StorefrontCustomerAccountSubscriptionsSection.saveButton}}"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+    </actionGroup>
+</actionGroups>
