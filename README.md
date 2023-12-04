@@ -23,6 +23,11 @@ This module features an option to enable international telephone number validati
 
 ## Changelog
 
+### 2.0.1
+
+##### Improvements
+- We updated our customer register observer to allow for cases when the `account_controller` arg has not been passed.
+
 ### 2.0.0
 
 ##### Bug fixes
