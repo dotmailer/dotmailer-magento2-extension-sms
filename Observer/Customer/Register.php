@@ -10,6 +10,8 @@ use Dotdigitalgroup\Sms\Model\Queue\Item\NewAccountSignup;
 use Dotdigitalgroup\Sms\Model\Queue\Item\TransactionalMessageEnqueuer;
 use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory as ContactCollectionFactory;
 use Dotdigitalgroup\Sms\Model\Subscriber;
+use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\Request\Http;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 
@@ -41,6 +43,11 @@ class Register implements ObserverInterface
     private $transactionalMessageEnqueuer;
 
     /**
+     * @var Context
+     */
+    private $context;
+
+    /**
      * Register constructor.
      *
      * @param ContactCollectionFactory $contactCollectionFactory
@@ -48,19 +55,22 @@ class Register implements ObserverInterface
      * @param ConsentManager $consentManager
      * @param TransactionalMessageEnqueuer $transactionalMessageEnqueuer
      * @param NewAccountSignup $newAccountSignupQueueItem
+     * @param Context $context
      */
     public function __construct(
         ContactCollectionFactory $contactCollectionFactory,
         ContactResource $contactResource,
         ConsentManager $consentManager,
         TransactionalMessageEnqueuer $transactionalMessageEnqueuer,
-        NewAccountSignup $newAccountSignupQueueItem
+        NewAccountSignup $newAccountSignupQueueItem,
+        Context $context
     ) {
         $this->consentManager = $consentManager;
         $this->contactCollectionFactory = $contactCollectionFactory;
         $this->contactResource = $contactResource;
         $this->transactionalMessageEnqueuer = $transactionalMessageEnqueuer;
         $this->newAccountSignupQueueItem = $newAccountSignupQueueItem;
+        $this->context = $context;
     }
 
     /**
@@ -72,11 +82,13 @@ class Register implements ObserverInterface
      */
     public function execute(Observer $observer): void
     {
-        $request = $observer->getAccountController()->getRequest()->getPost();
-        $customer = $observer->getEvent()->getCustomer();
-        $storeId = $customer->getStoreId();
+        /** @var Http $request */
+        $request = $this->context->getRequest();
+        $post = $request->getPost();
 
-        if ($request->get('is_sms_subscribed')) {
+        if ($post->get('is_sms_subscribed')) {
+            $customer = $observer->getEvent()->getCustomer();
+            $storeId = $customer->getStoreId();
             $contactModel = $this->contactCollectionFactory->create()
                 ->loadByCustomerEmail(
                     $customer->getEmail(),
