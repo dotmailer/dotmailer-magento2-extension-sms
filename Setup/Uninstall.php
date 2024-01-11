@@ -20,7 +20,7 @@ class Uninstall implements UninstallInterface
     {
         $connection = $setup->getConnection();
         $connection->dropTable(
-            $setup->getTable(SchemaInterface::EMAIL_TRANSACTIONAL_SMS_QUEUE_TABLE)
+            $setup->getTable(SchemaInterface::EMAIL_SMS_MESSAGE_QUEUE_TABLE)
         );
     }
 }

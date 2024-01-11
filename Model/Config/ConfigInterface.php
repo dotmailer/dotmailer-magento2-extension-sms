@@ -25,11 +25,11 @@ interface ConfigInterface
     public const XML_PATH_SMS_NEW_CREDIT_MEMO_ENABLED = 'transactional_sms/sms_templates/new_credit_memo_enabled';
     public const XML_PATH_SMS_NEW_CREDIT_MEMO_MESSAGE = 'transactional_sms/sms_templates/new_credit_memo_message';
 
-    public const XML_PATH_SMS_SIGNUP_ENABLED = 'transactional_sms/sms_templates/signup_enabled';
-    public const XML_PATH_SMS_SIGNUP_MESSAGE = 'transactional_sms/sms_templates/signup_message';
+    public const XML_PATH_SMS_SIGNUP_ENABLED = 'connector_consent/sms_templates/signup_enabled';
+    public const XML_PATH_SMS_SIGNUP_MESSAGE = 'connector_consent/sms_templates/signup_message';
 
-    public const XML_PATH_SMS_NEW_ACCOUNT_SIGNUP_ENABLED = 'transactional_sms/sms_templates/new_account_signup_enabled';
-    public const XML_PATH_SMS_NEW_ACCOUNT_SIGNUP_MESSAGE = 'transactional_sms/sms_templates/new_account_signup_message';
+    public const XML_PATH_SMS_NEW_ACCOUNT_SIGNUP_ENABLED = 'connector_consent/sms_templates/new_account_signup_enabled';
+    public const XML_PATH_SMS_NEW_ACCOUNT_SIGNUP_MESSAGE = 'connector_consent/sms_templates/new_account_signup_message';
     /**
      * @deprecated Since version 1.7.3, use new paths instead.
      * @see

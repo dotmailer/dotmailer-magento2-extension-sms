@@ -76,34 +76,6 @@
                     <frontend_model>Dotdigitalgroup\Sms\Block\Adminhtml\Config\UnicodeWarningMessage</frontend_model>
                 </group>
                 <attribute type="expanded">1</attribute>
-                <!-- SMS Sign Up -->
-                <field id="signup_heading" translate="label" sortOrder="5" showInStore="1" showInWebsite="1" showInDefault="1">
-                    <label>SMS Sign-Up</label>
-                    <frontend_model>Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
-                </field>
-                <field id="signup_enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Enabled</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
-                <field id="signup_message" translate="comment label" sortOrder="15" type="textarea" showInStore="1" showInWebsite="1" showInDefault="1">
-                    <label>Message</label>
-                    <tooltip><![CDATA[Variables: {{ first_name }}, {{ last_name }}, {{ store_name }}.]]></tooltip>
-                    <frontend_model>Dotdigitalgroup\Sms\Block\Adminhtml\AppendNote</frontend_model>
-                </field>
-                <!-- New Account SMS Sign Up -->
-                <field id="new_account_signup_heading" translate="label" sortOrder="20" showInStore="1" showInWebsite="1" showInDefault="1">
-                    <label>New Account SMS Sign-Up</label>
-                    <frontend_model>Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
-                </field>
-                <field id="new_account_signup_enabled" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Enabled</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
-                <field id="new_account_signup_message" translate="comment label" sortOrder="30" type="textarea" showInStore="1" showInWebsite="1" showInDefault="1">
-                    <label>Message</label>
-                    <tooltip><![CDATA[Variables: {{ first_name }}, {{ last_name }}, {{ store_name }}.]]></tooltip>
-                    <frontend_model>Dotdigitalgroup\Sms\Block\Adminhtml\AppendNote</frontend_model>
-                </field>
                 <!-- New Order Confirmation -->
                 <field id="new_order_confirmation_heading" translate="label" sortOrder="35" showInStore="1" showInWebsite="1" showInDefault="1">
                     <label>New Order Confirmation</label>
@@ -201,6 +173,46 @@
                 <field id="marketing_consent_text" translate="label" sortOrder="35" type="textarea" showInWebsite="1" showInStore="1" showInDefault="1">
                     <label>SMS marketing consent text</label>
                     <comment><![CDATA[Explain what you will do with consent, how customers can withdraw consent, and where they can learn more.]]></comment>
+                </field>
+            </group>
+            <group id="sms_templates" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>SMS Templates</label>
+                <group id="frontend_assets" translate="label" type="text" sortOrder="1" showInWebsite="1" showInStore="1"
+                       showInDefault="1">
+                    <frontend_model>Dotdigitalgroup\Sms\Block\Adminhtml\Config\FrontendAssets</frontend_model>
+                </group>
+                <group id="unicode_detection" translate="label" type="text" sortOrder="1" showInWebsite="1" showInStore="1"
+                       showInDefault="1">
+                    <frontend_model>Dotdigitalgroup\Sms\Block\Adminhtml\Config\UnicodeWarningMessage</frontend_model>
+                </group>
+                <attribute type="expanded">1</attribute>
+                <!-- SMS Sign Up -->
+                <field id="signup_heading" translate="label" sortOrder="5" showInStore="1" showInWebsite="1" showInDefault="1">
+                    <label>SMS Sign-Up</label>
+                    <frontend_model>Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
+                </field>
+                <field id="signup_enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="signup_message" translate="comment label" sortOrder="15" type="textarea" showInStore="1" showInWebsite="1" showInDefault="1">
+                    <label>Message</label>
+                    <tooltip><![CDATA[Variables: {{ first_name }}, {{ last_name }}, {{ store_name }}.]]></tooltip>
+                    <frontend_model>Dotdigitalgroup\Sms\Block\Adminhtml\AppendNote</frontend_model>
+                </field>
+                <!-- New Account SMS Sign Up -->
+                <field id="new_account_signup_heading" translate="label" sortOrder="20" showInStore="1" showInWebsite="1" showInDefault="1">
+                    <label>New Account SMS Sign-Up</label>
+                    <frontend_model>Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
+                </field>
+                <field id="new_account_signup_enabled" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="new_account_signup_message" translate="comment label" sortOrder="30" type="textarea" showInStore="1" showInWebsite="1" showInDefault="1">
+                    <label>Message</label>
+                    <tooltip><![CDATA[Variables: {{ first_name }}, {{ last_name }}, {{ store_name }}.]]></tooltip>
+                    <frontend_model>Dotdigitalgroup\Sms\Block\Adminhtml\AppendNote</frontend_model>
                 </field>
             </group>
         </section>
