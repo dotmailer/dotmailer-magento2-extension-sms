@@ -24,10 +24,12 @@ class Resolver implements ResolverInterface
      * @var string[]
      */
     private $templateVariables = [
+        'email',
         'first_name',
         'last_name',
-        'email',
-        'store_name'
+        'store_name',
+        'store_view_name',
+        'website_name'
     ];
 
     /**
@@ -56,6 +58,17 @@ class Resolver implements ResolverInterface
     }
 
     /**
+     * Get email.
+     *
+     * @param SmsOrderInterface $sms
+     * @return string|null
+     */
+    private function getEmail($sms)
+    {
+        return $sms->getEmail();
+    }
+
+    /**
      * Get first name.
      *
      * @param SmsOrderInterface $sms
@@ -74,7 +87,7 @@ class Resolver implements ResolverInterface
      */
     private function getLastName($sms)
     {
-        return $this->variableUtility->getAdditionalDataByKey($sms, 'firstName');
+        return $this->variableUtility->getAdditionalDataByKey($sms, 'lastName');
     }
 
     /**
@@ -88,5 +101,29 @@ class Resolver implements ResolverInterface
     {
         $groupId = $this->storeManager->getStore($sms->getStoreId())->getStoreGroupId();
         return $this->storeManager->getGroup($groupId)->getName();
+    }
+
+    /**
+     * Get store view name.
+     *
+     * @param SmsOrderInterface $sms
+     * @return string
+     * @throws NoSuchEntityException
+     */
+    private function getStoreViewName($sms)
+    {
+        return $this->storeManager->getStore($sms->getStoreId())->getName();
+    }
+
+    /**
+     * Get website name.
+     *
+     * @param SmsOrderInterface $sms
+     * @return string
+     * @throws NoSuchEntityException
+     */
+    private function getWebsiteName($sms)
+    {
+        return $this->storeManager->getWebsite($sms->getWebsiteId())->getName();
     }
 }
