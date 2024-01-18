@@ -151,7 +151,7 @@
         </section>
         <section id="connector_consent" translate="label" sortOrder="195" showInStore="1" showInWebsite="1" showInDefault="1">
             <group id="sms" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" >
-                <label>SMS Marketing</label>
+                <label>SMS</label>
                 <comment><![CDATA[Ask customers to share their mobile numbers and consent to receive SMS marketing messages at key touchpoints in your store.]]></comment>
 
                 <field id="registration_enabled" translate="label" sortOrder="15" type="select" showInStore="1" showInWebsite="1" showInDefault="1">
