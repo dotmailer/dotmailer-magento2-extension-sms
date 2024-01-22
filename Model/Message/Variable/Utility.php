@@ -46,6 +46,24 @@ class Utility
     }
 
     /**
+     * Return a key-value pair from a string like 'rule_id: 5'.
+     *
+     * @param string $string
+     *
+     * @return array
+     */
+    public function getArgsFromComplexVariable(string $string)
+    {
+        if (strpos($string, ':') === false) {
+            return [];
+        }
+        $bits = explode(':', $string);
+        return [
+            trim($bits[0]) => trim($bits[1])
+        ];
+    }
+
+    /**
      * Get additional data by key.
      *
      * @param SmsOrderInterface $sms

@@ -35,9 +35,9 @@
             </sms>
             <sms_templates>
                 <signup_enabled>0</signup_enabled>
-                <signup_message>Hi {{ first_name }}, you've signed up to marketing messages from {{ store_name }}.</signup_message>
+                <signup_message>Hi {{ first_name }}, thanks for signing up to receive marketing messages from {{ store_name }}.</signup_message>
                 <new_account_signup_enabled>0</new_account_signup_enabled>
-                <new_account_signup_message>{{ first_name }}, welcome to {{ store_name }}. Use WELCOME10 at checkout when placing your next order.</new_account_signup_message>
+                <new_account_signup_message>Hi {{ first_name }}, thanks for setting up your account at {{ store_name }}.</new_account_signup_message>
             </sms_templates>
         </connector_consent>
     </default>

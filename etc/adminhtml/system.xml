@@ -197,7 +197,7 @@
                 </field>
                 <field id="signup_message" translate="comment label" sortOrder="15" type="textarea" showInStore="1" showInWebsite="1" showInDefault="1">
                     <label>Message</label>
-                    <tooltip><![CDATA[Variables: {{email}}, {{ first_name }}, {{ last_name }}, {{ store_name }}, {{ store_view_name }}, {{ website_name }} .]]></tooltip>
+                    <tooltip><![CDATA[Variables: {{ first_name }}, {{ last_name }}, {{ email }}, {{ store_name }}, {{ store_view_name }}, {{ website_name }}, {{ coupon|rule_id:x }} where x is the ID from Marketing > Cart Price Rules.]]></tooltip>
                     <frontend_model>Dotdigitalgroup\Sms\Block\Adminhtml\AppendNote</frontend_model>
                 </field>
                 <!-- New Account SMS Sign Up -->
@@ -211,7 +211,7 @@
                 </field>
                 <field id="new_account_signup_message" translate="comment label" sortOrder="30" type="textarea" showInStore="1" showInWebsite="1" showInDefault="1">
                     <label>Message</label>
-                    <tooltip><![CDATA[Variables: {{email}}, {{ first_name }}, {{ last_name }}, {{ store_name }}, {{ store_view_name }}, {{ website_name }} .]]></tooltip>
+                    <tooltip><![CDATA[Variables: {{ first_name }}, {{ last_name }}, {{ email }}, {{ store_name }}, {{ store_view_name }}, {{ website_name }}, {{ coupon|rule_id:x }} where x is the ID from Marketing > Cart Price Rules.]]></tooltip>
                     <frontend_model>Dotdigitalgroup\Sms\Block\Adminhtml\AppendNote</frontend_model>
                 </field>
             </group>
