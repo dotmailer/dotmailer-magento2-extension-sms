@@ -10,5 +10,10 @@
         <element name="consentEnabledAccount" type="select" selector="#connector_consent_sms_account_enabled"/>
         <element name="signUpText" type="textarea" selector="#connector_consent_sms_signup_text" />
         <element name="marketingConsentText" type="textarea" selector="#connector_consent_sms_marketing_consent_text" />
+        <element name="consentSmsTemplatesFieldsetToggle" type="button" selector="#connector_consent_sms_templates-head"/>
+        <element name="smsSignUpEnabled" type="select" selector="#connector_consent_sms_templates_signup_enabled"/>
+        <element name="smsSignUpEnabledText" type="textarea" selector="#connector_consent_sms_templates_signup_message"/>
+        <element name="newAccountSmsSignUpEnabled" type="select" selector="#connector_consent_sms_templates_new_account_signup_enabled"/>
+        <element name="newAccountSmsSignUpEnabledText" type="textarea" selector="#connector_consent_sms_templates_new_account_signup_message"/>
     </section>
 </sections>

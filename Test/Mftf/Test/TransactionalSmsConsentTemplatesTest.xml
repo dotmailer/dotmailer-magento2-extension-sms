@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="TransactionalSmsConsentTemplatesTest">
+        <annotations>
+            <features value="Dotdigital module"/>
+            <stories value="Dotdigital Transactional SMS"/>
+            <title value="Validate Transactional SMS consent template fields"/>
+            <description value="Test that required consent templates exist in the marketing consent section."/>
+            <severity value="MINOR"/>
+            <group value="FS/mftf-239062"/>
+            <group value="dotdigitalSms"/>
+        </annotations>
+
+        <before>
+            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup1"/>
+        </before>
+
+        <after>
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="logout"/>
+        </after>
+
+        <amOnPage url="{{AdminDotdigitalConsentPage.url}}" stepKey="amOnDotdigitalMarketingConsentPage"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+
+
+        <seeElement selector="{{AdminSmsConsentSection.smsSignUpEnabled}}" stepKey="seeSmsSignUpEnabled"/>
+        <seeElement selector="{{AdminSmsConsentSection.smsSignUpEnabledText}}" stepKey="seeSmsSignUpEnabledText"/>
+        <seeElement selector="{{AdminSmsConsentSection.newAccountSmsSignUpEnabled}}" stepKey="seeNewAccountSmsSignUpEnabled"/>
+        <seeElement selector="{{AdminSmsConsentSection.newAccountSmsSignUpEnabledText}}" stepKey="seenewAccountSmsSignUpEnabledText"/>
+    </test>
+</tests>
+
+
+
+
+
