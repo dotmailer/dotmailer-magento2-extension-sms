@@ -164,35 +164,6 @@ class Configuration
     }
 
     /**
-     * Force switch off.
-     *
-     * Switches off the global SMS enabled flag in the current scope,
-     * and in any direct parent or child scopes.
-     *
-     * @return void
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     */
-    public function forceSwitchOff()
-    {
-        $storeId = $this->request->getParam('store');
-        $websiteId = $this->request->getParam('website', 0);
-
-        if ($storeId) {
-            $this->switchOffAtStoreLevel($storeId);
-            $this->switchOffAtWebsiteLevel(
-                $this->storeManager->getStore($storeId)->getWebsiteId()
-            );
-        } elseif ($websiteId) {
-            $this->switchOffAtWebsiteLevel($websiteId);
-            $this->switchOffForAllChildStores($websiteId);
-        } elseif ($websiteId === 0) {
-            $this->switchOffAtDefaultLevel();
-        }
-
-        $this->reinitableConfig->reinit();
-    }
-
-    /**
      * Get SMS marketing consent text.
      *
      * @param string|int $storeId
