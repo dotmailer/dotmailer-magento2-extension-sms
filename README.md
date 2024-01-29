@@ -23,6 +23,11 @@ This module features an option to enable international telephone number validati
 
 ## Changelog
 
+### 2.1.0
+
+##### What’s new
+- Merchants can now activate and test Transactional SMS on Dotdigital sandbox accounts.
+
 ### 2.0.1
 
 ##### Improvements
