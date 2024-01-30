@@ -72,7 +72,7 @@ class OrderSaveAfter implements \Magento\Framework\Event\ObserverInterface
     public function execute(Observer $observer)
     {
         $storeId = $this->storeManager->getStore()->getId();
-        if (!$this->moduleConfig->isSmsEnabled($storeId)) {
+        if (!$this->moduleConfig->isTransactionalSmsEnabled($storeId)) {
             return;
         }
 

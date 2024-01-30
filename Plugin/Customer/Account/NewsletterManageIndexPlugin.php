@@ -38,6 +38,8 @@ class NewsletterManageIndexPlugin
     private $urlFactory;
 
     /**
+     * NewsletterManageIndexPlugin constructor.
+     *
      * @param Data $dataHelper
      * @param Configuration $config
      * @param Session $customerSession
@@ -72,7 +74,7 @@ class NewsletterManageIndexPlugin
     ) {
         $websiteId = $this->customerSession->getCustomer()->getWebsiteId();
         $storeId = $this->customerSession->getCustomer()->getStoreId();
-        if (!$this->config->isSmsConsentEnabled($storeId) ||
+        if (!$this->config->isSmsConsentAccountEnabled($storeId) ||
             !$this->dataHelper->isEnabled($websiteId)) {
             return $result;
         }

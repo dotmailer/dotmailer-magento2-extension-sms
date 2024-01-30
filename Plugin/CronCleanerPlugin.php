@@ -11,7 +11,7 @@ class CronCleanerPlugin
      * @var array
      */
     private $tables = [
-        'sms_order_queue' => SchemaInterface::EMAIL_SMS_ORDER_QUEUE_TABLE
+        'sms_order_queue' => SchemaInterface::EMAIL_SMS_MESSAGE_QUEUE_TABLE
     ];
 
     /**

@@ -47,7 +47,7 @@ class Configuration
     private $storeManager;
 
     /**
-     * Transactional SMS constructor.
+     * Configuration constructor.
      *
      * @param ScopeConfigInterface $scopeConfig
      * @param WriterInterface $configWriter
@@ -78,7 +78,7 @@ class Configuration
      * @param int $storeId
      * @return bool
      */
-    public function isSmsEnabled($storeId)
+    public function isTransactionalSmsEnabled($storeId)
     {
         return $this->scopeConfig->getValue(
             ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_ENABLED,
@@ -103,21 +103,6 @@ class Configuration
     }
 
     /**
-     * SMS enabled at website level.
-     *
-     * @param string|int $websiteId
-     * @return bool
-     */
-    private function isSmsEnabledAtWebsiteLevel($websiteId)
-    {
-        return $this->scopeConfig->getValue(
-            ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_ENABLED,
-            ScopeInterface::SCOPE_WEBSITES,
-            $websiteId
-        );
-    }
-
-    /**
      * SMS type enabled.
      *
      * @param string|int $storeId
@@ -134,15 +119,45 @@ class Configuration
     }
 
     /**
-     * Is SMS consent capture enabled.
+     * Is SMS consent registration enabled.
      *
      * @param string|int $storeId
      * @return bool
      */
-    public function isSmsConsentEnabled($storeId)
+    public function isSmsConsentRegistrationEnabled($storeId)
     {
-        return $this->scopeConfig->getValue(
-            ConfigInterface::XML_PATH_CONSENT_SMS_ENABLED,
+        return $this->scopeConfig->isSetFlag(
+            ConfigInterface::XML_PATH_CONSENT_SMS_REGISTRATION_ENABLED,
+            ScopeInterface::SCOPE_STORES,
+            $storeId
+        );
+    }
+
+    /**
+     * Is SMS consent checkout enabled.
+     *
+     * @param string|int $storeId
+     * @return bool
+     */
+    public function isSmsConsentCheckoutEnabled($storeId)
+    {
+        return $this->scopeConfig->isSetFlag(
+            ConfigInterface::XML_PATH_CONSENT_SMS_CHECKOUT_ENABLED,
+            ScopeInterface::SCOPE_STORES,
+            $storeId
+        );
+    }
+
+    /**
+     * Is SMS consent account enabled.
+     *
+     * @param string|int $storeId
+     * @return bool
+     */
+    public function isSmsConsentAccountEnabled($storeId)
+    {
+        return $this->scopeConfig->isSetFlag(
+            ConfigInterface::XML_PATH_CONSENT_SMS_ACCOUNT_ENABLED,
             ScopeInterface::SCOPE_STORES,
             $storeId
         );
@@ -228,7 +243,7 @@ class Configuration
     {
         $childStores = $this->storeWebsiteRelation->getStoreByWebsiteId($websiteId);
         foreach ($childStores as $storeId) {
-            if ($this->isSmsEnabled($storeId)) {
+            if ($this->isTransactionalSmsEnabled($storeId)) {
                 $this->switchOffAtStoreLevel($storeId);
             }
         }

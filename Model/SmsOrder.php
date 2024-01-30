@@ -1,9 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Dotdigitalgroup\Sms\Model;
 
 use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterface;
+use Dotdigitalgroup\Sms\Model\Number\Utility;
+use Dotdigitalgroup\Sms\Model\ResourceModel\SmsOrder as SmsResource;
+use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Model\AbstractModel;
+use Magento\Framework\Model\Context;
+use Magento\Framework\Model\ResourceModel\AbstractResource;
+use Magento\Framework\Registry;
 
 class SmsOrder extends AbstractModel implements SmsOrderInterface
 {
@@ -13,13 +21,46 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     protected $_idFieldName = 'id';
 
     /**
+     * @var Utility
+     */
+    private $numberUtility;
+
+    /**
+     * SmsOrder constructor.
+     *
+     * @param Utility $numberUtility
+     * @param Context $context
+     * @param Registry $registry
+     * @param AbstractResource|null $resource
+     * @param AbstractDb|null $resourceCollection
+     * @param array $data
+     */
+    public function __construct(
+        Utility $numberUtility,
+        Context $context,
+        Registry $registry,
+        AbstractResource $resource = null,
+        AbstractDb $resourceCollection = null,
+        array $data = []
+    ) {
+        $this->numberUtility = $numberUtility;
+        parent::__construct(
+            $context,
+            $registry,
+            $resource,
+            $resourceCollection,
+            $data
+        );
+    }
+
+    /**
      * Initialize resource model.
      *
      * @return void
      */
     protected function _construct()
     {
-        $this->_init(\Dotdigitalgroup\Sms\Model\ResourceModel\SmsOrder::class);
+        $this->_init(SmsResource::class);
         parent::_construct();
     }
 
@@ -86,11 +127,11 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
     /**
      * Get phone number.
      *
-     * @return mixed|string|null
+     * @return string|null
      */
     public function getPhoneNumber()
     {
-        return $this->getData(self::PHONE_NUMBER);
+        return $this->numberUtility->returnMobileNumberFromStorage($this->getData(self::PHONE_NUMBER));
     }
 
     /**
@@ -221,7 +262,10 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
      */
     public function setPhoneNumber($phoneNumber)
     {
-        $this->setData(self::PHONE_NUMBER, $phoneNumber);
+        $this->setData(
+            self::PHONE_NUMBER,
+            $this->numberUtility->prepareMobileNumberForStorage($phoneNumber)
+        );
         return $this;
     }
 

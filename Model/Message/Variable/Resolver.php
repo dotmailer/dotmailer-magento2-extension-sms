@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Dotdigitalgroup\Sms\Model\Message\Variable;
 
 use Dotdigitalgroup\Email\Logger\Logger;
+use Dotdigitalgroup\Email\Model\SalesRule\DotdigitalCouponRequestProcessorFactory;
 use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Serialize\SerializerInterface;
-use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
-class Resolver
+class Resolver implements ResolverInterface
 {
     /**
      * @var Logger
@@ -17,14 +19,14 @@ class Resolver
     private $logger;
 
     /**
-     * @var SerializerInterface
+     * @var DotdigitalCouponRequestProcessorFactory
      */
-    private $serializer;
+    private $dotdigitalCouponRequestProcessorFactory;
 
     /**
-     * @var OrderRepositoryInterface
+     * @var Utility
      */
-    private $orderRepository;
+    private $variableUtility;
 
     /**
      * @var StoreManagerInterface
@@ -35,202 +37,162 @@ class Resolver
      * @var string[]
      */
     private $templateVariables = [
+        'email',
         'first_name',
         'last_name',
-        'email',
+        'coupon',
         'store_name',
-        'order_id',
-        'order_status',
-        'tracking_number',
-        'tracking_carrier',
-        'refund_amount'
+        'store_view_name',
+        'website_name'
     ];
 
     /**
-     * Resolver constructor.
      * @param Logger $logger
-     * @param SerializerInterface $serializer
-     * @param OrderRepositoryInterface $orderRepository
+     * @param DotdigitalCouponRequestProcessorFactory $dotdigitalCouponRequestProcessorFactory
+     * @param Utility $variableUtility
      * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         Logger $logger,
-        SerializerInterface $serializer,
-        OrderRepositoryInterface $orderRepository,
+        DotdigitalCouponRequestProcessorFactory $dotdigitalCouponRequestProcessorFactory,
+        Utility $variableUtility,
         StoreManagerInterface $storeManager
     ) {
         $this->logger = $logger;
-        $this->serializer = $serializer;
-        $this->orderRepository = $orderRepository;
+        $this->dotdigitalCouponRequestProcessorFactory = $dotdigitalCouponRequestProcessorFactory;
+        $this->variableUtility = $variableUtility;
         $this->storeManager = $storeManager;
     }
 
     /**
-     * Resolve variable from SMS template.
-     *
-     * @param string $variable
-     * @param SmsOrderInterface $sms
-     * @return string
+     * @inheritDoc
      */
-    public function resolve($variable, $sms)
+    public function resolve(string $variable, SmsOrderInterface $sms)
     {
+        $args = [];
+        if (strpos($variable, '|') !== false) {
+            $complexVariable = explode('|', $variable);
+            $variable = trim($complexVariable[0]);
+            $args = $this->variableUtility->getArgsFromComplexVariable(
+                trim($complexVariable[1])
+            );
+        }
+
         if (!in_array($variable, $this->templateVariables)) {
             return '';
         }
 
-        $method = $this->getMethodFromVariable($variable);
-        return (string) $this->$method($sms);
-    }
-
-    /**
-     * Get first name.
-     *
-     * @param SmsOrderInterface $sms
-     * @return string|null
-     */
-    private function getFirstName($sms)
-    {
-        /** @var \Magento\Sales\Model\Order $order */
-        $order = $this->orderRepository->get($sms->getOrderId());
-
-        if ($order->getCustomerFirstname() === null) {
-            return $order->getShippingAddress()->getFirstname();
-        }
-
-        return $order->getCustomerFirstname();
-    }
-
-    /**
-     * Get last name.
-     *
-     * @param SmsOrderInterface $sms
-     * @return string|null
-     */
-    private function getLastName($sms)
-    {
-        /** @var \Magento\Sales\Model\Order $order */
-        $order = $this->orderRepository->get($sms->getOrderId());
-
-        if ($order->getCustomerLastname() === null) {
-            return $order->getShippingAddress()->getLastname();
-        }
-
-        return $order->getCustomerLastname();
+        $method = $this->variableUtility->getMethodFromVariable($variable);
+        return (string) $this->$method($sms, $args);
     }
 
     /**
      * Get email.
      *
      * @param SmsOrderInterface $sms
+     * @param array $args
+     *
+     * @return string|null
      */
-    private function getEmail($sms)
+    private function getEmail($sms, array $args = [])
     {
-        /** @var \Magento\Sales\Model\Order $order */
-        $order = $this->orderRepository->get($sms->getOrderId());
-        return $order->getCustomerEmail();
+        return $sms->getEmail();
+    }
+
+    /**
+     * Get first name.
+     *
+     * @param SmsOrderInterface $sms
+     * @param array $args
+     *
+     * @return string|null
+     */
+    private function getFirstName($sms, array $args = [])
+    {
+        return $this->variableUtility->getAdditionalDataByKey($sms, 'firstName');
+    }
+
+    /**
+     * Get last name.
+     *
+     * @param SmsOrderInterface $sms
+     * @param array $args
+     *
+     * @return string|null
+     */
+    private function getLastName($sms, array $args = [])
+    {
+        return $this->variableUtility->getAdditionalDataByKey($sms, 'lastName');
     }
 
     /**
      * Get store name.
      *
      * @param SmsOrderInterface $sms
+     * @param array $args
+     *
      * @return string
      * @throws NoSuchEntityException
      */
-    private function getStoreName($sms)
+    private function getStoreName($sms, array $args = [])
     {
         $groupId = $this->storeManager->getStore($sms->getStoreId())->getStoreGroupId();
         return $this->storeManager->getGroup($groupId)->getName();
     }
 
     /**
-     * Get order id.
+     * Get store view name.
      *
      * @param SmsOrderInterface $sms
-     * @return float|string|null
+     * @param array $args
+     *
+     * @return string
+     * @throws NoSuchEntityException
      */
-    private function getOrderId($sms)
+    private function getStoreViewName($sms, array $args = [])
     {
-        /** @var \Magento\Sales\Model\Order $order */
-        $order = $this->orderRepository->get($sms->getOrderId());
-        return $order->getRealOrderId();
+        return $this->storeManager->getStore($sms->getStoreId())->getName();
     }
 
     /**
-     * Get order status.
+     * Get website name.
      *
      * @param SmsOrderInterface $sms
+     * @param array $args
+     *
      * @return string
+     * @throws LocalizedException
      */
-    private function getOrderStatus($sms)
+    private function getWebsiteName($sms, array $args = [])
     {
-        return $this->getAdditionalDataByKey($sms, 'orderStatus');
+        return $this->storeManager->getWebsite($sms->getWebsiteId())->getName();
     }
 
     /**
-     * Get tracking number.
+     * Get coupon.
      *
      * @param SmsOrderInterface $sms
-     * @return string
-     */
-    private function getTrackingNumber($sms)
-    {
-        return $this->getAdditionalDataByKey($sms, 'trackingNumber');
-    }
-
-    /**
-     * Get tracking carrier.
+     * @param array $args
      *
-     * @param SmsOrderInterface $sms
      * @return string
+     * @throws \ErrorException
      */
-    private function getTrackingCarrier($sms)
+    private function getCoupon($sms, array $args = [])
     {
-        return $this->getAdditionalDataByKey($sms, 'trackingCarrier');
-    }
-
-    /**
-     * Get refund amount.
-     *
-     * @param SmsOrderInterface $sms
-     * @return string
-     */
-    private function getRefundAmount($sms)
-    {
-        return $this->getAdditionalDataByKey($sms, 'creditMemoAmount');
-    }
-
-    /**
-     * Transform a variable like 'first_name' into the method name 'getFirstName'.
-     *
-     * @param string $variable
-     * @return string
-     */
-    private function getMethodFromVariable($variable)
-    {
-        return 'get' . str_replace(' ', '', ucwords(str_replace('_', ' ', $variable)));
-    }
-
-    /**
-     * Get additional data by key.
-     *
-     * @param SmsOrderInterface $sms
-     * @param string $key
-     * @return string
-     */
-    private function getAdditionalDataByKey($sms, $key)
-    {
-        try {
-            $additionalData = $this->serializer->unserialize(
-                $sms->getAdditionalData()
-            );
-            return $additionalData[$key] ?? '';
-        } catch (\InvalidArgumentException $e) {
-            $this->logger->debug(
-                'Could not unserialize ' . $key . ' for SMS id ' . $sms->getId(),
-                [(string) $e]
+        if (!isset($args['rule_id'])) {
+            $this->logger->error(
+                sprintf(
+                    'Coupon rule_id not correctly set in SMS template type %d',
+                    $sms->getTypeId()
+                )
             );
             return '';
         }
+        return $this->dotdigitalCouponRequestProcessorFactory->create()
+            ->processCouponRequest([
+                'id' => $args['rule_id'],
+                'code_email' => $sms->getEmail()
+            ])
+            ->getCouponCode();
     }
 }

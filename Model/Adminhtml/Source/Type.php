@@ -33,6 +33,14 @@ class Type implements OptionSourceInterface
             [
                 'value' => '5',
                 'label' => __('New Credit Memo'),
+            ],
+            [
+                'value' => '6',
+                'label' => __('SMS Sign-Up'),
+            ],
+            [
+                'value' => '7',
+                'label' => __('New Account SMS Sign-Up'),
             ]
         ];
     }

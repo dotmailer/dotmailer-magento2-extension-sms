@@ -139,7 +139,7 @@ class LayoutProcessor
      */
     private function appendConsentLayout(&$layoutNode, $storeId)
     {
-        if (!$this->moduleConfig->isSmsConsentEnabled($storeId)) {
+        if (!$this->moduleConfig->isSmsConsentCheckoutEnabled($storeId)) {
             return;
         }
 

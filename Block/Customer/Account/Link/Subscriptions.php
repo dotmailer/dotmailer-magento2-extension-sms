@@ -24,6 +24,8 @@ class Subscriptions extends Current
     private $config;
 
     /**
+     * Subscriptions constructor.
+     *
      * @param Context $context
      * @param DefaultPathInterface $defaultPath
      * @param Data $dataHelper
@@ -51,7 +53,7 @@ class Subscriptions extends Current
         $storeId = $this->_storeManager->getStore()->getId();
         $websiteId = $this->_storeManager->getWebsite()->getId();
 
-        if (!$this->config->isSmsConsentEnabled($storeId) ||
+        if (!$this->config->isSmsConsentAccountEnabled($storeId) ||
             !$this->dataHelper->isEnabled($websiteId)) {
             return '';
         }

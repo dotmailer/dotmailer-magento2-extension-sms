@@ -8,7 +8,6 @@ use InvalidArgumentException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Serialize\SerializerInterface;
-use Dotdigitalgroup\Sms\Model\Queue\OrderItem\Data\OrderData;
 use Magento\Sales\Api\Data\OrderInterface;
 
 abstract class AbstractOrderItem

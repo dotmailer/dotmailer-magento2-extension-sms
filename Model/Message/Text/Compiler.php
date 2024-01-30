@@ -1,24 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Dotdigitalgroup\Sms\Model\Message\Text;
 
 use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterface;
-use Dotdigitalgroup\Sms\Model\Message\Variable\Resolver;
+use Dotdigitalgroup\Sms\Model\Message\Variable\ResolverInterface;
+use Magento\Framework\Exception\LocalizedException;
 
 class Compiler
 {
     /**
-     * @var Resolver
+     * Resolvers are defined in di.xml
+     * @var array<ResolverInterface>
      */
-    private $variableResolver;
+    private $resolvers = [];
 
     /**
-     * @param Resolver $variableResolver
+     * Compiler constructor.
+     *
+     * @param array $resolvers
      */
-    public function __construct(
-        Resolver $variableResolver
-    ) {
-        $this->variableResolver = $variableResolver;
+    public function __construct(array $resolvers = [])
+    {
+        $this->setResolvers($resolvers);
     }
 
     /**
@@ -26,7 +31,9 @@ class Compiler
      *
      * @param string $text
      * @param SmsOrderInterface $sms
+     *
      * @return string
+     * @throws LocalizedException
      */
     public function compile($text, $sms)
     {
@@ -34,8 +41,17 @@ class Compiler
             $matchesToReplace = $matches[0];
             $matchesToResolve = $matches[1];
 
+            if (!isset($this->resolvers[$sms->getTypeId()])) {
+                throw new LocalizedException(__(
+                    sprintf(
+                        'Could not find a resolver for type id %s. Check di.xml and/or re-run setup:di:compile.',
+                        $sms->getTypeId()
+                    )
+                ));
+            }
+
             foreach ($matchesToResolve as $i => $match) {
-                $replacedValue = $this->variableResolver->resolve(trim($match, " "), $sms);
+                $replacedValue = $this->resolvers[$sms->getTypeId()]->resolve(trim($match, " "), $sms);
                 $text = str_replace($matchesToReplace[$i], $replacedValue, $text);
             }
         }
@@ -46,10 +62,24 @@ class Compiler
     /**
      * Get regular expression for matching variables.
      *
+     * The pattern will find any string inside {{ brackets }}.
+     *
      * @return string
      */
     private function getRegularExpression(): string
     {
         return '/{{([^}]+)\}}/si';
+    }
+
+    /**
+     * Set resolvers by type id.
+     *
+     * @param array $resolvers
+     *
+     * @return void
+     */
+    public function setResolvers($resolvers)
+    {
+        $this->resolvers = $resolvers;
     }
 }

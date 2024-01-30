@@ -21,7 +21,7 @@ class SmsOrder extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      */
     public function _construct()
     {
-        $this->_init(SchemaInterface::EMAIL_SMS_ORDER_QUEUE_TABLE, 'id');
+        $this->_init(SchemaInterface::EMAIL_SMS_MESSAGE_QUEUE_TABLE, 'id');
     }
 
     /**
@@ -50,7 +50,7 @@ class SmsOrder extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     {
         try {
             $this->getConnection()->update(
-                $this->getTable(SchemaInterface::EMAIL_SMS_ORDER_QUEUE_TABLE),
+                $this->getTable(SchemaInterface::EMAIL_SMS_MESSAGE_QUEUE_TABLE),
                 ['status' => $status],
                 ['id IN(?)' => $ids]
             );
@@ -68,7 +68,7 @@ class SmsOrder extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     public function expirePendingRowsOlderThan($date)
     {
         $num = $this->getConnection()->update(
-            $this->getTable(SchemaInterface::EMAIL_SMS_ORDER_QUEUE_TABLE),
+            $this->getTable(SchemaInterface::EMAIL_SMS_MESSAGE_QUEUE_TABLE),
             ['status' => OrderQueueManager::SMS_STATUS_EXPIRED],
             [
                 'status = ?' => OrderQueueManager::SMS_STATUS_PENDING,

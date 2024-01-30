@@ -31,7 +31,9 @@
             <actionGroup ref="SetPhoneNumberValidation" stepKey="EnablePhoneNumberValidation">
                 <argument name="enabled" value="No"/>
             </actionGroup>
-            <actionGroup ref="SetSmsConsentOptions" stepKey="SetSmsConsentOptions" />
+            <actionGroup ref="SetSmsConsentOptions" stepKey="SetSmsConsentOptions">
+                <argument name="configSelector" value="{{AdminSmsConsentSection.consentEnabledCheckout}}"/>
+            </actionGroup>
         </before>
 
         <after>
@@ -44,6 +46,7 @@
             </actionGroup>
             <actionGroup ref="SetSmsConsentOptions" stepKey="DisableSmsConsent">
                 <argument name="enabled" value="No"/>
+                <argument name="configSelector" value="{{AdminSmsConsentSection.consentEnabledCheckout}}"/>
             </actionGroup>
 
             <actionGroup ref="ResetDotmailerAccountData" stepKey="resetAccountData"/>

@@ -3,7 +3,7 @@
         <referenceBlock name="form.additional.info">
             <container name="dd.register.blocks.wrapper">
                 <block
-                    ifconfig="connector_consent/sms/enabled"
+                    ifconfig="connector_consent/sms/registration_enabled"
                     name="dd.account.create.sms.marketingconsent"
                     template="Dotdigitalgroup_Sms::customer/marketing-consent.phtml"
                 >
@@ -21,7 +21,7 @@
                     </arguments>
                 </block>
                 <block
-                    ifconfig="connector_consent/sms/enabled"
+                    ifconfig="connector_consent/sms/registration_enabled"
                     template="Dotdigitalgroup_Sms::customer/js-marketing-consent-toggler.phtml"
                     name="dd.account.create.sms.marketingconsent.checkbox.js">
                 </block>

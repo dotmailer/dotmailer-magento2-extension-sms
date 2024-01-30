@@ -15,13 +15,15 @@
             <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup1"/>
 
             <!-- Create simple product -->
-            <createData entity="SimpleProduct2" stepKey="createProduct"/>
+            <createData entity="SimpleProduct_100" stepKey="createProduct"/>
 
             <actionGroup ref="SetDotmailerAccountData" stepKey="SetDotmailerAccountData"/>
             <actionGroup ref="SetPhoneNumberValidation" stepKey="EnablePhoneNumberValidation">
                 <argument name="enabled" value="No"/>
             </actionGroup>
-            <actionGroup ref="SetSmsConsentOptions" stepKey="SetSmsConsentOptions" />
+            <actionGroup ref="SetSmsConsentOptions" stepKey="SetSmsConsentOptions">
+                <argument name="configSelector" value="{{AdminSmsConsentSection.consentEnabledCheckout}}"/>
+            </actionGroup>
         </before>
 
         <after>
@@ -32,6 +34,7 @@
             </actionGroup>
             <actionGroup ref="SetSmsConsentOptions" stepKey="DisableSmsConsent">
                 <argument name="enabled" value="No"/>
+                <argument name="configSelector" value="{{AdminSmsConsentSection.consentEnabledCheckout}}"/>
             </actionGroup>
 
             <actionGroup ref="ResetDotmailerAccountData" stepKey="resetAccountData"/>
@@ -42,10 +45,7 @@
         <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPage">
             <argument name="productUrlKey" value="$$createProduct.custom_attributes[url_key]$$"/>
         </actionGroup>
-        <actionGroup ref="StorefrontAddProductToCartActionGroup" stepKey="addProductToCart">
-            <argument name="product" value="$$createProduct$$"/>
-            <argument name="productCount" value="1"/>
-        </actionGroup>
+        <actionGroup ref="StorefrontAddToTheCartActionGroup" stepKey="addProductToCart"/>
 
         <!-- Proceed to Checkout from mini shopping cart -->
         <actionGroup ref="GoToCheckoutFromMinicartActionGroup" stepKey="goToCheckout"/>

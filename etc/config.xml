@@ -27,10 +27,18 @@
         </transactional_sms>
         <connector_consent>
             <sms>
-                <enabled>0</enabled>
+                <registration_enabled>0</registration_enabled>
+                <account_enabled>0</account_enabled>
+                <checkout_enabled>0</checkout_enabled>
                 <signup_text></signup_text>
                 <marketing_consent_text></marketing_consent_text>
             </sms>
+            <sms_templates>
+                <signup_enabled>0</signup_enabled>
+                <signup_message>Hi {{ first_name }}, thanks for signing up to receive marketing messages from {{ store_name }}.</signup_message>
+                <new_account_signup_enabled>0</new_account_signup_enabled>
+                <new_account_signup_message>Hi {{ first_name }}, thanks for setting up your account at {{ store_name }}.</new_account_signup_message>
+            </sms_templates>
         </connector_consent>
     </default>
 </config>

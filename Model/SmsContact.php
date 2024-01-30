@@ -1,16 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Dotdigitalgroup\Sms\Model;
 
 use Dotdigitalgroup\Email\Model\Contact;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact\CollectionFactory as ContactCollectionFactory;
+use Dotdigitalgroup\Sms\Model\Number\Utility;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Registry;
 use Magento\Framework\Stdlib\DateTime;
 
 class SmsContact extends Contact
 {
+    /**
+     * @var Utility
+     */
+    private $numberUtility;
+
     /**
      * @var DateTime
      */
@@ -23,6 +31,7 @@ class SmsContact extends Contact
      * @param Registry $registry
      * @param ContactResource $contactResource
      * @param ContactCollectionFactory $contactCollectionFactory
+     * @param Utility $numberUtility
      * @param DateTime $dateTime
      */
     public function __construct(
@@ -30,8 +39,10 @@ class SmsContact extends Contact
         \Magento\Framework\Registry $registry,
         ContactResource $contactResource,
         ContactCollectionFactory $contactCollectionFactory,
+        Utility $numberUtility,
         DateTime $dateTime
     ) {
+        $this->numberUtility = $numberUtility;
         $this->dateTime = $dateTime;
 
         parent::__construct(
@@ -65,17 +76,15 @@ class SmsContact extends Contact
      *
      * @param string|int $mobileNumber
      *
-     * @return void
+     * @return $this
      */
     public function setMobileNumber($mobileNumber)
     {
         if (!$mobileNumber) {
-            parent::setMobileNumber();
-            return;
+            return parent::setMobileNumber();
         }
 
-        $mobileNumber = str_replace(' ', '', $mobileNumber);
-        parent::setMobileNumber((int) $mobileNumber);
+        return parent::setMobileNumber($this->numberUtility->prepareMobileNumberForStorage($mobileNumber));
     }
 
     /**
@@ -90,6 +99,6 @@ class SmsContact extends Contact
         }
         $mobileNumber = str_replace(' ', '', parent::getMobileNumber());
 
-        return '+' . (int) $mobileNumber;
+        return $this->numberUtility->returnMobileNumberFromStorage($mobileNumber);
     }
 }

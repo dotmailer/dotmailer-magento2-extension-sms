@@ -67,7 +67,7 @@ class OrderItemNotificationEnqueuer
     {
         $storeId = $this->storeManager->getStore()->getId();
 
-        if (!$this->moduleConfig->isSmsEnabled($storeId) ||
+        if (!$this->moduleConfig->isTransactionalSmsEnabled($storeId) ||
             !$this->moduleConfig->isSmsTypeEnabled($storeId, $smsConfigPath)) {
             return;
         }

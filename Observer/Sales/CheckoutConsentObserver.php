@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Dotdigitalgroup\Sms\Observer\Sales;
 
 use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Email\Model\Contact;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
+use Dotdigitalgroup\Sms\Model\Queue\Item\SmsSignup;
+use Dotdigitalgroup\Sms\Model\Queue\Item\TransactionalMessageEnqueuer;
 use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory;
 use Dotdigitalgroup\Sms\Model\SmsContactFactory;
 use Dotdigitalgroup\Sms\Model\Subscriber;
@@ -13,6 +17,7 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
 /**
@@ -36,6 +41,16 @@ class CheckoutConsentObserver implements ObserverInterface
     private $contactResource;
 
     /**
+     * @var SmsSignup
+     */
+    private $smsSignupQueueItem;
+
+    /**
+     * @var TransactionalMessageEnqueuer
+     */
+    private $transactionalMessageEnqueuer;
+
+    /**
      * @var CollectionFactory
      */
     private $contactCollectionFactory;
@@ -56,9 +71,13 @@ class CheckoutConsentObserver implements ObserverInterface
     private $consentManager;
 
     /**
+     * CheckoutConsentObserver constructor.
+     *
      * @param Logger $logger
      * @param SmsContactFactory $contactFactory
      * @param ContactResource $contactResource
+     * @param SmsSignup $smsSignupQueueItem
+     * @param TransactionalMessageEnqueuer $transactionalMessageEnqueuer
      * @param CollectionFactory $contactCollectionFactory
      * @param CheckoutSession $checkoutSession
      * @param StoreManagerInterface $storeManager
@@ -68,6 +87,8 @@ class CheckoutConsentObserver implements ObserverInterface
         Logger $logger,
         SmsContactFactory $contactFactory,
         ContactResource $contactResource,
+        SmsSignup $smsSignupQueueItem,
+        TransactionalMessageEnqueuer $transactionalMessageEnqueuer,
         CollectionFactory $contactCollectionFactory,
         CheckoutSession $checkoutSession,
         StoreManagerInterface $storeManager,
@@ -76,6 +97,8 @@ class CheckoutConsentObserver implements ObserverInterface
         $this->logger = $logger;
         $this->contactFactory = $contactFactory;
         $this->contactResource = $contactResource;
+        $this->smsSignupQueueItem = $smsSignupQueueItem;
+        $this->transactionalMessageEnqueuer = $transactionalMessageEnqueuer;
         $this->contactCollectionFactory = $contactCollectionFactory;
         $this->checkoutSession = $checkoutSession;
         $this->storeManager = $storeManager;
@@ -123,10 +146,54 @@ class CheckoutConsentObserver implements ObserverInterface
             $contactModel->setSmsSubscriberImported(Contact::EMAIL_CONTACT_NOT_IMPORTED);
             $this->contactResource->save($contactModel);
             $this->consentManager->createConsentRecord($contactModel->getId(), $storeId);
+
+            if ($this->transactionalMessageEnqueuer->canQueue($this->smsSignupQueueItem, (int) $storeId)) {
+                $this->smsSignupQueueItem->prepare(
+                    $consentMobileNumber,
+                    $order->getCustomerEmail(),
+                    (int) $websiteId,
+                    (int) $storeId,
+                    $this->findFirstName($order),
+                    $this->findLastName($order)
+                );
+                $this->transactionalMessageEnqueuer->queue(
+                    $this->smsSignupQueueItem
+                );
+            }
         } catch (LocalizedException|\Exception $e) {
             $this->logger->debug((string) $e);
         }
 
         return $this;
+    }
+
+    /**
+     * Find first name.
+     *
+     * @param OrderInterface $order
+     *
+     * @return string|null
+     */
+    private function findFirstName(OrderInterface $order)
+    {
+        /** @var \Magento\Sales\Model\Order $order */
+        return $order->getCustomerFirstname() !== null ?
+            $order->getCustomerFirstname():
+            $order->getShippingAddress()->getFirstName();
+    }
+
+    /**
+     * Find last name.
+     *
+     * @param OrderInterface $order
+     *
+     * @return string|null
+     */
+    private function findLastName(OrderInterface $order)
+    {
+        /** @var \Magento\Sales\Model\Order $order */
+        return $order->getCustomerLastname() !== null ?
+            $order->getCustomerLastname():
+            $order->getShippingAddress()->getLastName();
     }
 }

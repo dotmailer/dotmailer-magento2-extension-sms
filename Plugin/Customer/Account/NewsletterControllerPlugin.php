@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Dotdigitalgroup\Sms\Plugin\Customer\Account;
 
 use Dotdigitalgroup\Email\Controller\Customer\Newsletter;
@@ -7,10 +9,13 @@ use Dotdigitalgroup\Email\Helper\Data;
 use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Email\Model\Contact;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
-use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory;
 use Dotdigitalgroup\Sms\Model\Importer\Enqueuer;
+use Dotdigitalgroup\Sms\Model\Queue\Item\SmsSignup;
+use Dotdigitalgroup\Sms\Model\Queue\Item\TransactionalMessageEnqueuer;
+use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory;
 use Dotdigitalgroup\Sms\Model\Subscriber;
 use Dotdigitalgroup\Sms\Model\Consent\ConsentManager;
+use Magento\Customer\Model\Customer;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
@@ -35,6 +40,16 @@ class NewsletterControllerPlugin
      * @var ContactResource
      */
     private $contactResource;
+
+    /**
+     * @var SmsSignup
+     */
+    private $smsSignupQueueItem;
+
+    /**
+     * @var TransactionalMessageEnqueuer
+     */
+    private $transactionalMessageEnqueuer;
 
     /**
      * @var CollectionFactory
@@ -72,9 +87,13 @@ class NewsletterControllerPlugin
     private $consentManager;
 
     /**
+     * NewsletterControllerPlugin constructor.
+     *
      * @param Data $dataHelper
      * @param Logger $logger
      * @param ContactResource $contactResource
+     * @param SmsSignup $smsSignupQueueItem
+     * @param TransactionalMessageEnqueuer $transactionalMessageEnqueuer
      * @param CollectionFactory $contactCollectionFactory
      * @param Session $customerSession
      * @param FormKeyValidator $formKeyValidator
@@ -87,6 +106,8 @@ class NewsletterControllerPlugin
         Data $dataHelper,
         Logger $logger,
         ContactResource $contactResource,
+        SmsSignup $smsSignupQueueItem,
+        TransactionalMessageEnqueuer $transactionalMessageEnqueuer,
         CollectionFactory $contactCollectionFactory,
         Session $customerSession,
         FormKeyValidator $formKeyValidator,
@@ -98,6 +119,8 @@ class NewsletterControllerPlugin
         $this->dataHelper = $dataHelper;
         $this->logger = $logger;
         $this->contactResource = $contactResource;
+        $this->smsSignupQueueItem = $smsSignupQueueItem;
+        $this->transactionalMessageEnqueuer = $transactionalMessageEnqueuer;
         $this->contactCollectionFactory = $contactCollectionFactory;
         $this->customerSession = $customerSession;
         $this->formKeyValidator = $formKeyValidator;
@@ -127,7 +150,7 @@ class NewsletterControllerPlugin
         if (!$this->dataHelper->isEnabled($websiteId)) {
             return $result;
         }
-        $hasProvidedConsent = $this->request->getParam('is_sms_subscribed') ?: false;
+        $hasProvidedConsent = (bool) $this->request->getParam('is_sms_subscribed');
         $consentMobileNumber = $this->request->getParam('mobile_number') ?
             str_replace(' ', '', $this->request->getParam('mobile_number')) :
             '';
@@ -136,12 +159,12 @@ class NewsletterControllerPlugin
         }
 
         $storeId = $this->storeManager->getStore()->getId();
-        $customerEmail = $this->customerSession->getCustomer()->getEmail();
+        $customer = $this->customerSession->getCustomer();
 
         try {
             $contactModel = $this->contactCollectionFactory->create()
                 ->loadByCustomerEmail(
-                    $customerEmail,
+                    $customer->getEmail(),
                     $websiteId
                 );
 
@@ -158,13 +181,27 @@ class NewsletterControllerPlugin
 
                     $this->consentManager->createConsentRecord($contactModel->getId(), $storeId);
 
+                    if ($this->transactionalMessageEnqueuer->canQueue($this->smsSignupQueueItem, (int) $storeId)) {
+                        $this->smsSignupQueueItem->prepare(
+                            $consentMobileNumber,
+                            $customer->getEmail(),
+                            (int) $websiteId,
+                            (int) $storeId,
+                            $customer->getData('firstname'),
+                            $customer->getData('lastname')
+                        );
+                        $this->transactionalMessageEnqueuer->queue(
+                            $this->smsSignupQueueItem
+                        );
+                    }
+
                 } elseif ($this->contactHasJustOptedOut(
                     $contactModel,
                     $hasProvidedConsent
                 )) {
                     $this->importerEnqueuer->enqueueUnsubscribe(
                         $contactModel->getContactId(),
-                        $customerEmail,
+                        $customer->getEmail(),
                         $websiteId
                     );
                     $contactModel->setMobileNumber($consentMobileNumber);

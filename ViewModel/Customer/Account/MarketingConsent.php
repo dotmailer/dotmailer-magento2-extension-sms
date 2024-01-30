@@ -40,6 +40,8 @@ class MarketingConsent implements ArgumentInterface
     private $storeManager;
 
     /**
+     * MarketingConsent constructor.
+     *
      * @param Consent $consent
      * @param AccountSubscriptions $containerViewModel
      * @param Configuration $moduleConfig
@@ -153,7 +155,11 @@ class MarketingConsent implements ArgumentInterface
     public function shouldValidatePhoneNumberWithCheckbox()
     {
         $storeId = $this->storeManager->getStore()->getId();
-        return $this->moduleConfig->isSmsConsentEnabled($storeId) &&
+        return (
+                $this->moduleConfig->isSmsConsentRegistrationEnabled($storeId)
+                ||
+                $this->moduleConfig->isSmsConsentAccountEnabled($storeId)
+            ) &&
             $this->moduleConfig->isPhoneNumberValidationEnabled($storeId);
     }
 }
