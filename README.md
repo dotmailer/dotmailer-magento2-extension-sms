@@ -23,9 +23,20 @@ This module features an option to enable international telephone number validati
 
 ## Changelog
 
+### 2.2.0
+
+##### What's new
+- SMS consent can now be enabled in different contexts (in account registration and at checkout).
+- We added marketing message templates for SMS Sign-up and New Account SMS Sign-Up.
+- We added a template variable to allow sending of generated coupon codes in marketing SMS.
+- The `email_sms_order_queue` table has been renamed to `email_sms_message_queue`.
+
+##### Improvements
+- We moved some job checking code from the cron process into an admin controller.
+
 ### 2.1.0
 
-##### What’s new
+##### What's new
 - Merchants can now activate and test Transactional SMS on Dotdigital sandbox accounts.
 
 ### 2.0.1
