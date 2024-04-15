@@ -95,7 +95,7 @@ class Register implements ObserverInterface
                     $customer->getWebsiteId()
                 );
 
-            if ($contactModel->getId()) {
+            if ($contactModel && $contactModel->getId()) {
                 $contactModel->setMobileNumber($request->get('mobile_number'));
                 $contactModel->setSmsSubscriberStatus(Subscriber::STATUS_SUBSCRIBED);
                 $this->contactResource->save($contactModel);

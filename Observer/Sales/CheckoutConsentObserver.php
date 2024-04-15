@@ -131,7 +131,7 @@ class CheckoutConsentObserver implements ObserverInterface
                     $websiteId
                 );
 
-            if ($contactModel->getId()) {
+            if ($contactModel && $contactModel->getId()) {
                 $contactModel->setMobileNumber($consentMobileNumber);
                 $contactModel->setSmsSubscriberStatus(Subscriber::STATUS_SUBSCRIBED);
             } else {
