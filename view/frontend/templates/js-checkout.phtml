@@ -17,6 +17,7 @@ $view = $block->getData('config');
 
             telephoneInput.addEventListener('blur', function() {
                 telephoneInput.value = iti.getNumber();
+                telephoneInput.dispatchEvent(new Event('change'));
             });
 
             document.addEventListener('numberIsInvalid', function(event) {
