@@ -2,7 +2,7 @@
     "name": "dotdigital/dotdigital-magento2-extension-sms",
     "description": "Dotdigital for Magento 2: SMS module",
     "type": "magento2-module",
-    "version": "2.2.0",
+    "version": "2.2.1",
     "license": "MIT",
     "repositories": [
         {
@@ -29,7 +29,7 @@
         "magento/module-reports": "^100.3|^100.4",
         "magento/module-cron": "^100.3|^100.4",
         "magento/module-newsletter": "^100.3|^100.4",
-        "psr/log": "^1.0",
+        "psr/log": "^1 || ^2 || ^3",
         "ext-pcre": "*"
     },
     "autoload": {

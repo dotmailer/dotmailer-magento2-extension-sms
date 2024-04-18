@@ -23,6 +23,11 @@ This module features an option to enable international telephone number validati
 
 ## Changelog
 
+### 2.2.1
+
+##### Bug fixes
+- Our requirement for `psr/log` has been updated for Magento 2.4.7.
+
 ### 2.2.0
 
 ##### What's new
