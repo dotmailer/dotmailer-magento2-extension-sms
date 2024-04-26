@@ -9,20 +9,21 @@ use Dotdigitalgroup\Email\Helper\Data;
 use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Email\Model\Contact;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
-use Dotdigitalgroup\Sms\Model\Importer\Enqueuer;
 use Dotdigitalgroup\Sms\Model\Queue\Item\SmsSignup;
 use Dotdigitalgroup\Sms\Model\Queue\Item\TransactionalMessageEnqueuer;
 use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory;
 use Dotdigitalgroup\Sms\Model\Subscriber;
 use Dotdigitalgroup\Sms\Model\Consent\ConsentManager;
-use Magento\Customer\Model\Customer;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Data\Form\FormKey\Validator as FormKeyValidator;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\MessageQueue\PublisherInterface;
+use Dotdigitalgroup\Sms\Model\Queue\Message\MarketingSmsUnsubscribeDataFactory;
 
 class NewsletterControllerPlugin
 {
@@ -77,14 +78,19 @@ class NewsletterControllerPlugin
     private $storeManager;
 
     /**
-     * @var Enqueuer
-     */
-    private $importerEnqueuer;
-
-    /**
      * @var ConsentManager
      */
     private $consentManager;
+
+    /**
+     * @var PublisherInterface
+     */
+    private $publisher;
+
+    /**
+     * @var MarketingSmsUnsubscribeDataFactory
+     */
+    private $marketingSmsUnsubscribeDataFactory;
 
     /**
      * NewsletterControllerPlugin constructor.
@@ -98,9 +104,10 @@ class NewsletterControllerPlugin
      * @param Session $customerSession
      * @param FormKeyValidator $formKeyValidator
      * @param StoreManagerInterface $storeManager
-     * @param Enqueuer $importerEnqueuer
      * @param ConsentManager $consentManager
      * @param Context $context
+     * @param PublisherInterface $publisher
+     * @param MarketingSmsUnsubscribeDataFactory $marketingSmsUnsubscribeDataFactory
      */
     public function __construct(
         Data $dataHelper,
@@ -112,9 +119,10 @@ class NewsletterControllerPlugin
         Session $customerSession,
         FormKeyValidator $formKeyValidator,
         StoreManagerInterface $storeManager,
-        Enqueuer $importerEnqueuer,
         ConsentManager $consentManager,
-        Context $context
+        Context $context,
+        PublisherInterface $publisher,
+        MarketingSmsUnsubscribeDataFactory $marketingSmsUnsubscribeDataFactory
     ) {
         $this->dataHelper = $dataHelper;
         $this->logger = $logger;
@@ -125,9 +133,10 @@ class NewsletterControllerPlugin
         $this->customerSession = $customerSession;
         $this->formKeyValidator = $formKeyValidator;
         $this->storeManager = $storeManager;
-        $this->importerEnqueuer = $importerEnqueuer;
         $this->consentManager = $consentManager;
         $this->request = $context->getRequest();
+        $this->publisher = $publisher;
+        $this->marketingSmsUnsubscribeDataFactory = $marketingSmsUnsubscribeDataFactory;
     }
 
     /**
@@ -137,7 +146,7 @@ class NewsletterControllerPlugin
      * @param Redirect $result
      *
      * @return Redirect
-     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function afterExecute(Newsletter $subject, Redirect $result): Redirect
     {
@@ -199,11 +208,16 @@ class NewsletterControllerPlugin
                     $contactModel,
                     $hasProvidedConsent
                 )) {
-                    $this->importerEnqueuer->enqueueUnsubscribe(
-                        $contactModel->getContactId(),
-                        $customer->getEmail(),
-                        $websiteId
+
+                    $contactMessage = $this->marketingSmsUnsubscribeDataFactory->create();
+                    $contactMessage->setWebsiteId($websiteId);
+                    $contactMessage->setEmail($customer->getEmail());
+
+                    $this->publisher->publish(
+                        'ddg.sms.unsubscribe',
+                        $contactMessage
                     );
+
                     $contactModel->setMobileNumber($consentMobileNumber);
                     $contactModel->setSmsSubscriberStatus(Subscriber::STATUS_UNSUBSCRIBED);
                     $this->contactResource->save($contactModel);

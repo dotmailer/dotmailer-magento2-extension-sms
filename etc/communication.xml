@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Communication/etc/communication.xsd">
+    <topic name="ddg.sms.unsubscribe" request="Dotdigitalgroup\Sms\Model\Queue\Message\MarketingSmsUnsubscribeData">
+        <handler
+            name="ddg_marketing_sms_unsubscribe"
+            type="Dotdigitalgroup\Sms\Model\Queue\Consumer\MarketingSmsUnsubscribe"
+            method="process"
+        />
+    </topic>
+</config>

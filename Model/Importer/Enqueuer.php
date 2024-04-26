@@ -25,6 +25,9 @@ class Enqueuer
     /**
      * Add an unsubscribe job to the import queue.
      *
+     * @deprecated we have moved this functionality to message queues.
+     * @see \Dotdigitalgroup\Sms\Model\Queue\Consumer\MarketingSmsUnsubscribe::process()
+     *
      * @param string|null $contactId
      * @param string $email
      * @param int $websiteId

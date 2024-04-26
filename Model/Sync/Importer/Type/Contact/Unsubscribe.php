@@ -54,6 +54,9 @@ class Unsubscribe extends AbstractItemSyncer
     /**
      * Process an SMS_Subscriber / Subscriber_Unsubscribe import row.
      *
+     * @deprecated we have moved this functionality to message queues.
+     * @see \Dotdigitalgroup\Sms\Model\Queue\Consumer\MarketingSmsUnsubscribe::process()
+     *
      * @param mixed $item
      *
      * @return \stdClass|void

@@ -4,11 +4,12 @@ namespace Dotdigitalgroup\Sms\Plugin\Customer\Controller\Adminhtml\Index;
 
 use Dotdigitalgroup\Email\Model\Contact;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
-use Dotdigitalgroup\Sms\Model\Importer\Enqueuer;
+use Dotdigitalgroup\Sms\Model\Queue\Message\MarketingSmsUnsubscribeDataFactory;
 use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory as ContactCollectionFactory;
 use Dotdigitalgroup\Sms\Model\Subscriber;
 use Magento\Backend\Model\View\Result\Redirect;
 use Magento\Framework\Exception\AlreadyExistsException;
+use Magento\Framework\MessageQueue\PublisherInterface;
 
 class Save
 {
@@ -23,23 +24,31 @@ class Save
     private $contactResource;
 
     /**
-     * @var Enqueuer
+     * @var PublisherInterface
      */
-    private $importerEnqueuer;
+    private $publisher;
+
+    /**
+     * @var MarketingSmsUnsubscribeDataFactory
+     */
+    private $marketingSmsUnsubscribeDataFactory;
 
     /**
      * @param ContactCollectionFactory $contactCollectionFactory
      * @param ContactResource $contactResource
-     * @param Enqueuer $importerEnqueuer
+     * @param PublisherInterface $publisher
+     * @param MarketingSmsUnsubscribeDataFactory $marketingSmsUnsubscribeDataFactory
      */
     public function __construct(
         ContactCollectionFactory $contactCollectionFactory,
         ContactResource $contactResource,
-        Enqueuer $importerEnqueuer
+        PublisherInterface $publisher,
+        MarketingSmsUnsubscribeDataFactory $marketingSmsUnsubscribeDataFactory
     ) {
         $this->contactCollectionFactory = $contactCollectionFactory;
         $this->contactResource = $contactResource;
-        $this->importerEnqueuer = $importerEnqueuer;
+        $this->publisher = $publisher;
+        $this->marketingSmsUnsubscribeDataFactory = $marketingSmsUnsubscribeDataFactory;
     }
 
     /**
@@ -66,10 +75,13 @@ class Save
         }
 
         if (!$hasSubscribed && $contactModel->getSmsSubscriberStatus() == Subscriber::STATUS_SUBSCRIBED) {
-            $this->importerEnqueuer->enqueueUnsubscribe(
-                $contactModel->getContactId(),
-                $contactModel->getEmail(),
-                $contactModel->getWebsiteId()
+            $contactMessage = $this->marketingSmsUnsubscribeDataFactory->create();
+            $contactMessage->setWebsiteId((string)$contactModel->getWebsiteId());
+            $contactMessage->setEmail((string)$contactModel->getEmail());
+
+            $this->publisher->publish(
+                'ddg.sms.unsubscribe',
+                $contactMessage
             );
         }
 
