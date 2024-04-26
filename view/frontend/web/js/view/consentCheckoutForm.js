@@ -1,26 +1,69 @@
+/**
+ * This module defines a Magento UI component for handling the consent form on the checkout page.
+ * It uses the Knockout.js library for data binding and event handling.
+ *
+ * @module consentCheckoutForm
+ * @requires jquery
+ * @requires Magento_Ui/js/form/form
+ * @requires ko
+ * @requires Magento_Checkout/js/model/quote
+ * @requires Magento_Ui/js/lib/view/utils/async
+ */
 define([
+
     'jquery',
     'Magento_Ui/js/form/form',
     'ko',
-    'Magento_Checkout/js/model/quote'
+    'Magento_Checkout/js/model/quote',
+    'Magento_Ui/js/lib/view/utils/async',
 ], function ($, Component, ko, quote) {
     'use strict';
+
+    /**
+     * @class
+     * @extends Component
+     */
     return Component.extend({
 
+        /**
+         * Observable for the checkbox state.
+         * @type {ko.observable}
+         */
         isChecked: ko.observable(null, {deferred: true}),
+
+        /**
+         * Observable for the validity of the telephone number.
+         * @type {ko.observable}
+         */
         isValid: ko.observable(null),
+
+        /**
+         * Observable for the telephone input field.
+         * @type {ko.observable}
+         */
         consentPhoneInput: ko.observable(''),
 
-        initialize: function () {
+        /**
+         * Configuration object.
+         * @type {Object}
+         */
+        config: null,
+
+        /**
+         * Initializes the component.
+         * @param {Object} config - The configuration object.
+         * @returns {Component} Returns the instance of the component.
+         */
+        initialize: function (config) {
             this._super();
+            this.config = config;
             return this;
         },
 
         /**
-         * When ready add event listener to checkbox
-         *
-         * @param element
-         * @param UiClass
+         * Sets up event listeners when the component is ready.
+         * @param {HTMLElement} element - The DOM element associated with the component.
+         * @param {Object} UiClass - The UI class associated with the component.
          */
         onReady: function (element, UiClass) {
 
@@ -33,6 +76,7 @@ define([
                     .regions['consent-checkout-form-fields-checkbox']()[0]
                     .getChild('dd_sms_consent_checkbox');
 
+            this.attachIntlTelInput(consentTelephoneInput);
             this.isChecked(consentCheckbox.value());
             this.consentPhoneInput(consentTelephoneInput);
 
@@ -116,11 +160,21 @@ define([
         },
 
         /**
-         * Update telephone field value on next tick
-         *
-         * @param UiClass
-         * @param value
-         * @param triggerDOM
+         * Attaches the international telephone input plugin to the given UI component.
+         * @param {Object} uiComponent - The UI component to attach the plugin to.
+         */
+        attachIntlTelInput: function (uiComponent) {
+            $.async(`input[name="${uiComponent.inputName}"]`, (node) => {
+                window.intlTelInput(node, this._configData)
+            })
+        },
+
+
+        /**
+         * Updates the telephone field value on the next tick.
+         * @param {Object} UiClass - The UI class associated with the component.
+         * @param {string} value - The new value for the telephone field.
+         * @param {boolean} [triggerDOM=true] - Whether to trigger a DOM change event.
          */
         updateTelephoneField: function (UiClass, value, triggerDOM = true) {
             setTimeout(() => {
@@ -147,10 +201,10 @@ define([
             }, 1);
         },
 
+
         /**
-         * Returns bool value for content block state (expanded or not)
-         *
-         * @returns {*|Boolean}
+         * Returns the state of the consent block (expanded or not).
+         * @returns {ko.observable} The observable for the checkbox state.
          */
         isConsentBlockExpanded: function () {
             return this.isChecked;

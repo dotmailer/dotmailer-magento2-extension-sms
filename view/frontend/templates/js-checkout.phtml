@@ -6,25 +6,21 @@
 // @codingStandardsIgnoreFile
 $view = $block->getData('config');
 ?>
-<script type="application/javascript">
-    require([
-        'jquery',
-        'Dotdigitalgroup_Sms/js/intlTelInput'
-    ], function ($, intlTelInput) {
-        ddgTelephoneRenderComplete = function(node) {
-            let telephoneInput = $(node)[0],
-                iti = window.intlTelInput(telephoneInput, <?= $view->getConfig(); ?>);
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Dotdigitalgroup_Sms/js/internationalTelephoneInputCheckout": <?= $view->getConfig(); ?>
+    },
 
-            telephoneInput.addEventListener('blur', function() {
-                telephoneInput.value = iti.getNumber();
-                telephoneInput.dispatchEvent(new Event('change'));
-            });
-
-            document.addEventListener('numberIsInvalid', function(event) {
-                telephoneInput.value = event.detail.number;
-                telephoneInput.value = iti.getNumber();
-                telephoneInput.dispatchEvent(new Event('change'));
-            });
+    ".form-address-edit": {
+        "validation": {
+            "rules": {
+                "telephone": {
+                    "validate-phone-number":true
+                }
+            }
         }
-    });
+    }
+}
 </script>
+
