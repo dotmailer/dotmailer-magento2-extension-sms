@@ -1,12 +1,21 @@
-<script type="application/javascript">
-    require([
-        'jquery'
-    ], function ($) {
-        $(".telephone").hide();
-        $("#dd_sms_consent_text").hide();
-        $("#dd_sms_consent_checkbox").change(function () {
-            $(".telephone").toggle();
-            $("#dd_sms_consent_text").toggle();
+<script>
+    (() => {
+        const consentCheckbox = document.getElementById('dd_sms_consent_checkbox');
+        const telephoneElements = document.querySelectorAll('.dd-telephone');
+        const consentText = document.getElementById('dd_sms_consent_text');
+
+        Array.from(telephoneElements).forEach(function(element) {
+            element.style.display = 'none';
         });
-    });
+
+        consentText.style.display = 'none';
+
+        consentCheckbox.addEventListener('change', function() {
+            Array.from(telephoneElements).forEach(function(element) {
+                element.style.display = element.style.display === 'none' ? '' : 'none';
+            });
+
+            consentText.style.display = consentText.style.display === 'none' ? '' : 'none';
+        });
+    })();
 </script>
