@@ -23,6 +23,11 @@ This module features an option to enable international telephone number validati
 
 ## Changelog
 
+### 2.3.0
+
+##### What's new
+- We made some templating changes to support our SMS Hyvä compatibility module.
+
 ### 2.2.2
 
 ##### Bug fixes
