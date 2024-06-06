@@ -177,31 +177,21 @@ define([
          * @param {boolean} [triggerDOM=true] - Whether to trigger a DOM change event.
          */
         updateTelephoneField: function (UiClass, value, triggerDOM = true) {
-            setTimeout(() => {
-                const element = $('#' + UiClass.uid);
+            if (typeof window.intlTelInputGlobals === 'undefined') { return; }
+            const element = document.getElementById(UiClass.uid);
+            const intlElement = window.intlTelInputGlobals.getInstance(element);
 
-                if (element[0] && value) {
-                    UiClass.value(value);
+            intlElement.setNumber(value);
+            element.value = value
 
-                    if (typeof window.intlTelInputGlobals === 'undefined') { return; }
-                    Object
-                        .entries(window.intlTelInputGlobals.instances)
-                        // eslint-disable-next-line no-unused-vars
-                        .find(([key, intlElement]) => intlElement.telInput.id === element[0].id)
-                        ?.pop()
-                        ?.setNumber(`${value}`);
-                }
-
-                if (triggerDOM && element[0]) {
-                    ko.utils.triggerEvent(
-                        element[0],
-                        'change'
-                    );
-                }
-            }, 1);
+            if (triggerDOM) {
+                ko.utils.triggerEvent(
+                    element,
+                    'change'
+                );
+            }
         },
-
-
+        
         /**
          * Returns the state of the consent block (expanded or not).
          * @returns {ko.observable} The observable for the checkbox state.
