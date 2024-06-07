@@ -23,6 +23,11 @@ This module features an option to enable international telephone number validati
 
 ## Changelog
 
+### 2.3.1
+
+##### What's new
+- The consent telephone input at checkout now accurately mirrors values set in the shipping telephone input.
+
 ### 2.3.0
 
 ##### What's new
