@@ -3,29 +3,22 @@
 namespace Dotdigitalgroup\Sms\Model\Sync;
 
 use DateTime;
-use Dotdigitalgroup\Email\Model\Contact;
-use Dotdigitalgroup\Email\Model\Importer;
-use Dotdigitalgroup\Email\Model\ResourceModel\Contact\Collection;
 use Dotdigitalgroup\Email\Helper\Config;
 use Dotdigitalgroup\Email\Helper\Data;
 use Dotdigitalgroup\Email\Logger\Logger;
-use Dotdigitalgroup\Email\Model\Sync\AbstractContactSyncer;
 use Dotdigitalgroup\Email\Model\Sync\SyncInterface;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
-use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory as ContactCollectionFactory;
 use Dotdigitalgroup\Sms\Model\Sync\Batch\SmsSubscriberBatchProcessor;
 use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\Exporter;
+use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\ExporterFactory;
+use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\RetrieverFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Dotdigitalgroup\Sms\Model\Subscriber;
 use Magento\Store\Api\Data\WebsiteInterface;
-use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\ExporterFactory;
-use Magento\Framework\App\ResourceConnection;
 use Magento\Store\Model\ScopeInterface;
 
-class SmsSubscriber extends DataObject implements SyncInterface
+class SmsSubscriber implements SyncInterface
 {
     /**
      * @var Logger
@@ -48,19 +41,9 @@ class SmsSubscriber extends DataObject implements SyncInterface
     private $syncedCount = 0;
 
     /**
-     * @var ContactCollectionFactory
-     */
-    private $contactCollectionFactory;
-
-    /**
      * @var ExporterFactory
      */
     private $exporterFactory;
-
-    /**
-     * @var ResourceConnection
-     */
-    private $resource;
 
     /**
      * @var SmsSubscriberBatchProcessor
@@ -73,46 +56,35 @@ class SmsSubscriber extends DataObject implements SyncInterface
     private $scopeConfig;
 
     /**
+     * @var RetrieverFactory
+     */
+    private $retrieverFactory;
+
+    /**
      * @param Logger $logger
      * @param Data $emailHelper
      * @param Configuration $smsConfig
-     * @param ContactCollectionFactory $contactCollectionFactory
      * @param ExporterFactory $exporterFactory
-     * @param ResourceConnection $resource
      * @param SmsSubscriberBatchProcessor $batchProcessor
      * @param ScopeConfigInterface $scopeConfig
-     * @param array $data
+     * @param RetrieverFactory $retrieverFactory
      */
     public function __construct(
         Logger $logger,
         Data $emailHelper,
         Configuration $smsConfig,
-        ContactCollectionFactory $contactCollectionFactory,
         ExporterFactory $exporterFactory,
-        ResourceConnection $resource,
         SmsSubscriberBatchProcessor $batchProcessor,
         ScopeConfigInterface $scopeConfig,
-        array $data = []
+        RetrieverFactory $retrieverFactory
     ) {
         $this->logger = $logger;
         $this->emailHelper = $emailHelper;
         $this->smsConfig = $smsConfig;
-        $this->contactCollectionFactory = $contactCollectionFactory;
         $this->exporterFactory = $exporterFactory;
-        $this->resource = $resource;
         $this->batchProcessor = $batchProcessor;
         $this->scopeConfig = $scopeConfig;
-        parent::__construct($data);
-    }
-
-    /**
-     * Determines whether the sync was triggered from Configuration > Dotdigital > Developer > Sync Settings.
-     *
-     * @return bool
-     */
-    protected function isRunFromDeveloperButton(): bool
-    {
-        return (bool)$this->_getData('web');
+        $this->retrieverFactory = $retrieverFactory;
     }
 
     /**
@@ -126,9 +98,7 @@ class SmsSubscriber extends DataObject implements SyncInterface
     public function sync(DateTime $from = null): array
     {
         $start = microtime(true);
-        $breakValue = $this->isRunFromDeveloperButton() ?
-            (int) $this->scopeConfig->getValue(Config::XML_PATH_CONNECTOR_SYNC_LIMIT):
-            (int) $this->scopeConfig->getValue(Config::XML_PATH_CONNECTOR_SYNC_BREAK_VALUE);
+        $breakValue = (int) $this->scopeConfig->getValue(Config::XML_PATH_CONNECTOR_SYNC_BREAK_VALUE);
         $megaBatchSize = (int) $this->scopeConfig->getValue(
             Config::XML_PATH_CONNECTOR_MEGA_BATCH_SIZE_CONTACT
         );
@@ -178,7 +148,11 @@ class SmsSubscriber extends DataObject implements SyncInterface
         $megaBatch = [];
 
         do {
-            $subscribers = $this->getSmsSubscribers($website, $limit, $offset);
+            $subscribers = $this->retrieverFactory
+                ->create()
+                ->setWebsite($website->getId())
+                ->getSmsSubscribers($limit, $offset);
+
             if (!count($subscribers->getItems())) {
                 break;
             }
@@ -220,70 +194,6 @@ class SmsSubscriber extends DataObject implements SyncInterface
             return $this->emailHelper->isEnabled($website->getId())
                 && $this->smsConfig->isSmsSyncEnabled($website->getId());
         });
-    }
-
-    /**
-     * Get Sms subscribers to import.
-     *
-     * @param WebsiteInterface $website
-     * @param int $limit
-     * @param int $offset
-     *
-     * @return Collection
-     */
-    private function getSmsSubscribers(WebsiteInterface $website, int $limit, int $offset): Collection
-    {
-        $smsSubscriberCollection = $this->contactCollectionFactory->create()
-            ->addFieldToFilter('main_table.website_id', ['eq' => $website->getId()])
-            ->addFieldToFilter('sms_subscriber_status', (string) Subscriber::STATUS_SUBSCRIBED)
-            ->addFieldToFilter('sms_subscriber_imported', (string) Contact::EMAIL_CONTACT_NOT_IMPORTED)
-            ->addFieldToFilter('mobile_number', ['notnull' => true ])
-            ->addFieldToFilter('mobile_number', ['neq' => '']);
-
-        $smsSubscriberCollection->getSelect()
-            ->joinLeft(
-                ['customer' => $this->getTable('customer_entity')],
-                'main_table.customer_id = customer.entity_id',
-                [
-                    'customer.firstname',
-                    'customer.lastname'
-                ]
-            )
-            ->joinLeft(
-                ['website' => $this->getTable('store_website')],
-                'main_table.website_id = website.website_id',
-                [
-                    'website.name as website_name'
-                ]
-            )
-            ->joinLeft(
-                ['store' => $this->getTable('store')],
-                'main_table.store_id = store.store_id',
-                [
-                    'store.name as store_name',
-                ]
-            )
-            ->joinLeft(
-                ['store_group' => $this->getTable('store_group')],
-                'main_table.store_id = store_group.group_id',
-                [
-                    'store_group.name as store_name_additional',
-                ]
-            )
-            ->limit($limit, $offset);
-
-        return $smsSubscriberCollection;
-    }
-
-    /**
-     * Get table name with prefix support
-     *
-     * @param string $name
-     * @return string
-     */
-    public function getTable(string $name):string
-    {
-        return $this->resource->getTableName($name);
     }
 
     /**

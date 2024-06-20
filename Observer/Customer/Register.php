@@ -14,6 +14,8 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\MessageQueue\PublisherInterface;
+use Dotdigitalgroup\Sms\Model\Queue\Message\MarketingSmsSubscribeDataFactory;
 
 class Register implements ObserverInterface
 {
@@ -48,6 +50,16 @@ class Register implements ObserverInterface
     private $context;
 
     /**
+     * @var PublisherInterface
+     */
+    private $publisher;
+
+    /**
+     * @var MarketingSmsSubscribeDataFactory
+     */
+    private $marketingSmsSubscribeDataFactory;
+
+    /**
      * Register constructor.
      *
      * @param ContactCollectionFactory $contactCollectionFactory
@@ -56,6 +68,8 @@ class Register implements ObserverInterface
      * @param TransactionalMessageEnqueuer $transactionalMessageEnqueuer
      * @param NewAccountSignup $newAccountSignupQueueItem
      * @param Context $context
+     * @param PublisherInterface $publisher
+     * @param MarketingSmsSubscribeDataFactory $marketingSmsSubscribeDataFactory
      */
     public function __construct(
         ContactCollectionFactory $contactCollectionFactory,
@@ -63,13 +77,17 @@ class Register implements ObserverInterface
         ConsentManager $consentManager,
         TransactionalMessageEnqueuer $transactionalMessageEnqueuer,
         NewAccountSignup $newAccountSignupQueueItem,
-        Context $context
+        Context $context,
+        PublisherInterface $publisher,
+        MarketingSmsSubscribeDataFactory $marketingSmsSubscribeDataFactory
     ) {
         $this->consentManager = $consentManager;
         $this->contactCollectionFactory = $contactCollectionFactory;
         $this->contactResource = $contactResource;
         $this->transactionalMessageEnqueuer = $transactionalMessageEnqueuer;
         $this->newAccountSignupQueueItem = $newAccountSignupQueueItem;
+        $this->publisher = $publisher;
+        $this->marketingSmsSubscribeDataFactory = $marketingSmsSubscribeDataFactory;
         $this->context = $context;
     }
 
@@ -111,6 +129,13 @@ class Register implements ObserverInterface
                     $this->newAccountSignupQueueItem
                 );
             }
+
+            $this->publisher->publish(
+                'ddg.sms.subscribe',
+                $this->marketingSmsSubscribeDataFactory->create()
+                    ->setWebsiteId((int) $contactModel->getData('website_id'))
+                    ->setContactId((int) $contactModel->getId())
+            );
         }
     }
 }

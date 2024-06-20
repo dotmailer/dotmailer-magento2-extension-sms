@@ -4,6 +4,7 @@ namespace Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber;
 
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact\Collection;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
+use Dotdigitalgroup\Sms\Model\SmsContact;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Api\Data\WebsiteInterface;
@@ -53,22 +54,36 @@ class Exporter
         $smsAddressBookListId = $this->configuration->getListId($website->getId());
 
         foreach ($smsSubscribers as $smsSubscriber) {
-            $contact = new DotdigitalContact([
-                'matchIdentifier' => 'email'
-            ]);
-            $contact->setIdentifiers([
-                'email' => $smsSubscriber->getEmail(),
-                'mobileNumber' => $smsSubscriber->getMobileNumber()
-            ]);
+            $contact = $this->prepareContact($smsSubscriber);
             $contact->setLists([$smsAddressBookListId]);
-            $contact->setDataFields(
-                $this->mapFields($smsSubscriber->getData())
-            );
-
             $exportedData["{$smsSubscriber->getEmailContactId()}"] = $contact;
         }
 
         return $exportedData;
+    }
+
+    /**
+     * Export a single subscriber
+     *
+     * @param SmsContact $smsSubscriber
+     * @param string $identifier
+     * @return DotdigitalContact
+     * @throws \Exception
+     */
+    public function prepareContact(SmsContact $smsSubscriber, string $identifier = "email"): DotdigitalContact
+    {
+        $contact = new DotdigitalContact([
+            'matchIdentifier' => $identifier
+        ]);
+        $contact->setIdentifiers([
+            'email' => $smsSubscriber->getEmail(),
+            'mobileNumber' => $smsSubscriber->getMobileNumber()
+        ]);
+        $contact->setDataFields(
+            $this->mapFields($smsSubscriber->getData())
+        );
+
+        return $contact;
     }
 
     /**

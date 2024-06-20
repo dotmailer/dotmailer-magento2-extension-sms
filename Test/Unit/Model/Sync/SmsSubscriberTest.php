@@ -3,24 +3,23 @@
 namespace Dotdigitalgroup\Sms\Test\Unit\Model\Sync;
 
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact\Collection;
-use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory;
 use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\Exporter;
-use Dotdigital\V3\Models\ContactCollection;
 use Dotdigitalgroup\Email\Helper\Data;
 use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\Model\Sync\Batch\SmsSubscriberBatchProcessor;
 use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber;
 use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\ExporterFactory;
+use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\Retriever;
+use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\RetrieverFactory;
+use Dotdigitalgroup\Sms\Test\Unit\Traits\TestInteractsWithV3ApiModels;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Select;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Api\Data\WebsiteInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Dotdigitalgroup\Sms\Test\Unit\Traits\TestInteractsWithV3ApiModels;
 
 class SmsSubscriberTest extends TestCase
 {
@@ -49,16 +48,6 @@ class SmsSubscriberTest extends TestCase
      * @var Configuration|MockObject
      */
     private $smsConfigMock;
-
-    /**
-     * @var ResourceConnection|MockObject
-     */
-    private $resourceMock;
-
-    /**
-     * @var ContactCollectionFactory|MockObject
-     */
-    private $contactCollectionFactoryMock;
 
     /**
      * @var ExporterFactory|MockObject
@@ -91,14 +80,14 @@ class SmsSubscriberTest extends TestCase
     private $websiteInterfaceMock;
 
     /**
-     * @var Select|(Select&MockObject)|MockObject
+     * @var (RetrieverFactory&MockObject)|MockObject
      */
-    private $selectMock;
+    private $retrieverFactoryMock;
 
     /**
-     * @var (ContactCollection&MockObject)|MockObject $contactCollectionMock
+     * @var (Retriever&MockObject)|MockObject
      */
-    private $contactCollectionMock;
+    private $retrieverMock;
 
     /**
      * @inheritDoc
@@ -106,16 +95,14 @@ class SmsSubscriberTest extends TestCase
     protected function setUp(): void
     {
         $this->loggerMock = $this->createMock(Logger::class);
-        $this->resourceMock = $this->createMock(ResourceConnection::class);
         $this->exporterFactoryMock = $this->createMock(ExporterFactory::class);
         $this->batchProcessorMock = $this->createMock(SmsSubscriberBatchProcessor::class);
         $this->scopeConfigMock = $this->createMock(ScopeConfigInterface::class);
-        $this->selectMock = $this->createMock(Select::class);
         $this->emailHelperMock = $this->getMockBuilder(Data::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->contactCollectionMock = $this->getMockBuilder(ContactCollection::class)
+        $this->retrieverFactoryMock = $this->getMockBuilder(RetrieverFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -123,11 +110,7 @@ class SmsSubscriberTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->subscriberCollectionMock = $this->getMockBuilder(Collection::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->contactCollectionFactoryMock = $this->createMock(CollectionFactory::class);
+        $this->subscriberCollectionMock = $this->createMock(Collection::class);
 
         $this->smsExporter = $this->getMockBuilder(Exporter::class)
             ->disableOriginalConstructor()
@@ -154,11 +137,10 @@ class SmsSubscriberTest extends TestCase
             $this->loggerMock,
             $this->emailHelperMock,
             $this->smsConfigMock,
-            $this->contactCollectionFactoryMock,
             $this->exporterFactoryMock,
-            $this->resourceMock,
             $this->batchProcessorMock,
-            $this->scopeConfigMock
+            $this->scopeConfigMock,
+            $this->retrieverFactoryMock
         );
     }
 
@@ -168,7 +150,6 @@ class SmsSubscriberTest extends TestCase
      */
     public function testSync()
     {
-
         $total_loops = self::LIMIT / self::BATCH_SIZE;
 
         $batch = $this->generateBulkImportSmsContacts(self::BATCH_SIZE);
@@ -217,42 +198,17 @@ class SmsSubscriberTest extends TestCase
             ->with($this->websiteInterfaceMock->getId())
             ->willReturn(123);
 
-        $this->contactCollectionFactoryMock->expects($this->atLeast(1))
+        $retrieverMock = $this->createMock(Retriever::class);
+        $this->retrieverFactoryMock->expects($this->atLeast(1))
             ->method('create')
+            ->willReturn($retrieverMock);
+
+        $retrieverMock->expects($this->atLeast($total_loops))
+            ->method('getSmsSubscribers')
             ->willReturn($this->subscriberCollectionMock);
 
-        $this->subscriberCollectionMock->expects($this->atLeast($total_loops))
-            ->method('addFieldToFilter')
+        $retrieverMock->method('setWebsite')
             ->willReturnSelf();
-
-        $this->subscriberCollectionMock->expects($this->atLeast($total_loops))
-            ->method('getSelect')
-            ->willReturn($this->selectMock);
-
-        $this->selectMock->expects($this->atLeast(3*$total_loops))
-            ->method('joinLeft')
-            ->willReturnSelf();
-
-        $this->resourceMock->expects($this->atLeast(3*$total_loops))
-            ->method('getTableName')
-            ->willReturnOnConsecutiveCalls(
-                'customer_entity',
-                'store_website',
-                'store',
-                'store_group',
-                'customer_entity',
-                'store_website',
-                'store',
-                'store_group',
-                'customer_entity',
-                'store_website',
-                'store',
-                'store_group',
-                'customer_entity',
-                'store_website',
-                'store',
-                'store_group',
-            );
 
         $this->subscriberCollectionMock->expects($this->atLeast($total_loops*2))
             ->method('getItems')

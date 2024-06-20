@@ -1,5 +1,9 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/consumer.xsd">
+    <consumer name="ddg.sms.subscribe"
+              queue="ddg.sms.queue"
+              handler="Dotdigitalgroup\Sms\Model\Queue\Consumer\MarketingSmsSubscribe::process"
+              connection="db" />
     <consumer name="ddg.sms.unsubscribe"
               queue="ddg.sms.queue"
               handler="Dotdigitalgroup\Sms\Model\Queue\Consumer\MarketingSmsUnsubscribe::process"

@@ -12,7 +12,8 @@ trait TestInteractsWithV3ApiModels
      * Generate a collection of SMS contacts
      *
      * @param int $count
-     * @return ContactCollection
+     *
+     * @return array
      * @throws \Exception
      */
     public function generateBulkImportSmsContacts(int $count): array

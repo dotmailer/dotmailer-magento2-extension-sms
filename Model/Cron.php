@@ -42,17 +42,4 @@ class Cron
         $this->senderManagerFactory->create()
             ->run();
     }
-
-    /**
-     * Sms subscriber sync.
-     *
-     * @return void
-     * @throws LocalizedException
-     * @throws NoSuchEntityException
-     */
-    public function smsSubscriberSync():void
-    {
-        $this->smsSubscriberFactory->create()
-            ->sync();
-    }
 }

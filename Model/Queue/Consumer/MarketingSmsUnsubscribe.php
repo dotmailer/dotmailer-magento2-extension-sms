@@ -113,14 +113,14 @@ class MarketingSmsUnsubscribe
                     $contact->getContactId()
                 );
                 $this->logger->info(
-                    "Contact marketing SMS subscribe success:",
+                    "Contact marketing SMS unsubscribe success:",
                     [
-                        'identifier' => $contact->getIdentifiers()
+                        'identifiers' => $contact->getIdentifiers()
                     ]
                 );
             } catch (\Exception $e) {
-                $this->logger->warning(
-                    "Contact marketing SMS unsubscribe warning:",
+                $this->logger->error(
+                    "Contact marketing SMS unsubscribe error:",
                     [
                         'identifier' => $unsubscribeData->getEmail(),
                         'exception' => $e,

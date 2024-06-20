@@ -18,6 +18,11 @@ This module provides support for Transactional SMS notifications to Magento merc
 - Ensure you have set valid API credentials in **Configuration > Dotdigital > Account Settings**
 - Head to **Configuration > Dotdigital > Transactional SMS** for configuration.
 
+## CLI
+- This module provides a CLI command to sync historical SMS subscribers to Dotdigital.
+- Run `bin/magento dotdigital:sync SmsSubscriber`.
+- Normally, the module uses message queues to subscribe and unsubscribe SMS subscribers. This command is only necessary if you reset your data in the case of running `dotdigital:migrate` or switching Dotdigital accounts.
+
 ## Credits
 This module features an option to enable international telephone number validation. Our supporting code uses a version of the [International Telephone Input](https://github.com/jackocnr/intl-tel-input) JavaScript plugin. We've also borrowed some components from this [MaxMage Magento module](https://github.com/MaxMage/international-telephone-input). Kudos and thanks!
 

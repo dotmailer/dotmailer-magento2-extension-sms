@@ -9,6 +9,7 @@ use Dotdigitalgroup\Email\Model\Contact;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
 use Dotdigitalgroup\Sms\Model\Queue\Item\SmsSignup;
 use Dotdigitalgroup\Sms\Model\Queue\Item\TransactionalMessageEnqueuer;
+use Dotdigitalgroup\Sms\Model\Queue\Message\MarketingSmsSubscribeDataFactory;
 use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory;
 use Dotdigitalgroup\Sms\Model\SmsContactFactory;
 use Dotdigitalgroup\Sms\Model\Subscriber;
@@ -17,6 +18,7 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\MessageQueue\PublisherInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
@@ -71,6 +73,16 @@ class CheckoutConsentObserver implements ObserverInterface
     private $consentManager;
 
     /**
+     * @var PublisherInterface
+     */
+    private $publisher;
+
+    /**
+     * @var MarketingSmsSubscribeDataFactory
+     */
+    private $marketingSmsSubscribeDataFactory;
+
+    /**
      * CheckoutConsentObserver constructor.
      *
      * @param Logger $logger
@@ -82,6 +94,8 @@ class CheckoutConsentObserver implements ObserverInterface
      * @param CheckoutSession $checkoutSession
      * @param StoreManagerInterface $storeManager
      * @param ConsentManager $consentManager
+     * @param PublisherInterface $publisher
+     * @param MarketingSmsSubscribeDataFactory $marketingSmsSubscribeDataFactory
      */
     public function __construct(
         Logger $logger,
@@ -92,7 +106,9 @@ class CheckoutConsentObserver implements ObserverInterface
         CollectionFactory $contactCollectionFactory,
         CheckoutSession $checkoutSession,
         StoreManagerInterface $storeManager,
-        ConsentManager $consentManager
+        ConsentManager $consentManager,
+        PublisherInterface $publisher,
+        MarketingSmsSubscribeDataFactory $marketingSmsSubscribeDataFactory,
     ) {
         $this->logger = $logger;
         $this->contactFactory = $contactFactory;
@@ -101,8 +117,10 @@ class CheckoutConsentObserver implements ObserverInterface
         $this->transactionalMessageEnqueuer = $transactionalMessageEnqueuer;
         $this->contactCollectionFactory = $contactCollectionFactory;
         $this->checkoutSession = $checkoutSession;
-        $this->storeManager = $storeManager;
         $this->consentManager = $consentManager;
+        $this->marketingSmsSubscribeDataFactory = $marketingSmsSubscribeDataFactory;
+        $this->storeManager = $storeManager;
+        $this->publisher = $publisher;
     }
 
     /**
@@ -146,6 +164,12 @@ class CheckoutConsentObserver implements ObserverInterface
             $contactModel->setSmsSubscriberImported(Contact::EMAIL_CONTACT_NOT_IMPORTED);
             $this->contactResource->save($contactModel);
             $this->consentManager->createConsentRecord($contactModel->getId(), $storeId);
+            $this->publisher->publish(
+                'ddg.sms.subscribe',
+                $this->marketingSmsSubscribeDataFactory->create()
+                    ->setWebsiteId((int) $contactModel->getData('website_id'))
+                    ->setContactId((int) $contactModel->getId())
+            );
 
             if ($this->transactionalMessageEnqueuer->canQueue($this->smsSignupQueueItem, (int) $storeId)) {
                 $this->smsSignupQueueItem->prepare(

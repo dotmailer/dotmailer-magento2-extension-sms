@@ -4,6 +4,7 @@ namespace Dotdigitalgroup\Sms\Plugin\Customer\Controller\Adminhtml\Index;
 
 use Dotdigitalgroup\Email\Model\Contact;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
+use Dotdigitalgroup\Sms\Model\Queue\Message\MarketingSmsSubscribeDataFactory;
 use Dotdigitalgroup\Sms\Model\Queue\Message\MarketingSmsUnsubscribeDataFactory;
 use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory as ContactCollectionFactory;
 use Dotdigitalgroup\Sms\Model\Subscriber;
@@ -34,20 +35,28 @@ class Save
     private $marketingSmsUnsubscribeDataFactory;
 
     /**
+     * @var MarketingSmsSubscribeDataFactory
+     */
+    private $marketingSmsSubscribeDataFactory;
+
+    /**
      * @param ContactCollectionFactory $contactCollectionFactory
      * @param ContactResource $contactResource
      * @param PublisherInterface $publisher
+     * @param MarketingSmsSubscribeDataFactory $marketingSmsSubscribeDataFactory
      * @param MarketingSmsUnsubscribeDataFactory $marketingSmsUnsubscribeDataFactory
      */
     public function __construct(
         ContactCollectionFactory $contactCollectionFactory,
         ContactResource $contactResource,
         PublisherInterface $publisher,
+        MarketingSmsSubscribeDataFactory $marketingSmsSubscribeDataFactory,
         MarketingSmsUnsubscribeDataFactory $marketingSmsUnsubscribeDataFactory
     ) {
         $this->contactCollectionFactory = $contactCollectionFactory;
         $this->contactResource = $contactResource;
         $this->publisher = $publisher;
+        $this->marketingSmsSubscribeDataFactory = $marketingSmsSubscribeDataFactory;
         $this->marketingSmsUnsubscribeDataFactory = $marketingSmsUnsubscribeDataFactory;
     }
 
@@ -94,6 +103,12 @@ class Save
 
         if ($hasSubscribed) {
             $contactModel->setSmsSubscriberImported(Contact::EMAIL_CONTACT_NOT_IMPORTED);
+            $this->publisher->publish(
+                'ddg.sms.subscribe',
+                $this->marketingSmsSubscribeDataFactory->create()
+                    ->setWebsiteId((int) $contactModel->getData('website_id'))
+                    ->setContactId((int) $contactModel->getId())
+            );
         }
 
         $this->contactResource->save($contactModel);
