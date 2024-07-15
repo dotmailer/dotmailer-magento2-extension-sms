@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Dotdigitalgroup\Sms\Test\Unit\Model\Queue\Message;
 
-use Dotdigitalgroup\Sms\Model\Queue\Message\MarketingSmsSubscribeData;
+use Dotdigitalgroup\Sms\Model\Queue\Message\SmsSubscriptionData;
 use PHPUnit\Framework\TestCase;
 
 class MarketingSmsSubscribeDataTest extends TestCase
 {
     /**
-     * @var MarketingSmsSubscribeData
+     * @var SmsSubscriptionData
      *
      * Instance of the class that is being tested.
      */
-    private $marketingSmsSubscribeData;
+    private $smsSubscriptionData;
 
     /**
      * This method is called before each test.
@@ -23,7 +23,7 @@ class MarketingSmsSubscribeDataTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->marketingSmsSubscribeData = new MarketingSmsSubscribeData();
+        $this->smsSubscriptionData = new SmsSubscriptionData();
     }
 
     /**
@@ -34,8 +34,8 @@ class MarketingSmsSubscribeDataTest extends TestCase
     public function testCanSetAndGetWebsiteId(): void
     {
         $websiteId = 1;
-        $this->marketingSmsSubscribeData->setWebsiteId($websiteId);
-        $this->assertEquals($websiteId, $this->marketingSmsSubscribeData->getWebsiteId());
+        $this->smsSubscriptionData->setWebsiteId($websiteId);
+        $this->assertEquals($websiteId, $this->smsSubscriptionData->getWebsiteId());
     }
 
     /**
@@ -46,7 +46,7 @@ class MarketingSmsSubscribeDataTest extends TestCase
     public function testCanSetAndGetContactId(): void
     {
         $contactId = 1;
-        $this->marketingSmsSubscribeData->setContactId($contactId);
-        $this->assertEquals($contactId, $this->marketingSmsSubscribeData->getContactId());
+        $this->smsSubscriptionData->setContactId($contactId);
+        $this->assertEquals($contactId, $this->smsSubscriptionData->getContactId());
     }
 }

@@ -11,6 +11,7 @@ use Dotdigitalgroup\Email\Model\Contact;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
 use Dotdigitalgroup\Sms\Model\Queue\Item\SmsSignup;
 use Dotdigitalgroup\Sms\Model\Queue\Item\TransactionalMessageEnqueuer;
+use Dotdigitalgroup\Sms\Model\Queue\Message\SmsSubscriptionDataFactory;
 use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory;
 use Dotdigitalgroup\Sms\Model\Subscriber;
 use Dotdigitalgroup\Sms\Model\Consent\ConsentManager;
@@ -22,9 +23,7 @@ use Magento\Framework\Data\Form\FormKey\Validator as FormKeyValidator;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\StoreManagerInterface;
-use Dotdigitalgroup\Sms\Model\Queue\Message\MarketingSmsSubscribeDataFactory;
 use Magento\Framework\MessageQueue\PublisherInterface;
-use Dotdigitalgroup\Sms\Model\Queue\Message\MarketingSmsUnsubscribeDataFactory;
 
 class NewsletterControllerPlugin
 {
@@ -89,14 +88,9 @@ class NewsletterControllerPlugin
     private $publisher;
 
     /**
-     * @var MarketingSmsUnsubscribeDataFactory
+     * @var SmsSubscriptionDataFactory
      */
-    private $marketingSmsUnsubscribeDataFactory;
-
-    /**
-     * @var MarketingSmsSubscribeDataFactory
-     */
-    private $marketingSmsSubscribeDataFactory;
+    private $smsSubscriptionDataFactory;
 
     /**
      * NewsletterControllerPlugin constructor.
@@ -111,8 +105,7 @@ class NewsletterControllerPlugin
      * @param FormKeyValidator $formKeyValidator
      * @param StoreManagerInterface $storeManager
      * @param ConsentManager $consentManager
-     * @param MarketingSmsSubscribeDataFactory $marketingSmsSubscribeDataFactory
-     * @param MarketingSmsUnsubscribeDataFactory $marketingSmsUnsubscribeDataFactory
+     * @param SmsSubscriptionDataFactory $smsSubscriptionDataFactory
      * @param PublisherInterface $publisher
      * @param Context $context
      */
@@ -127,8 +120,7 @@ class NewsletterControllerPlugin
         FormKeyValidator $formKeyValidator,
         StoreManagerInterface $storeManager,
         ConsentManager $consentManager,
-        MarketingSmsSubscribeDataFactory $marketingSmsSubscribeDataFactory,
-        MarketingSmsUnsubscribeDataFactory $marketingSmsUnsubscribeDataFactory,
+        SmsSubscriptionDataFactory $smsSubscriptionDataFactory,
         PublisherInterface $publisher,
         Context $context
     ) {
@@ -142,8 +134,7 @@ class NewsletterControllerPlugin
         $this->formKeyValidator = $formKeyValidator;
         $this->storeManager = $storeManager;
         $this->consentManager = $consentManager;
-        $this->marketingSmsSubscribeDataFactory = $marketingSmsSubscribeDataFactory;
-        $this->marketingSmsUnsubscribeDataFactory = $marketingSmsUnsubscribeDataFactory;
+        $this->smsSubscriptionDataFactory = $smsSubscriptionDataFactory;
         $this->publisher = $publisher;
         $this->request = $context->getRequest();
     }
@@ -199,10 +190,11 @@ class NewsletterControllerPlugin
                     $this->contactResource->save($contactModel);
                     $this->consentManager->createConsentRecord($contactModel->getId(), $storeId);
                     $this->publisher->publish(
-                        'ddg.sms.subscribe',
-                        $this->marketingSmsSubscribeDataFactory->create()
+                        'ddg.sms.subscription',
+                        $this->smsSubscriptionDataFactory->create()
                             ->setWebsiteId((int) $websiteId)
                             ->setContactId((int) $contactModel->getId())
+                            ->setType('subscribe')
                     );
 
                     if ($this->transactionalMessageEnqueuer->canQueue($this->smsSignupQueueItem, (int) $storeId)) {
@@ -224,12 +216,13 @@ class NewsletterControllerPlugin
                     $hasProvidedConsent
                 )) {
 
-                    $contactMessage = $this->marketingSmsUnsubscribeDataFactory->create();
-                    $contactMessage->setWebsiteId($websiteId);
+                    $contactMessage = $this->smsSubscriptionDataFactory->create();
+                    $contactMessage->setWebsiteId((int) $websiteId);
                     $contactMessage->setEmail($customer->getEmail());
+                    $contactMessage->setType('unsubscribe');
 
                     $this->publisher->publish(
-                        'ddg.sms.unsubscribe',
+                        'ddg.sms.subscription',
                         $contactMessage
                     );
 

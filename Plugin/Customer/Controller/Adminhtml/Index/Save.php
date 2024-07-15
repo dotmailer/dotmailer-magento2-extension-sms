@@ -4,8 +4,7 @@ namespace Dotdigitalgroup\Sms\Plugin\Customer\Controller\Adminhtml\Index;
 
 use Dotdigitalgroup\Email\Model\Contact;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
-use Dotdigitalgroup\Sms\Model\Queue\Message\MarketingSmsSubscribeDataFactory;
-use Dotdigitalgroup\Sms\Model\Queue\Message\MarketingSmsUnsubscribeDataFactory;
+use Dotdigitalgroup\Sms\Model\Queue\Message\SmsSubscriptionDataFactory;
 use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory as ContactCollectionFactory;
 use Dotdigitalgroup\Sms\Model\Subscriber;
 use Magento\Backend\Model\View\Result\Redirect;
@@ -30,34 +29,26 @@ class Save
     private $publisher;
 
     /**
-     * @var MarketingSmsUnsubscribeDataFactory
+     * @var SmsSubscriptionDataFactory
      */
-    private $marketingSmsUnsubscribeDataFactory;
-
-    /**
-     * @var MarketingSmsSubscribeDataFactory
-     */
-    private $marketingSmsSubscribeDataFactory;
+    private $smsSubscriptionDataFactory;
 
     /**
      * @param ContactCollectionFactory $contactCollectionFactory
      * @param ContactResource $contactResource
      * @param PublisherInterface $publisher
-     * @param MarketingSmsSubscribeDataFactory $marketingSmsSubscribeDataFactory
-     * @param MarketingSmsUnsubscribeDataFactory $marketingSmsUnsubscribeDataFactory
+     * @param SmsSubscriptionDataFactory $smsSubscriptionDataFactory
      */
     public function __construct(
         ContactCollectionFactory $contactCollectionFactory,
         ContactResource $contactResource,
         PublisherInterface $publisher,
-        MarketingSmsSubscribeDataFactory $marketingSmsSubscribeDataFactory,
-        MarketingSmsUnsubscribeDataFactory $marketingSmsUnsubscribeDataFactory
+        SmsSubscriptionDataFactory $smsSubscriptionDataFactory
     ) {
         $this->contactCollectionFactory = $contactCollectionFactory;
         $this->contactResource = $contactResource;
         $this->publisher = $publisher;
-        $this->marketingSmsSubscribeDataFactory = $marketingSmsSubscribeDataFactory;
-        $this->marketingSmsUnsubscribeDataFactory = $marketingSmsUnsubscribeDataFactory;
+        $this->smsSubscriptionDataFactory = $smsSubscriptionDataFactory;
     }
 
     /**
@@ -84,12 +75,13 @@ class Save
         }
 
         if (!$hasSubscribed && $contactModel->getSmsSubscriberStatus() == Subscriber::STATUS_SUBSCRIBED) {
-            $contactMessage = $this->marketingSmsUnsubscribeDataFactory->create();
-            $contactMessage->setWebsiteId((string)$contactModel->getWebsiteId());
-            $contactMessage->setEmail((string)$contactModel->getEmail());
+            $contactMessage = $this->smsSubscriptionDataFactory->create();
+            $contactMessage->setWebsiteId((int) $contactModel->getWebsiteId());
+            $contactMessage->setEmail((string) $contactModel->getEmail());
+            $contactMessage->setType('unsubscribe');
 
             $this->publisher->publish(
-                'ddg.sms.unsubscribe',
+                'ddg.sms.subscription',
                 $contactMessage
             );
         }
@@ -104,10 +96,11 @@ class Save
         if ($hasSubscribed) {
             $contactModel->setSmsSubscriberImported(Contact::EMAIL_CONTACT_NOT_IMPORTED);
             $this->publisher->publish(
-                'ddg.sms.subscribe',
-                $this->marketingSmsSubscribeDataFactory->create()
+                'ddg.sms.subscription',
+                $this->smsSubscriptionDataFactory->create()
                     ->setWebsiteId((int) $contactModel->getData('website_id'))
                     ->setContactId((int) $contactModel->getId())
+                    ->setType('subscribe')
             );
         }
 

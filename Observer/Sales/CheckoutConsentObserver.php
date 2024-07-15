@@ -9,7 +9,7 @@ use Dotdigitalgroup\Email\Model\Contact;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
 use Dotdigitalgroup\Sms\Model\Queue\Item\SmsSignup;
 use Dotdigitalgroup\Sms\Model\Queue\Item\TransactionalMessageEnqueuer;
-use Dotdigitalgroup\Sms\Model\Queue\Message\MarketingSmsSubscribeDataFactory;
+use Dotdigitalgroup\Sms\Model\Queue\Message\SmsSubscriptionDataFactory;
 use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory;
 use Dotdigitalgroup\Sms\Model\SmsContactFactory;
 use Dotdigitalgroup\Sms\Model\Subscriber;
@@ -78,9 +78,9 @@ class CheckoutConsentObserver implements ObserverInterface
     private $publisher;
 
     /**
-     * @var MarketingSmsSubscribeDataFactory
+     * @var SmsSubscriptionDataFactory
      */
-    private $marketingSmsSubscribeDataFactory;
+    private $smsSubscriptionDataFactory;
 
     /**
      * CheckoutConsentObserver constructor.
@@ -95,7 +95,7 @@ class CheckoutConsentObserver implements ObserverInterface
      * @param StoreManagerInterface $storeManager
      * @param ConsentManager $consentManager
      * @param PublisherInterface $publisher
-     * @param MarketingSmsSubscribeDataFactory $marketingSmsSubscribeDataFactory
+     * @param SmsSubscriptionDataFactory $smsSubscriptionDataFactory
      */
     public function __construct(
         Logger $logger,
@@ -108,7 +108,7 @@ class CheckoutConsentObserver implements ObserverInterface
         StoreManagerInterface $storeManager,
         ConsentManager $consentManager,
         PublisherInterface $publisher,
-        MarketingSmsSubscribeDataFactory $marketingSmsSubscribeDataFactory,
+        SmsSubscriptionDataFactory $smsSubscriptionDataFactory,
     ) {
         $this->logger = $logger;
         $this->contactFactory = $contactFactory;
@@ -118,7 +118,7 @@ class CheckoutConsentObserver implements ObserverInterface
         $this->contactCollectionFactory = $contactCollectionFactory;
         $this->checkoutSession = $checkoutSession;
         $this->consentManager = $consentManager;
-        $this->marketingSmsSubscribeDataFactory = $marketingSmsSubscribeDataFactory;
+        $this->smsSubscriptionDataFactory = $smsSubscriptionDataFactory;
         $this->storeManager = $storeManager;
         $this->publisher = $publisher;
     }
@@ -165,10 +165,11 @@ class CheckoutConsentObserver implements ObserverInterface
             $this->contactResource->save($contactModel);
             $this->consentManager->createConsentRecord($contactModel->getId(), $storeId);
             $this->publisher->publish(
-                'ddg.sms.subscribe',
-                $this->marketingSmsSubscribeDataFactory->create()
+                'ddg.sms.subscription',
+                $this->smsSubscriptionDataFactory->create()
                     ->setWebsiteId((int) $contactModel->getData('website_id'))
                     ->setContactId((int) $contactModel->getId())
+                    ->setType('subscribe')
             );
 
             if ($this->transactionalMessageEnqueuer->canQueue($this->smsSignupQueueItem, (int) $storeId)) {

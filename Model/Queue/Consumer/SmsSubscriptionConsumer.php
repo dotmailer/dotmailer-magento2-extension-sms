@@ -4,42 +4,37 @@ declare(strict_types=1);
 
 namespace Dotdigitalgroup\Sms\Model\Queue\Consumer;
 
+use Dotdigital\V3\Models\Contact;
+use Dotdigitalgroup\Email\Helper\Data;
 use Dotdigitalgroup\Email\Logger\Logger;
-use Dotdigital\V3\Models\ContactFactory;
 use Dotdigitalgroup\Email\Model\Apiconnector\V3\ClientFactory as V3ClientFactory;
 use Dotdigitalgroup\Email\Model\Apiconnector\V3\Client as V3Client;
-use Dotdigitalgroup\Sms\Api\Queue\Message\SmsMessageInterface;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\Exporter;
 use Http\Client\Exception;
-use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory as ContactCollectionFactory;
 use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\ExporterFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Store\Model\ScopeInterface;
-use Dotdigitalgroup\Sms\Model\Queue\Message\MarketingSmsSubscribeData;
+use Dotdigitalgroup\Sms\Model\Queue\Message\SmsSubscriptionData;
 use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\RetrieverFactory;
 
-class MarketingSmsSubscribe
+class SmsSubscriptionConsumer
 {
+    /**
+     * @var Data
+     */
+    private $helper;
+
     /**
      * @var Logger
      */
     private $logger;
 
     /**
-     * @var ContactFactory
-     */
-    private $contactFactory;
-
-    /**
      * @var V3ClientFactory
      */
     private $v3ClientFactory;
-
-    /**
-     * @var V3Client
-     */
-    private $v3Client;
 
     /**
      * @var Configuration
@@ -64,8 +59,8 @@ class MarketingSmsSubscribe
     /**
      * MarketingSmsSubscribe constructor.
      *
+     * @param Data $helper
      * @param Logger $logger
-     * @param ContactFactory $contactFactory
      * @param V3ClientFactory $v3ClientFactory
      * @param Configuration $smsConfig
      * @param ExporterFactory $exporterFactory
@@ -73,17 +68,17 @@ class MarketingSmsSubscribe
      * @param RetrieverFactory $retrieverFactory
      */
     public function __construct(
+        Data $helper,
         Logger $logger,
-        ContactFactory $contactFactory,
         V3ClientFactory $v3ClientFactory,
         Configuration $smsConfig,
         ExporterFactory $exporterFactory,
         ScopeConfigInterface $scopeConfig,
         RetrieverFactory $retrieverFactory
     ) {
-        $this->contactFactory = $contactFactory;
-        $this->v3ClientFactory = $v3ClientFactory;
+        $this->helper = $helper;
         $this->logger = $logger;
+        $this->v3ClientFactory = $v3ClientFactory;
         $this->smsConfig = $smsConfig;
         $this->exporterFactory = $exporterFactory;
         $this->scopeConfig = $scopeConfig;
@@ -93,14 +88,41 @@ class MarketingSmsSubscribe
     /**
      * Execute.
      *
-     * @param MarketingSmsSubscribeData $smsSubscribeData
+     * @param SmsSubscriptionData $data
+     *
+     * @return void
+     * @throws Exception
+     * @throws LocalizedException
+     */
+    public function process(SmsSubscriptionData $data): void
+    {
+        if (!$data->getType()) {
+            throw new LocalizedException(__('Unknown subscription type'));
+        }
+
+        $v3Client = $this->v3ClientFactory->create(['websiteId' => $data->getWebsiteId()]);
+
+        switch ($data->getType()) {
+            case 'subscribe':
+                $this->subscribe($data, $v3Client);
+                break;
+            case 'unsubscribe':
+                $this->unsubscribe($data, $v3Client);
+                break;
+        }
+    }
+
+    /**
+     * Subscribe.
+     *
+     * @param SmsSubscriptionData $smsSubscribeData
+     * @param V3Client $v3Client
+     *
      * @return void
      * @throws Exception
      */
-    public function process(MarketingSmsSubscribeData $smsSubscribeData): void
+    private function subscribe(SmsSubscriptionData $smsSubscribeData, V3Client $v3Client)
     {
-        $this->v3Client = $this->v3ClientFactory->create(['websiteId' => $smsSubscribeData->getWebsiteId()]);
-
         try {
             $smsSubscriber = $this->retrieverFactory
                 ->create()
@@ -110,14 +132,13 @@ class MarketingSmsSubscribe
             $contact = $this->exporterFactory
                 ->create()
                 ->setFieldMapping($this->getValuesForMappedFields($smsSubscribeData->getWebsiteId()))
-                ->prepareContact($smsSubscriber, 'mobile-number');
+                ->prepareContact($smsSubscriber);
 
             $contact->setLists([$this->smsConfig->getListId($smsSubscribeData->getWebsiteId())]);
 
-            $this->v3Client->contacts->patchByIdentifier(
+            $v3Client->contacts->patchByIdentifier(
                 $smsSubscriber->getMobileNumber(),
-                $contact,
-                'mobile-number'
+                $contact
             );
 
             /** @var \Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact $smsSubscriber  */
@@ -140,6 +161,69 @@ class MarketingSmsSubscribe
                 ]
             );
         }
+    }
+
+    /**
+     * Unsubscribe.
+     *
+     * @param SmsSubscriptionData $unsubscribeData
+     * @param V3Client $v3Client
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function unsubscribe(SmsSubscriptionData $unsubscribeData, V3Client $v3Client): void
+    {
+        $v2Client = $this->helper->getWebsiteApiClient($unsubscribeData->getWebsiteId());
+        $contact = $this->getContact($unsubscribeData, $v3Client);
+
+        if (!empty($contact)) {
+            try {
+                $v2Client->deleteAddressBookContact(
+                    $this->smsConfig->getListId($unsubscribeData->getWebsiteId()),
+                    $contact->getContactId()
+                );
+                $this->logger->info(
+                    "Contact marketing SMS unsubscribe success:",
+                    [
+                        'identifiers' => $contact->getIdentifiers()
+                    ]
+                );
+            } catch (\Exception $e) {
+                $this->logger->error(
+                    "Contact marketing SMS unsubscribe error:",
+                    [
+                        'identifier' => $unsubscribeData->getEmail(),
+                        'exception' => $e,
+                    ]
+                );
+            }
+        }
+    }
+
+    /**
+     * Get contact.
+     *
+     * @param SmsSubscriptionData $unsubscribeData
+     * @param V3Client $v3Client
+     *
+     * @return Contact|null
+     * @throws Exception
+     */
+    private function getContact(SmsSubscriptionData $unsubscribeData, V3Client $v3Client): ?Contact
+    {
+        try {
+            return $v3Client->contacts->getByIdentifier($unsubscribeData->getEmail());
+        } catch (\Exception $e) {
+            $this->logger->warning(
+                "Contact marketing SMS unsubscribe warning:",
+                [
+                    'identifier' => $unsubscribeData->getEmail(),
+                    'exception' => $e,
+                ]
+            );
+        }
+        return null;
     }
 
     /**
