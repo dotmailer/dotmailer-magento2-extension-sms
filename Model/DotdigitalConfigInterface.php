@@ -17,8 +17,12 @@ interface DotdigitalConfigInterface
         ConfigInterface::XML_PATH_SMS_NEW_SHIPMENT_ENABLED,
         ConfigInterface::XML_PATH_SMS_SHIPMENT_UPDATE_ENABLED,
         ConfigInterface::XML_PATH_SMS_NEW_CREDIT_MEMO_ENABLED,
-        ConfigInterface::XML_PATH_CONSENT_SMS_ENABLED,
+        ConfigInterface::XML_PATH_CONSENT_SMS_REGISTRATION_ENABLED,
+        ConfigInterface::XML_PATH_CONSENT_SMS_CHECKOUT_ENABLED,
+        ConfigInterface::XML_PATH_CONSENT_SMS_ACCOUNT_ENABLED,
         ConfigInterface::XML_PATH_CONSENT_SMS_SIGNUP_TEXT,
         ConfigInterface::XML_PATH_CONSENT_SMS_MARKETING_TEXT,
+        ConfigInterface::XML_PATH_SMS_SIGNUP_ENABLED,
+        ConfigInterface::XML_PATH_SMS_NEW_ACCOUNT_SIGNUP_ENABLED,
     ];
 }
