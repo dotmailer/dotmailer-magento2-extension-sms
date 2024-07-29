@@ -11,7 +11,6 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Shipping\Controller\Adminhtml\Order\Shipment\Save as NewShipmentAction;
-use Magento\Store\Model\StoreManagerInterface;
 use PHPUnit\Framework\TestCase;
 
 class NewShipmentPluginTest extends TestCase
@@ -47,11 +46,6 @@ class NewShipmentPluginTest extends TestCase
     private $requestInterfaceMock;
 
     /**
-     * @var StoreManagerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $storeManagerMock;
-
-    /**
      * @var NewShipmentPlugin
      */
     private $plugin;
@@ -69,7 +63,6 @@ class NewShipmentPluginTest extends TestCase
         $this->newShipmentActionMock = $this->createMock(NewShipmentAction::class);
         $this->newShipmentMock = $this->createMock(NewShipment::class);
         $this->requestInterfaceMock = $this->createMock(RequestInterface::class);
-        $this->storeManagerMock = $this->createMock(StoreManagerInterface::class);
         $this->orderInterfaceMock = $this->createMock(OrderInterface::class);
         $contextMock = $this->createMock(Context::class);
 
@@ -82,8 +75,7 @@ class NewShipmentPluginTest extends TestCase
             $this->moduleConfigMock,
             $this->orderRepositoryInterfaceMock,
             $this->newShipmentMock,
-            $contextMock,
-            $this->storeManagerMock
+            $contextMock
         );
     }
 
@@ -96,25 +88,21 @@ class NewShipmentPluginTest extends TestCase
             'title' => 'Chaz Express'
         ]];
 
-        $this->checkEnabled();
-
         $this->requestInterfaceMock
             ->expects($this->exactly(2))
             ->method('getParam')
-            ->withConsecutive(
-                ['order_id'],
-                ['tracking']
-            )
-            ->willReturnOnConsecutiveCalls(
-                $orderId,
-                $tracking
-            );
+            ->with($this->logicalOr(
+                $this->equalTo('order_id'),
+                $this->equalTo('tracking')
+            ))
+            ->willReturnCallback(function ($param) use ($orderId, $tracking) {
+                return match ($param) {
+                    'order_id' => $orderId,
+                    'tracking' => $tracking,
+                };
+            });
 
-        $this->orderRepositoryInterfaceMock
-            ->expects($this->once())
-            ->method('get')
-            ->with($orderId)
-            ->willReturn($this->orderInterfaceMock);
+        $this->checkEnabled($orderId);
 
         $this->newShipmentMock
             ->expects($this->once())
@@ -138,19 +126,21 @@ class NewShipmentPluginTest extends TestCase
         $orderId = 1;
         $tracking = null;
 
-        $this->checkEnabled();
-
         $this->requestInterfaceMock
             ->expects($this->exactly(2))
             ->method('getParam')
-            ->withConsecutive(
-                ['order_id'],
-                ['tracking']
-            )
-            ->willReturnOnConsecutiveCalls(
-                $orderId,
-                $tracking
-            );
+            ->with($this->logicalOr(
+                $this->equalTo('order_id'),
+                $this->equalTo('tracking')
+            ))
+            ->willReturnCallback(function ($param) use ($orderId, $tracking) {
+                return match ($param) {
+                    'order_id' => $orderId,
+                    'tracking' => $tracking,
+                };
+            });
+
+        $this->checkEnabled($orderId);
 
         $this->orderRepositoryInterfaceMock
             ->expects($this->once())
@@ -169,16 +159,16 @@ class NewShipmentPluginTest extends TestCase
         $this->plugin->afterExecute($this->newShipmentActionMock, []);
     }
 
-    private function checkEnabled()
+    private function checkEnabled($orderId)
     {
-        $storeMock = $this->createMock(\Magento\Store\Model\Store::class);
+        $this->orderRepositoryInterfaceMock
+            ->expects($this->once())
+            ->method('get')
+            ->with($orderId)
+            ->willReturn($this->orderInterfaceMock);
 
-        $this->storeManagerMock->expects($this->once())
-            ->method('getStore')
-            ->willReturn($storeMock);
-
-        $storeMock->expects($this->once())
-            ->method('getId')
+        $this->orderInterfaceMock->expects($this->once())
+            ->method('getStoreId')
             ->willReturn(1);
 
         $this->moduleConfigMock->expects($this->once())

@@ -9,7 +9,6 @@ use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\OrderItemNotificationEnqueuer;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Store\Api\Data\StoreInterface;
-use Magento\Store\Api\Data\WebsiteInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -51,11 +50,6 @@ class OrderNotificationEnqueuerTest extends TestCase
     private $storeInterfaceMock;
 
     /**
-     * @var WebsiteInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $websiteInterfaceMock;
-
-    /**
      * @var SmsOrderInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $smsOrderInterfaceMock;
@@ -65,7 +59,8 @@ class OrderNotificationEnqueuerTest extends TestCase
         $assignedMethods = ['getId','getData','getShippingAddress', 'getTelephone'];
         $this->orderInterfaceMock = $this->getMockBuilder(OrderInterface::class)
             ->disableOriginalConstructor()
-            ->setMethods(array_merge(get_class_methods(OrderInterface::class), $assignedMethods))
+            ->onlyMethods(get_class_methods(OrderInterface::class))
+            ->addMethods($assignedMethods)
             ->getMock();
 
         $this->smsOrderInterfaceFactoryMock = $this->createMock(SmsOrderInterfaceFactory::class);
@@ -73,7 +68,6 @@ class OrderNotificationEnqueuerTest extends TestCase
         $this->smsOrderRepositoryInterfaceMock = $this->createMock(SmsOrderRepositoryInterface::class);
         $this->storeManagerInterfaceMock = $this->createMock(StoreManagerInterface::class);
         $this->storeInterfaceMock = $this->createMock(StoreInterface::class);
-        $this->websiteInterfaceMock = $this->createMock(WebsiteInterface::class);
         $this->smsOrderInterfaceMock = $this->createMock(SmsOrderInterface::class);
 
         $this->smsOrderNotificationEnqueuer = new OrderItemNotificationEnqueuer(
@@ -86,13 +80,8 @@ class OrderNotificationEnqueuerTest extends TestCase
 
     public function testThatSmsWillBeStoredIfSmsIsEnabled()
     {
-        $this->storeManagerInterfaceMock->expects($this->once())
-            ->method('getStore')
-            ->willReturn($this->storeInterfaceMock);
-
-        $this->storeInterfaceMock
-            ->expects($this->once())
-            ->method('getId')
+        $this->orderInterfaceMock->expects($this->once())
+            ->method('getStoreId')
             ->willReturn($storeId = 1);
 
         $this->moduleConfigMock->expects($this->once())
@@ -125,12 +114,12 @@ class OrderNotificationEnqueuerTest extends TestCase
             ->willReturn($orderId = 1);
 
         $this->storeManagerInterfaceMock->expects($this->once())
-            ->method('getWebsite')
-            ->willReturn($this->websiteInterfaceMock);
+            ->method('getStore')
+            ->willReturn($this->storeInterfaceMock);
 
-        $this->websiteInterfaceMock
+        $this->storeInterfaceMock
             ->expects($this->once())
-            ->method('getId')
+            ->method('getWebsiteId')
             ->willReturn($websiteId = 1);
 
         $this->smsOrderInterfaceFactoryMock->expects($this->once())
@@ -195,12 +184,8 @@ class OrderNotificationEnqueuerTest extends TestCase
 
     public function testThatSmsWillNotBeStoredIfSmsIsNotEnabled()
     {
-        $this->storeManagerInterfaceMock->expects($this->once())
-            ->method('getStore')
-            ->willReturn($this->storeInterfaceMock);
-
-        $this->storeInterfaceMock->expects($this->once())
-            ->method('getId')
+        $this->orderInterfaceMock->expects($this->once())
+            ->method('getStoreId')
             ->willReturn($storeId = 1);
 
         $this->moduleConfigMock->expects($this->once())
@@ -222,10 +207,6 @@ class OrderNotificationEnqueuerTest extends TestCase
 
         $this->storeManagerInterfaceMock->expects($this->never())
             ->method('getWebsite');
-
-        $this->websiteInterfaceMock
-            ->expects($this->never())
-            ->method('getId');
 
         $this->smsOrderInterfaceFactoryMock->expects($this->never())
             ->method('create');

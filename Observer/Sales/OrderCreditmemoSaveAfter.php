@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Dotdigitalgroup\Sms\Observer\Sales;
 
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
@@ -61,17 +63,17 @@ class OrderCreditmemoSaveAfter implements \Magento\Framework\Event\ObserverInter
      */
     public function execute(Observer $observer)
     {
-        $storeId = $this->storeManager->getStore()->getId();
-        if (!$this->moduleConfig->isTransactionalSmsEnabled($storeId)) {
-            return;
-        }
-
         if ($this->smsSalesService->isOrderCreditmemoSaveAfterExecuted()) {
             return;
         }
 
         $creditmemo = $observer->getEvent()->getCreditmemo();
         $order = $creditmemo->getOrder();
+        $storeId = $order->getStoreId();
+
+        if (!$this->moduleConfig->isTransactionalSmsEnabled($storeId)) {
+            return;
+        }
 
         $this->newCreditMemo
             ->buildAdditionalData($order, $creditmemo)
