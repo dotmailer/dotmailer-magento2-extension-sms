@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dotdigitalgroup\Sms\Model\Queue\OrderItem;
 
+use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterfaceFactory;
 use Dotdigitalgroup\Sms\Api\SmsOrderRepositoryInterface;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
@@ -14,6 +15,11 @@ use Magento\Store\Model\StoreManagerInterface;
 
 class OrderItemNotificationEnqueuer
 {
+    /**
+     * @var Logger
+     */
+    private $logger;
+
     /**
      * @var SmsOrderInterfaceFactory
      */
@@ -37,17 +43,20 @@ class OrderItemNotificationEnqueuer
     /**
      * OrderItemNotificationEnqueuer constructor.
      *
+     * @param Logger $logger
      * @param SmsOrderInterfaceFactory $smsOrderInterfaceFactory
      * @param SmsOrderRepositoryInterface $smsOrderRepositoryInterface
      * @param Configuration $moduleConfig
      * @param StoreManagerInterface $storeManager
      */
     public function __construct(
+        Logger $logger,
         SmsOrderInterfaceFactory $smsOrderInterfaceFactory,
         SmsOrderRepositoryInterface $smsOrderRepositoryInterface,
         Configuration $moduleConfig,
         StoreManagerInterface $storeManager
     ) {
+        $this->logger = $logger;
         $this->storeManager = $storeManager;
         $this->smsOrderInterfaceFactory = $smsOrderInterfaceFactory;
         $this->smsOrderRepositoryInterface = $smsOrderRepositoryInterface;
@@ -75,6 +84,14 @@ class OrderItemNotificationEnqueuer
 
         /** @var \Magento\Sales\Model\Order $order */
         $address = $order->getShippingAddress() ?? $order->getBillingAddress();
+        if (!$address->getTelephone()) {
+            $this->logger->debug(sprintf(
+                'No telephone number supplied for order %s, not queueing transactional SMS.',
+                $order->getIncrementId()
+            ));
+            return;
+        }
+
         $orderId = (int) $order->getId();
         $smsOrder = $this->smsOrderInterfaceFactory
             ->create()

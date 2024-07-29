@@ -2,6 +2,7 @@
 
 namespace Dotdigitalgroup\Sms\Test\Unit\Model\Queue;
 
+use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterface;
 use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterfaceFactory;
 use Dotdigitalgroup\Sms\Api\SmsOrderRepositoryInterface;
@@ -14,6 +15,11 @@ use PHPUnit\Framework\TestCase;
 
 class OrderNotificationEnqueuerTest extends TestCase
 {
+    /**
+     * @var Logger|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $loggerMock;
+
     /**
      * @var OrderInterface|\PHPUnit\Framework\MockObject\MockObject
      */
@@ -63,6 +69,7 @@ class OrderNotificationEnqueuerTest extends TestCase
             ->addMethods($assignedMethods)
             ->getMock();
 
+        $this->loggerMock = $this->createMock(Logger::class);
         $this->smsOrderInterfaceFactoryMock = $this->createMock(SmsOrderInterfaceFactory::class);
         $this->moduleConfigMock = $this->createMock(Configuration::class);
         $this->smsOrderRepositoryInterfaceMock = $this->createMock(SmsOrderRepositoryInterface::class);
@@ -71,6 +78,7 @@ class OrderNotificationEnqueuerTest extends TestCase
         $this->smsOrderInterfaceMock = $this->createMock(SmsOrderInterface::class);
 
         $this->smsOrderNotificationEnqueuer = new OrderItemNotificationEnqueuer(
+            $this->loggerMock,
             $this->smsOrderInterfaceFactoryMock,
             $this->smsOrderRepositoryInterfaceMock,
             $this->moduleConfigMock,
@@ -101,7 +109,7 @@ class OrderNotificationEnqueuerTest extends TestCase
             ->method('getShippingAddress')
             ->willReturn($this->orderInterfaceMock);
 
-        $this->orderInterfaceMock->expects($this->once())
+        $this->orderInterfaceMock->expects($this->exactly(2))
             ->method('getTelephone')
             ->willReturn($telephone = '+4407400000000');
 
@@ -235,6 +243,44 @@ class OrderNotificationEnqueuerTest extends TestCase
         $this->smsOrderNotificationEnqueuer->queue(
             $this->orderInterfaceMock,
             '',
+            'chazPath',
+            'chazType'
+        );
+    }
+
+    public function testThatSmsWillNotBeStoredIfNoTelephoneNumber()
+    {
+        $this->orderInterfaceMock->expects($this->once())
+            ->method('getStoreId')
+            ->willReturn($storeId = 1);
+
+        $this->moduleConfigMock->expects($this->once())
+            ->method('isTransactionalSmsEnabled')
+            ->with($storeId)
+            ->willReturn(true);
+
+        $this->moduleConfigMock->expects($this->once())
+            ->method('isSmsTypeEnabled')
+            ->willReturn(true);
+
+        $this->orderInterfaceMock->expects($this->once())
+            ->method('getShippingAddress')
+            ->willReturn($this->orderInterfaceMock);
+
+        $this->orderInterfaceMock->expects($this->once())
+            ->method('getShippingAddress')
+            ->willReturn($this->orderInterfaceMock);
+
+        $this->orderInterfaceMock->expects($this->once())
+            ->method('getTelephone')
+            ->willReturn(null);
+
+        $this->smsOrderRepositoryInterfaceMock->expects($this->never())
+            ->method('save');
+
+        $this->smsOrderNotificationEnqueuer->queue(
+            $this->orderInterfaceMock,
+            '{order_status:pending}',
             'chazPath',
             'chazType'
         );

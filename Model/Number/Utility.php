@@ -15,7 +15,7 @@ class Utility
      */
     public function prepareMobileNumberForStorage(?string $number)
     {
-        return (int) str_replace(' ', '', $number);
+        return (int) str_replace(' ', '', (string) $number);
     }
 
     /**
