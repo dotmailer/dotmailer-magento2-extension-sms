@@ -23,6 +23,12 @@ This module features an option to enable international telephone number validati
 
 ## Changelog
 
+### 2.3.2
+
+### Bug fixes
+- We now properly handle when address telephone numbers are not required, and not submitted, at checkout.
+- We fixed an issue with incorrect scope when triggering transactional SMS sends from the admin.
+
 ### 2.3.1
 
 ##### What's new
