@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Dotdigitalgroup\Sms\Plugin\Order\Shipment;
 
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
@@ -12,7 +14,6 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\ShipmentRepositoryInterface;
 use Magento\Shipping\Controller\Adminhtml\Order\Shipment\AddTrack as UpdateShipmentAction;
-use Magento\Store\Model\StoreManagerInterface;
 
 class ShipmentUpdatePlugin
 {
@@ -42,11 +43,6 @@ class ShipmentUpdatePlugin
     private $request;
 
     /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
      * ShipmentUpdatePlugin constructor.
      *
      * @param Configuration $moduleConfig
@@ -54,22 +50,19 @@ class ShipmentUpdatePlugin
      * @param UpdateShipment $updateShipment
      * @param ShipmentRepositoryInterface $shipmentRepository
      * @param Context $context
-     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         Configuration $moduleConfig,
         OrderRepositoryInterface $orderRepository,
         UpdateShipment $updateShipment,
         ShipmentRepositoryInterface $shipmentRepository,
-        Context $context,
-        StoreManagerInterface $storeManager
+        Context $context
     ) {
         $this->moduleConfig = $moduleConfig;
         $this->orderRepository = $orderRepository;
         $this->updateShipment = $updateShipment;
         $this->shipmentRepository = $shipmentRepository;
         $this->request = $context->getRequest();
-        $this->storeManager = $storeManager;
     }
 
     /**
@@ -85,14 +78,13 @@ class ShipmentUpdatePlugin
         UpdateShipmentAction $subject,
         $result
     ) {
-        $storeId = $this->storeManager->getStore()->getId();
-        if (!$this->moduleConfig->isTransactionalSmsEnabled($storeId)) {
-            return $result;
-        }
-
         $shipment = $this->shipmentRepository->get(
             $this->request->getParam('shipment_id')
         );
+
+        if (!$this->moduleConfig->isTransactionalSmsEnabled($shipment->getStoreId())) {
+            return $result;
+        }
 
         $orderId = $shipment->getOrderId();
 

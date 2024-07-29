@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Dotdigitalgroup\Sms\Plugin\Order\Shipment;
 
 use Dotdigitalgroup\Email\Logger\Logger;
@@ -12,7 +14,6 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Shipping\Controller\Adminhtml\Order\Shipment\Save as NewShipmentAction;
-use Magento\Store\Model\StoreManagerInterface;
 
 class NewShipmentPlugin
 {
@@ -42,11 +43,6 @@ class NewShipmentPlugin
     private $request;
 
     /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
      * NewShipmentPlugin constructor.
      *
      * @param Logger $logger
@@ -54,22 +50,19 @@ class NewShipmentPlugin
      * @param OrderRepositoryInterface $orderRepository
      * @param NewShipment $newShipment
      * @param Context $context
-     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         Logger $logger,
         Configuration $moduleConfig,
         OrderRepositoryInterface $orderRepository,
         NewShipment $newShipment,
-        Context $context,
-        StoreManagerInterface $storeManager
+        Context $context
     ) {
         $this->logger = $logger;
         $this->moduleConfig = $moduleConfig;
         $this->orderRepository = $orderRepository;
         $this->newShipment = $newShipment;
         $this->request = $context->getRequest();
-        $this->storeManager = $storeManager;
     }
 
     /**
@@ -85,26 +78,25 @@ class NewShipmentPlugin
         NewShipmentAction $subject,
         $result
     ) {
-        $storeId = $this->storeManager->getStore()->getId();
-        if (!$this->moduleConfig->isTransactionalSmsEnabled($storeId)) {
-            return $result;
-        }
-
         try {
             $order = $this->orderRepository->get(
                 $this->request->getParam('order_id')
             );
         } catch (\Exception $e) {
-            $order = null;
             $this->logger->debug(
                 'Could not load order for shipment',
                 [(string) $e]
             );
+            return $result;
+        }
+
+        if (!$this->moduleConfig->isTransactionalSmsEnabled($order->getStoreId())) {
+            return $result;
         }
 
         $trackings = $this->request->getParam('tracking');
 
-        if ($order && is_array($trackings)) {
+        if (is_array($trackings)) {
             foreach ($trackings as $tracking) {
                 $this->newShipment
                     ->buildAdditionalData(

@@ -13,7 +13,6 @@ use Magento\Sales\Api\Data\ShipmentInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\ShipmentRepositoryInterface;
 use Magento\Shipping\Controller\Adminhtml\Order\Shipment\AddTrack as UpdateShipmentAction;
-use Magento\Store\Model\StoreManagerInterface;
 use PHPUnit\Framework\TestCase;
 
 class ShipmentUpdatePluginTest extends TestCase
@@ -63,11 +62,6 @@ class ShipmentUpdatePluginTest extends TestCase
      */
     private $orderInterfaceMock;
 
-    /**
-     * @var StoreManagerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $storeManagerMock;
-
     protected function setUp(): void
     {
         $this->moduleConfigMock = $this->createMock(Configuration::class);
@@ -78,7 +72,6 @@ class ShipmentUpdatePluginTest extends TestCase
         $this->requestInterfaceMock = $this->createMock(RequestInterface::class);
         $this->shipmentInterfaceMock = $this->createMock(ShipmentInterface::class);
         $this->orderInterfaceMock = $this->createMock(OrderInterface::class);
-        $this->storeManagerMock = $this->createMock(StoreManagerInterface::class);
         $contextMock = $this->createMock(Context::class);
 
         $contextMock->expects($this->any())
@@ -90,44 +83,35 @@ class ShipmentUpdatePluginTest extends TestCase
             $this->orderRepositoryInterfaceMock,
             $this->updateShipmentMock,
             $this->shipmentRepositoryInterfaceMock,
-            $contextMock,
-            $this->storeManagerMock
+            $contextMock
         );
     }
 
     public function testAfterExecuteMethod()
     {
-        $storeMock = $this->createMock(\Magento\Store\Model\Store::class);
-
-        $this->storeManagerMock->expects($this->once())
-            ->method('getStore')
-            ->willReturn($storeMock);
-
-        $storeMock->expects($this->once())
-            ->method('getId')
-            ->willReturn(1);
+        $shipmentId = 1;
+        $trackingNumber = 12345;
+        $trackingCode = 'chaz';
 
         $this->moduleConfigMock->expects($this->once())
             ->method('isTransactionalSmsEnabled')
             ->willReturn(1);
 
         $this->requestInterfaceMock
-            ->expects($this->at(0))
+            ->expects($this->exactly(3))
             ->method('getParam')
-            ->with('shipment_id')
-            ->willReturn($shipmentId = 1);
-
-        $this->requestInterfaceMock
-            ->expects($this->at(1))
-            ->method('getParam')
-            ->with('number')
-            ->willReturn($trackingNumber = 12345);
-
-        $this->requestInterfaceMock
-            ->expects($this->at(2))
-            ->method('getParam')
-            ->with('title')
-            ->willReturn($trackingCode = 'chaz');
+            ->with($this->logicalOr(
+                $this->equalTo('shipment_id'),
+                $this->equalTo('number'),
+                $this->equalTo('title')
+            ))
+            ->willReturnCallback(function ($param) use ($shipmentId, $trackingNumber, $trackingCode) {
+                return match ($param) {
+                    'shipment_id' => $shipmentId,
+                    'number' => $trackingNumber,
+                    'title' => $trackingCode,
+                };
+            });
 
         $this->shipmentRepositoryInterfaceMock
             ->expects($this->once())

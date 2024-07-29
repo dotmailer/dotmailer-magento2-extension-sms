@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Dotdigitalgroup\Sms\Model\Queue\OrderItem;
 
 use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterfaceFactory;
 use Dotdigitalgroup\Sms\Api\SmsOrderRepositoryInterface;
-use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -65,7 +66,7 @@ class OrderItemNotificationEnqueuer
      */
     public function queue($order, $additionalData, $smsConfigPath, $smsType)
     {
-        $storeId = $this->storeManager->getStore()->getId();
+        $storeId = $order->getStoreId();
 
         if (!$this->moduleConfig->isTransactionalSmsEnabled($storeId) ||
             !$this->moduleConfig->isSmsTypeEnabled($storeId, $smsConfigPath)) {
@@ -79,7 +80,7 @@ class OrderItemNotificationEnqueuer
             ->create()
             ->setOrderId($orderId)
             ->setStoreId($storeId)
-            ->setWebsiteId($this->storeManager->getWebsite()->getId())
+            ->setWebsiteId($this->storeManager->getStore($storeId)->getWebsiteId())
             ->setTypeId($smsType)
             ->setStatus(0)
             ->setPhoneNumber($address->getTelephone())

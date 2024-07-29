@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Dotdigitalgroup\Sms\Observer\Sales;
 
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
@@ -8,7 +10,6 @@ use Dotdigitalgroup\Sms\Model\Queue\OrderItem\NewOrder;
 use Dotdigitalgroup\Sms\Model\Sales\SmsSalesService;
 use Magento\Framework\Event\Observer;
 use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Store\Model\StoreManagerInterface;
 
 class OrderSaveAfter implements \Magento\Framework\Event\ObserverInterface
 {
@@ -33,31 +34,23 @@ class OrderSaveAfter implements \Magento\Framework\Event\ObserverInterface
     private $smsSalesService;
 
     /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
      * OrderSaveAfter constructor.
      *
      * @param Configuration $moduleConfig
      * @param UpdateOrder $updateOrder
      * @param NewOrder $newOrder
      * @param SmsSalesService $smsSalesService
-     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         Configuration $moduleConfig,
         UpdateOrder $updateOrder,
         NewOrder $newOrder,
-        SmsSalesService $smsSalesService,
-        StoreManagerInterface $storeManager
+        SmsSalesService $smsSalesService
     ) {
         $this->moduleConfig = $moduleConfig;
         $this->updateOrder = $updateOrder;
         $this->newOrder = $newOrder;
         $this->smsSalesService = $smsSalesService;
-        $this->storeManager = $storeManager;
     }
 
     /**
@@ -71,7 +64,9 @@ class OrderSaveAfter implements \Magento\Framework\Event\ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        $storeId = $this->storeManager->getStore()->getId();
+        $order = $observer->getEvent()->getOrder();
+        $storeId = $order->getStoreId();
+
         if (!$this->moduleConfig->isTransactionalSmsEnabled($storeId)) {
             return;
         }
@@ -79,8 +74,6 @@ class OrderSaveAfter implements \Magento\Framework\Event\ObserverInterface
         if ($this->smsSalesService->isOrderSaveAfterExecuted()) {
             return;
         }
-
-        $order = $observer->getEvent()->getOrder();
 
         if ($this->isCanceledOrHolded($order)) {
             $this->updateOrder
