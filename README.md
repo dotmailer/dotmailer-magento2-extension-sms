@@ -23,9 +23,17 @@ This module features an option to enable international telephone number validati
 
 ## Changelog
 
+### 2.3.3
+
+##### Improvements
+- The telephone input for consent at checkout now loads with the correct config.
+
 ### 2.3.2
 
-### Bug fixes
+##### Improvements
+- We added some missing configs to the Integration Insights data export for this module.
+
+##### Bug fixes
 - We now properly handle when address telephone numbers are not required, and not submitted, at checkout.
 - We fixed an issue with incorrect scope when triggering transactional SMS sends from the admin.
 
