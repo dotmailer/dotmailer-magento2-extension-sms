@@ -10,13 +10,13 @@
  * @requires Magento_Ui/js/lib/view/utils/async
  */
 define([
-
     'jquery',
     'Magento_Ui/js/form/form',
     'ko',
     'Magento_Checkout/js/model/quote',
     'Magento_Ui/js/lib/view/utils/async',
-], function ($, Component, ko, quote) {
+    'Dotdigitalgroup_Sms/js/intlTelInput'
+], function ($, Component, ko, quote, intlTelInput) {
     'use strict';
 
     /**
@@ -165,10 +165,9 @@ define([
          */
         attachIntlTelInput: function (uiComponent) {
             $.async(`input[name="${uiComponent.inputName}"]`, (node) => {
-                window.intlTelInput(node, this._configData)
+                window.intlTelInput(node, JSON.parse(this.config.intlTelInputConfig));
             })
         },
-
 
         /**
          * Updates the telephone field value on the next tick.
@@ -191,7 +190,7 @@ define([
                 );
             }
         },
-        
+
         /**
          * Returns the state of the consent block (expanded or not).
          * @returns {ko.observable} The observable for the checkbox state.
