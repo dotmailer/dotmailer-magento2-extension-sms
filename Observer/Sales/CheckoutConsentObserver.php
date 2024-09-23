@@ -165,7 +165,7 @@ class CheckoutConsentObserver implements ObserverInterface
             $this->contactResource->save($contactModel);
             $this->consentManager->createConsentRecord($contactModel->getId(), $storeId);
             $this->publisher->publish(
-                'ddg.sms.subscription',
+                Subscriber::TOPIC_SMS_SUBSCRIPTION,
                 $this->smsSubscriptionDataFactory->create()
                     ->setWebsiteId((int) $contactModel->getData('website_id'))
                     ->setContactId((int) $contactModel->getId())

@@ -81,7 +81,7 @@ class Save
             $contactMessage->setType('unsubscribe');
 
             $this->publisher->publish(
-                'ddg.sms.subscription',
+                Subscriber::TOPIC_SMS_SUBSCRIPTION,
                 $contactMessage
             );
         }
@@ -96,7 +96,7 @@ class Save
         if ($hasSubscribed) {
             $contactModel->setSmsSubscriberImported(Contact::EMAIL_CONTACT_NOT_IMPORTED);
             $this->publisher->publish(
-                'ddg.sms.subscription',
+                Subscriber::TOPIC_SMS_SUBSCRIPTION,
                 $this->smsSubscriptionDataFactory->create()
                     ->setWebsiteId((int) $contactModel->getData('website_id'))
                     ->setContactId((int) $contactModel->getId())
