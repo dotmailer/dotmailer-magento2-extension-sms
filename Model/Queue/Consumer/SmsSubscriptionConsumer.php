@@ -100,7 +100,7 @@ class SmsSubscriptionConsumer
             throw new LocalizedException(__('Unknown subscription type'));
         }
 
-        $v3Client = $this->v3ClientFactory->create(['websiteId' => $data->getWebsiteId()]);
+        $v3Client = $this->v3ClientFactory->create(['data' => ['websiteId' => $data->getWebsiteId()]]);
 
         switch ($data->getType()) {
             case 'subscribe':
@@ -137,7 +137,7 @@ class SmsSubscriptionConsumer
             $contact->setLists([$this->smsConfig->getListId($smsSubscribeData->getWebsiteId())]);
 
             $v3Client->contacts->patchByIdentifier(
-                $smsSubscriber->getMobileNumber(),
+                $smsSubscriber->getEmail(),
                 $contact
             );
 

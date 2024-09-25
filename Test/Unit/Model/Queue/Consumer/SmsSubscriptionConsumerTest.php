@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace Dotdigitalgroup\Sms\Test\Unit\Model\Queue\Consumer;
 
 use Dotdigital\V3\Models\Contact as ContactModel;
+use Dotdigital\V3\Models\ContactFactory;
 use Dotdigitalgroup\Email\Helper\Data;
 use Dotdigitalgroup\Email\Logger\Logger;
-use Dotdigital\V3\Models\ContactFactory;
 use Dotdigitalgroup\Email\Model\Apiconnector\Client as V2Client;
 use Dotdigitalgroup\Email\Model\Apiconnector\V3\ClientFactory as V3ClientFactory;
 use Dotdigitalgroup\Email\Model\Apiconnector\V3\Client as V3Client;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\Model\Queue\Consumer\SmsSubscriptionConsumer;
+use Dotdigitalgroup\Sms\Model\SmsContact;
 use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\Exporter;
 use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\ExporterFactory;
 use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\Retriever;
@@ -75,6 +76,11 @@ class SmsSubscriptionConsumerTest extends TestCase
      */
     private $smsSubscribeDataMock;
 
+    /**
+     * @var SmsContact|MockObject
+     */
+    private $smsSubscriberMock;
+
     protected function setUp(): void
     {
         $this->helperMock = $this->createMock(Data::class);
@@ -86,6 +92,10 @@ class SmsSubscriptionConsumerTest extends TestCase
         $this->retrieverFactoryMock = $this->createMock(RetrieverFactory::class);
         $this->smsSubscribeDataMock = $this->createMock(SmsSubscriptionData::class);
         $this->exporterFactoryMock = $this->createMock(ExporterFactory::class);
+        $this->smsSubscriberMock = $this->getMockBuilder(SmsContact::class)
+            ->disableOriginalConstructor()
+            ->addMethods(['getEmail'])
+            ->getMock();
 
         $this->smsSubscriptionConsumer = new SmsSubscriptionConsumer(
             $this->helperMock,
@@ -106,7 +116,7 @@ class SmsSubscriptionConsumerTest extends TestCase
 
         $this->v3ClientFactoryMock->expects($this->once())
             ->method('create')
-            ->with(['websiteId' => 1])
+            ->with(['data' => ['websiteId' => 1]])
             ->willReturn($v3ClientMock);
 
         $this->smsSubscribeDataMock->expects($this->exactly(4))
@@ -129,6 +139,14 @@ class SmsSubscriptionConsumerTest extends TestCase
             ->method('setWebsite')
             ->with($this->equalTo(1))
             ->willReturnSelf();
+
+        $retrieverMock->expects($this->once())
+            ->method('getSmsSubscriber')
+            ->willReturn($this->smsSubscriberMock);
+
+        $this->smsSubscriberMock->expects($this->once())
+            ->method('getEmail')
+            ->willReturn('chaz@emailsim.io');
 
         $this->retrieverFactoryMock->expects($this->once())
             ->method('create')
@@ -159,7 +177,7 @@ class SmsSubscriptionConsumerTest extends TestCase
 
         $this->v3ClientFactoryMock->expects($this->once())
             ->method('create')
-            ->with(['websiteId' => 1])
+            ->with(['data' => ['websiteId' => 1]])
             ->willReturn($v3ClientMock);
 
         $v2ClientMock = $this->createMock(V2Client::class);

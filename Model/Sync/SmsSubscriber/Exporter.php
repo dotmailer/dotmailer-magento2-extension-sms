@@ -66,14 +66,13 @@ class Exporter
      * Export a single subscriber
      *
      * @param SmsContact $smsSubscriber
-     * @param string $identifier
      * @return DotdigitalContact
      * @throws \Exception
      */
-    public function prepareContact(SmsContact $smsSubscriber, string $identifier = "email"): DotdigitalContact
+    public function prepareContact(SmsContact $smsSubscriber): DotdigitalContact
     {
         $contact = new DotdigitalContact([
-            'matchIdentifier' => $identifier
+            'matchIdentifier' => 'email'
         ]);
         $contact->setIdentifiers([
             'email' => $smsSubscriber->getEmail(),
