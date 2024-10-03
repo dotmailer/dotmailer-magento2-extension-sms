@@ -21,6 +21,7 @@
 
             <!-- Create simple product -->
             <createData entity="SimpleProduct_100" stepKey="createProduct"/>
+            <createData entity="FlatRateShippingMethodDefault" stepKey="setDefaultFlatRateShippingMethod"/>
         </before>
 
         <after>
@@ -69,9 +70,11 @@
         <seeElement selector="{{CheckoutConsentFormSection.consentMobileNumber}}" stepKey="seeConsentMobileNumber"/>
 
         <!-- Mobile number is auto-populated -->
-        <seeInField userInput="(512) 345-6789" selector="{{CheckoutConsentFormSection.consentMobileNumber}}" stepKey="seeAutoPopulatedMobileNumber"/>
+        <seeInField userInput="{{US_Address_TX.telephone}}" selector="{{CheckoutConsentFormSection.consentMobileNumber}}" stepKey="seeAutoPopulatedMobileNumber"/>
 
         <!-- Go to *Next* -->
+        <!-- Note that the test fails occasionally at this point because seemingly with the consent input popped out it can't find elements lower down. -->
+        <waitForElement selector="{{CheckoutShippingMethodsSection.checkShippingMethodByName('Flat Rate')}}" stepKey="waitForFlatRateShippingMethod"/>
         <click selector="{{CheckoutShippingMethodsSection.checkShippingMethodByName('Flat Rate')}}" stepKey="selectFlatRateShippingMethod"/>
         <scrollTo selector="{{CheckoutShippingMethodsSection.next}}" stepKey="scrollToButtonNext1"/>
         <actionGroup ref="StorefrontCheckoutClickNextButtonActionGroup" stepKey="goNext1"/>
@@ -88,8 +91,11 @@
         <!-- Test validation and inline error messages -->
         <scrollTo selector="{{CheckoutConsentFormSection.consentCheckbox}}" stepKey="scrollToConsentForm1"/>
 
-        <executeJS function="return (jQuery('input[name=&quot;dd_consent[dd_sms_consent_telephone]&quot;]').val('999').trigger('change'));" stepKey="fillInvalidConsentMobileNumberViaJS"/>
-        <seeElementInDOM selector="{{CheckoutConsentFormSection.consentMobileNumberMessageContainsText('Invalid telephone number')}}" stepKey="seeMobileNumberError1"/>
+        <!-- Required 'warm-up' to ensure the validation message appears on the second try. -->
+        <executeJS function="return (jQuery('input[name=&quot;dd_consent[dd_sms_consent_telephone]&quot;]').val('999').trigger('change'));" stepKey="fillInvalidConsentMobileNumberViaJS1"/>
+        <!-- Second try. -->
+        <executeJS function="return (jQuery('input[name=&quot;dd_consent[dd_sms_consent_telephone]&quot;]').val('123').trigger('change'));" stepKey="fillInvalidConsentMobileNumberViaJS2"/>
+        <seeElementInDOM selector="{{CheckoutConsentFormSection.consentMobileNumberMessageContainsText('Telephone number is too short')}}" stepKey="seeMobileNumberError1"/>
 
         <executeJS function="return (jQuery('input[name=&quot;dd_consent[dd_sms_consent_telephone]&quot;]').val('').trigger('change'));" stepKey="clearConsentMobileNumberViaJS"/>
         <seeElementInDOM selector="{{CheckoutConsentFormSection.consentMobileNumberMessageContainsText('Telephone number is too short')}}" stepKey="seeMobileNumberError2"/>
