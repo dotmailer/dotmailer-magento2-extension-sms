@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dotdigitalgroup\Sms\Observer\Sales;
 
+use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\UpdateOrder;
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\NewOrder;
@@ -13,6 +14,11 @@ use Magento\Sales\Api\Data\OrderInterface;
 
 class OrderSaveAfter implements \Magento\Framework\Event\ObserverInterface
 {
+    /**
+     * @var Logger
+     */
+    private $logger;
+
     /**
      * @var Configuration
      */
@@ -36,17 +42,20 @@ class OrderSaveAfter implements \Magento\Framework\Event\ObserverInterface
     /**
      * OrderSaveAfter constructor.
      *
+     * @param Logger $logger
      * @param Configuration $moduleConfig
      * @param UpdateOrder $updateOrder
      * @param NewOrder $newOrder
      * @param SmsSalesService $smsSalesService
      */
     public function __construct(
+        Logger $logger,
         Configuration $moduleConfig,
         UpdateOrder $updateOrder,
         NewOrder $newOrder,
         SmsSalesService $smsSalesService
     ) {
+        $this->logger = $logger;
         $this->moduleConfig = $moduleConfig;
         $this->updateOrder = $updateOrder;
         $this->newOrder = $newOrder;
@@ -58,36 +67,40 @@ class OrderSaveAfter implements \Magento\Framework\Event\ObserverInterface
      *
      * @param Observer $observer
      *
-     * @return void
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return $this
      */
     public function execute(Observer $observer)
     {
-        $order = $observer->getEvent()->getOrder();
-        $storeId = $order->getStoreId();
+        try {
+            $order = $observer->getEvent()->getOrder();
+            $storeId = $order->getStoreId();
 
-        if (!$this->moduleConfig->isTransactionalSmsEnabled($storeId)) {
-            return;
+            if (!$this->moduleConfig->isTransactionalSmsEnabled($storeId)) {
+                return $this;
+            }
+
+            if ($this->smsSalesService->isOrderSaveAfterExecuted()) {
+                return $this;
+            }
+
+            if ($this->isCanceledOrHolded($order)) {
+                $this->updateOrder
+                    ->buildAdditionalData($order)
+                    ->queue();
+            }
+
+            if ($this->isNewOrder($order)) {
+                $this->newOrder
+                    ->buildAdditionalData($order)
+                    ->queue();
+            }
+
+            $this->smsSalesService->setIsOrderSaveAfterExecuted();
+        } catch (\Exception $e) {
+            $this->logger->error('Error in SMS OrderSaveAfter observer', [(string) $e]);
         }
 
-        if ($this->smsSalesService->isOrderSaveAfterExecuted()) {
-            return;
-        }
-
-        if ($this->isCanceledOrHolded($order)) {
-            $this->updateOrder
-                ->buildAdditionalData($order)
-                ->queue();
-        }
-
-        if ($this->isNewOrder($order)) {
-            $this->newOrder
-                ->buildAdditionalData($order)
-                ->queue();
-        }
-
-        $this->smsSalesService->setIsOrderSaveAfterExecuted();
+        return $this;
     }
 
     /**

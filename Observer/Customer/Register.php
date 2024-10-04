@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dotdigitalgroup\Sms\Observer\Customer;
 
+use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
 use Dotdigitalgroup\Sms\Model\Consent\ConsentManager;
 use Dotdigitalgroup\Sms\Model\Queue\Item\NewAccountSignup;
@@ -19,6 +20,11 @@ use Magento\Framework\MessageQueue\PublisherInterface;
 
 class Register implements ObserverInterface
 {
+    /**
+     * @var Logger
+     */
+    private $logger;
+
     /**
      * @var ContactCollectionFactory
      */
@@ -62,6 +68,7 @@ class Register implements ObserverInterface
     /**
      * Register constructor.
      *
+     * @param Logger $logger
      * @param ContactCollectionFactory $contactCollectionFactory
      * @param ContactResource $contactResource
      * @param ConsentManager $consentManager
@@ -72,6 +79,7 @@ class Register implements ObserverInterface
      * @param SmsSubscriptionDataFactory $smsSubscriptionDataFactory
      */
     public function __construct(
+        Logger $logger,
         ContactCollectionFactory $contactCollectionFactory,
         ContactResource $contactResource,
         ConsentManager $consentManager,
@@ -81,6 +89,7 @@ class Register implements ObserverInterface
         PublisherInterface $publisher,
         SmsSubscriptionDataFactory $smsSubscriptionDataFactory
     ) {
+        $this->logger = $logger;
         $this->consentManager = $consentManager;
         $this->contactCollectionFactory = $contactCollectionFactory;
         $this->contactResource = $contactResource;
@@ -95,16 +104,20 @@ class Register implements ObserverInterface
      * Execute.
      *
      * @param Observer $observer
-     * @return void
+     * @return $this
      * @throws \Magento\Framework\Exception\AlreadyExistsException
      */
-    public function execute(Observer $observer): void
+    public function execute(Observer $observer)
     {
         /** @var Http $request */
         $request = $this->context->getRequest();
         $post = $request->getPost();
 
-        if ($post->get('is_sms_subscribed')) {
+        if (!$post->get('is_sms_subscribed')) {
+            return $this;
+        }
+
+        try {
             $customer = $observer->getEvent()->getCustomer();
             $storeId = $customer->getStoreId();
             $contactModel = $this->contactCollectionFactory->create()
@@ -137,6 +150,10 @@ class Register implements ObserverInterface
                     ->setContactId((int) $contactModel->getId())
                     ->setType('subscribe')
             );
+        } catch (\Exception $e) {
+            $this->logger->error('Error in SMS register observer', [(string) $e]);
         }
+
+        return $this;
     }
 }
