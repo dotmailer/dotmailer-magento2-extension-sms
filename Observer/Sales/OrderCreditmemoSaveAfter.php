@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Dotdigitalgroup\Sms\Observer\Sales;
 
+use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\Model\Queue\OrderItem\NewCreditMemo;
 use Dotdigitalgroup\Sms\Model\Sales\SmsSalesService;
@@ -12,6 +13,11 @@ use Magento\Store\Model\StoreManagerInterface;
 
 class OrderCreditmemoSaveAfter implements \Magento\Framework\Event\ObserverInterface
 {
+    /**
+     * @var Logger
+     */
+    private $logger;
+
     /**
      * @var Configuration
      */
@@ -28,28 +34,23 @@ class OrderCreditmemoSaveAfter implements \Magento\Framework\Event\ObserverInter
     private $smsSalesService;
 
     /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
      * OrderCreditmemoSaveAfter constructor.
      *
+     * @param Logger $logger
      * @param Configuration $moduleConfig
      * @param NewCreditMemo $newCreditMemo
      * @param SmsSalesService $smsSalesService
-     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
+        Logger $logger,
         Configuration $moduleConfig,
         NewCreditMemo $newCreditMemo,
-        SmsSalesService $smsSalesService,
-        StoreManagerInterface $storeManager
+        SmsSalesService $smsSalesService
     ) {
+        $this->logger = $logger;
         $this->moduleConfig = $moduleConfig;
         $this->newCreditMemo = $newCreditMemo;
         $this->smsSalesService = $smsSalesService;
-        $this->storeManager = $storeManager;
     }
 
     /**
@@ -57,28 +58,32 @@ class OrderCreditmemoSaveAfter implements \Magento\Framework\Event\ObserverInter
      *
      * @param Observer $observer
      *
-     * @return void
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return $this
      */
     public function execute(Observer $observer)
     {
         if ($this->smsSalesService->isOrderCreditmemoSaveAfterExecuted()) {
-            return;
+            return $this;
         }
 
-        $creditmemo = $observer->getEvent()->getCreditmemo();
-        $order = $creditmemo->getOrder();
-        $storeId = $order->getStoreId();
+        try {
+            $creditmemo = $observer->getEvent()->getCreditmemo();
+            $order = $creditmemo->getOrder();
+            $storeId = $order->getStoreId();
 
-        if (!$this->moduleConfig->isTransactionalSmsEnabled($storeId)) {
-            return;
+            if (!$this->moduleConfig->isTransactionalSmsEnabled($storeId)) {
+                return $this;
+            }
+
+            $this->newCreditMemo
+                ->buildAdditionalData($order, $creditmemo)
+                ->queue();
+
+            $this->smsSalesService->setIsOrderCreditmemoSaveAfterExecuted();
+        } catch (\Exception $e) {
+            $this->logger->error('Error in SMS OrderCreditmemoSaveAfter observer', [(string) $e]);
         }
 
-        $this->newCreditMemo
-            ->buildAdditionalData($order, $creditmemo)
-            ->queue();
-
-        $this->smsSalesService->setIsOrderCreditmemoSaveAfterExecuted();
+        return $this;
     }
 }

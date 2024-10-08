@@ -4,8 +4,5 @@
         <job name="ddg_automation_sms_order_messages" instance="Dotdigitalgroup\Sms\Model\Cron" method="sendSmsOrderMessages">
             <schedule>*/1 * * * *</schedule>
         </job>
-        <job name="ddg_automation_sms_subscriber" instance="Dotdigitalgroup\Sms\Model\Cron" method="smsSubscriberSync">
-            <schedule>*/1 * * * *</schedule>
-        </job>
     </group>
 </config>

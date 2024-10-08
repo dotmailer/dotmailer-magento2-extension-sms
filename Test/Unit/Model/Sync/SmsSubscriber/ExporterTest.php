@@ -2,8 +2,8 @@
 
 namespace Dotdigitalgroup\Sms\Test\Unit\Model\Sync\SmsSubscriber;
 
-use Dotdigitalgroup\Email\Model\Contact;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
+use Dotdigitalgroup\Sms\Model\SmsContact;
 use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\Exporter;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -54,10 +54,10 @@ class ExporterTest extends TestCase
      */
     public function testExportMethod()
     {
-        $emailContact = $this->getMockBuilder(Contact::class)
+        $emailContact = $this->getMockBuilder(SmsContact::class)
             ->disableOriginalConstructor()
-            ->addMethods(['getEmail', 'getMobileNumber', 'getEmailContactId'])
-            ->onlyMethods(['getData'])
+            ->addMethods(['getEmail','getEmailContactId'])
+            ->onlyMethods(['getMobileNumber', 'getData'])
             ->getMock();
 
         $emailContact->expects($this->once())
@@ -65,7 +65,7 @@ class ExporterTest extends TestCase
             ->willReturn('test1@example.com');
         $emailContact->expects($this->once())
             ->method('getMobileNumber')
-            ->willReturn('555-555-5555');
+            ->willReturn('5555555555');
         $emailContact->expects($this->once())
             ->method('getData')
             ->willReturn([
@@ -88,10 +88,10 @@ class ExporterTest extends TestCase
             ->with($this->websiteMock->getId())
             ->willReturn(123);
 
-        $expectedContact =  new DotdigitalContact(['matchIdentifier' => 'email']);
+        $expectedContact = new DotdigitalContact(['matchIdentifier' => 'email']);
         $expectedContact->setIdentifiers([
             'email' => 'test1@example.com',
-            'mobileNumber' => '555-555-5555'
+            'mobileNumber' => '5555555555'
         ]);
         $expectedContact->setLists([123]);
         $expectedContact->setDataFields([

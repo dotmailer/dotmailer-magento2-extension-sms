@@ -131,7 +131,7 @@ class MarketingConsent implements ArgumentInterface
                 $emailContactModel->getEmail(),
                 $emailContactModel->getWebsiteId()
             );
-        return $smsContactModel->getMobileNumber();
+        return $smsContactModel ? $smsContactModel->getMobileNumber() : '';
     }
 
     /**

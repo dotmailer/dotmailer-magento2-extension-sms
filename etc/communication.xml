@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Communication/etc/communication.xsd">
+    <topic name="ddg.sms.subscription" request="Dotdigitalgroup\Sms\Model\Queue\Message\SmsSubscriptionData">
+        <handler
+            name="ddg_marketing_sms_subscription"
+            type="Dotdigitalgroup\Sms\Model\Queue\Consumer\SmsSubscriptionConsumer"
+            method="process"
+        />
+    </topic>
+</config>
