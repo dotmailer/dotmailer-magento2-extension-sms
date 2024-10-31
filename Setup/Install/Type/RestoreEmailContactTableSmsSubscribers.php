@@ -38,25 +38,6 @@ class RestoreEmailContactTableSmsSubscribers extends AbstractBulkUpdater impleme
 
     /**
      * @inheritdoc
-     *
-     * Note this method is only present because we want to pass an array to
-     * getUpdateBindings as opposed to a single value keyed on 'bind key'.
-     */
-    protected function bulkUpdate()
-    {
-        foreach ($this->fetchRecords() as $record) {
-            $this->rowsAffected += $this->resourceConnection
-                ->getConnection()
-                ->update(
-                    $this->resourceConnection->getTableName($this->tableName),
-                    $this->getUpdateBindings($record),
-                    $this->getUpdateWhereClause($record)
-                );
-        }
-    }
-
-    /**
-     * @inheritdoc
      */
     public function getUpdateBindings($bind)
     {
