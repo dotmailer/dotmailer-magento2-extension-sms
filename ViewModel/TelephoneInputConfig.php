@@ -3,6 +3,7 @@
 namespace Dotdigitalgroup\Sms\ViewModel;
 
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
+use Magento\Eav\Model\Config as EavConfig;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Escaper;
 use Magento\Framework\Serialize\SerializerInterface;
@@ -43,6 +44,11 @@ class TelephoneInputConfig implements ArgumentInterface
     private $storeManager;
 
     /**
+     * @var EavConfig
+     */
+    private $eavConfig;
+
+    /**
      * TelephoneInputConfig constructor.
      * @param Configuration $moduleConfig
      * @param RequestInterface $request
@@ -50,6 +56,7 @@ class TelephoneInputConfig implements ArgumentInterface
      * @param SerializerInterface $serializer
      * @param AssetRepository $assetRepository
      * @param StoreManagerInterface $storeManager
+     * @param EavConfig $eavConfig
      */
     public function __construct(
         Configuration $moduleConfig,
@@ -57,7 +64,8 @@ class TelephoneInputConfig implements ArgumentInterface
         Escaper $escaper,
         SerializerInterface $serializer,
         AssetRepository $assetRepository,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        EavConfig $eavConfig
     ) {
         $this->moduleConfig = $moduleConfig;
         $this->request = $request;
@@ -65,6 +73,7 @@ class TelephoneInputConfig implements ArgumentInterface
         $this->serializer = $serializer;
         $this->assetRepository = $assetRepository;
         $this->storeManager = $storeManager;
+        $this->eavConfig = $eavConfig;
     }
 
     /**
@@ -90,7 +99,20 @@ class TelephoneInputConfig implements ArgumentInterface
 
         return $this->serializer->serialize($config);
     }
-    
+
+    /**
+     * Check is the customer phone number is required.
+     *
+     * @return bool
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function isRequired(): bool
+    {
+        return (bool)$this->eavConfig
+            ->getAttribute('customer_address', 'telephone')
+            ->getIsRequired();
+    }
+
     /**
      * Get path for script.
      *
