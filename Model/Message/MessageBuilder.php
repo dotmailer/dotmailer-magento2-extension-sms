@@ -69,10 +69,10 @@ class MessageBuilder
                 'body' => $this->getCompiledMessageText($item)
             ];
 
-            $fromNumber = $this->getFromNumber($item->getStoreId());
+            $originator = $this->getOriginator($item->getStoreId());
 
-            if ($fromNumber) {
-                $buildMessage['channelOptions']['sms']['from'] = $fromNumber;
+            if ($originator) {
+                $buildMessage['channelOptions']['sms']['from'] = $originator;
             }
 
             $batch[] = $buildMessage;
@@ -114,24 +114,27 @@ class MessageBuilder
     }
 
     /**
-     * Get from number.
+     * Get originator for SMS send.
+     *
+     * This can be a from name, or a dedicated number, or a shortcode.
+     * Or it can be null (if shared pool number was selected).
      *
      * @param string|int $storeId
      * @return string|null
      */
-    private function getFromNumber($storeId)
+    private function getOriginator($storeId)
     {
-        $fromName = $this->scopeConfig->getValue(
+        $originator = $this->scopeConfig->getValue(
             ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_DEFAULT_FROM_NAME,
             ScopeInterface::SCOPE_STORES,
             $storeId
         );
 
-        if ($fromName === FromName::SHARED_POOL_NUMBER) {
+        if ($originator === FromName::SHARED_POOL_NUMBER) {
             return null;
         }
 
-        if ($fromName === FromName::ALPHANUMERIC_NUMBER) {
+        if ($originator === FromName::ALPHANUMERIC_NUMBER) {
             return $this->scopeConfig->getValue(
                 ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_ALPHANUMERIC_FROM_NAME,
                 ScopeInterface::SCOPE_STORES,
@@ -139,6 +142,6 @@ class MessageBuilder
             );
         }
 
-        return $fromName;
+        return $originator;
     }
 }

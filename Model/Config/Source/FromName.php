@@ -58,10 +58,6 @@ class FromName implements \Magento\Framework\Option\ArrayInterface
             $fields[] = ['value' => $dedicatedNumber->number, 'label' => $dedicatedNumber->number];
         }
 
-        foreach ($client->getKeywords() as $keyword) {
-            $fields[] = ['value' => $keyword->number, 'label' => $keyword->number];
-        }
-
         foreach ($client->getShortCodes() as $shortCode) {
             $fields[] = ['value' => $shortCode->number, 'label' => $shortCode->number];
         }
