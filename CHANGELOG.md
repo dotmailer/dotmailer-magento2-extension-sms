@@ -1,3 +1,12 @@
+### 2.5.0
+
+##### What’s new
+- We have added an `isRequired()` method to the `TelephoneCheckoutConfig` class for use in Hyva Checkout.
+
+##### Improvements
+- Keywords are no longer listed as possible 'From name' originators for transactional SMS.
+- The `ddg_automation_sms` cron job now schedules ahead for 10 minutes.
+
 ### 2.4.0
 
 ##### What's new
