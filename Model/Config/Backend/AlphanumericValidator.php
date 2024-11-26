@@ -1,6 +1,6 @@
 <?php
 
-namespace Dotdigitalgroup\Sms\Model\Adminhtml\Backend;
+namespace Dotdigitalgroup\Sms\Model\Config\Backend;
 
 use Magento\Framework\App\Config\Value;
 
