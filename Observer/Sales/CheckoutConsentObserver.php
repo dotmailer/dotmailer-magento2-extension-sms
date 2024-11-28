@@ -108,7 +108,7 @@ class CheckoutConsentObserver implements ObserverInterface
         StoreManagerInterface $storeManager,
         ConsentManager $consentManager,
         PublisherInterface $publisher,
-        SmsSubscriptionDataFactory $smsSubscriptionDataFactory,
+        SmsSubscriptionDataFactory $smsSubscriptionDataFactory
     ) {
         $this->logger = $logger;
         $this->contactFactory = $contactFactory;
