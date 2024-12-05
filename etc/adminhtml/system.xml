@@ -54,7 +54,7 @@
                 <field id="alphanumeric_from_name" type="text" translate="label" sortOrder="6" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <label>Alphanumeric from name</label>
-                    <backend_model>Dotdigitalgroup\Sms\Model\Adminhtml\Backend\AlphanumericValidator</backend_model>
+                    <backend_model>Dotdigitalgroup\Sms\Model\Config\Backend\AlphanumericValidator</backend_model>
                     <depends>
                         <field id="transactional_sms/sms_settings/default_sms_from_name">alphanumeric_number</field>
                     </depends>
@@ -152,14 +152,17 @@
                 <field id="registration_enabled" translate="label" sortOrder="15" type="select" showInStore="1" showInWebsite="1" showInDefault="1">
                     <label>During Account Registration</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <backend_model>Dotdigitalgroup\Sms\Model\Config\Backend\Consent\RequireConsentText</backend_model>
                 </field>
                 <field id="checkout_enabled" translate="label" sortOrder="20" type="select" showInStore="1" showInWebsite="1" showInDefault="1">
                     <label>During Checkout</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <backend_model>Dotdigitalgroup\Sms\Model\Config\Backend\Consent\RequireConsentText</backend_model>
                 </field>
                 <field id="account_enabled" translate="label" sortOrder="25" type="select" showInStore="1" showInWebsite="1" showInDefault="1">
                     <label>In the My Account Section</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <backend_model>Dotdigitalgroup\Sms\Model\Config\Backend\Consent\RequireConsentText</backend_model>
                 </field>
                 <field id="signup_text" translate="label" sortOrder="30" type="textarea" showInWebsite="1" showInStore="1" showInDefault="1">
                     <label>Sign up text</label>
@@ -167,7 +170,8 @@
                 </field>
                 <field id="marketing_consent_text" translate="label" sortOrder="35" type="textarea" showInWebsite="1" showInStore="1" showInDefault="1">
                     <label>SMS marketing consent text</label>
-                    <comment><![CDATA[Explain what you will do with consent, how customers can withdraw consent, and where they can learn more.]]></comment>
+                    <backend_model>Dotdigitalgroup\Sms\Model\Config\Backend\Consent\PreventConsentTextDeletion</backend_model>
+                    <comment><![CDATA[[Required] Explain what you will do with consent, how customers can withdraw consent, and where they can learn more.]]></comment>
                 </field>
             </group>
             <group id="sms_templates" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">

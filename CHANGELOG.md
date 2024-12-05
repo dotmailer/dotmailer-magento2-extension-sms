@@ -1,3 +1,12 @@
+### 2.6.0
+
+##### Improvements
+- Consent can now only be enabled if consent text is provided.
+- We removed an overloaded method in the `RestoreEmailContactTableSmsSubscribers` data migration.
+
+##### Bug fixes
+- We fixed a DI compile error on PHP 7.4.
+
 ### 2.5.0
 
 ##### What’s new
