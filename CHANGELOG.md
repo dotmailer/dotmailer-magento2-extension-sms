@@ -1,3 +1,8 @@
+### 2.6.1
+
+##### Improvements
+- A list for SMS Subscribers is now created when merchants run ‘Setup Integration’ on the admin Accounts page.
+
 ### 2.6.0
 
 ##### Improvements
