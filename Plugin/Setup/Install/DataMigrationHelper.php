@@ -41,7 +41,7 @@ class DataMigrationHelper
      * @throws \Zend_Db_Exception
      * @throws \Zend_Db_Statement_Exception
      */
-    public function beforeEmptyTables(EmailDataMigrationHelper $migrationHelper, string $table = null)
+    public function beforeEmptyTables(EmailDataMigrationHelper $migrationHelper, ?string $table = null)
     {
         if (empty($table) || $table === SchemaInterface::EMAIL_CONTACT_TABLE) {
             $this->temporaryTable->create();

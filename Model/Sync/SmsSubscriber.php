@@ -95,7 +95,7 @@ class SmsSubscriber implements SyncInterface
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    public function sync(DateTime $from = null): array
+    public function sync(?DateTime $from = null): array
     {
         $start = microtime(true);
         $breakValue = (int) $this->scopeConfig->getValue(Config::XML_PATH_CONNECTOR_SYNC_BREAK_VALUE);

@@ -34,7 +34,7 @@ class DataMigrationTypeProvider
     public function afterGetTypes(
         EmailDataMigrationTypeProvider $provider,
         $result,
-        string $table = null
+        ?string $table = null
     ) {
         return empty($table) || $table === SchemaInterface::EMAIL_CONTACT_TABLE ?
             $result + [$this->restoreEmailContactTableSmsSubscribers] :
