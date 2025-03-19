@@ -1,5 +1,6 @@
 <?php
 /** @var \Dotdigitalgroup\Sms\Block\Adminhtml\AppendNote $block */
+// phpcs:disable Magento2.Legacy.EscapeMethodsOnBlockClass
 
 $counterSelector = sprintf('%s_counter', $block->getElement()->getId());
 $commentSelector = sprintf('%s_comment', $block->getElement()->getId());
@@ -7,7 +8,7 @@ $totalSelector = sprintf('%s_total', $block->getElement()->getId());
 ?>
 <?= $block->getElement()->getElementHtml(); ?>
 <p class="note ddg-note">
-    <?php //@codingStandardsIgnoreStart?>
+    <?php // phpcs:disable?>
     <span id="<?= $block->escapeHtml($counterSelector); ?>"></span><span><?= $block->escapeHtml(__(' characters (')); ?></span><span id="<?= $block->escapeHtml($commentSelector)?>" style="display: none"><?= $block->escapeHtml(__('minimum ')); ?></span><span id="<?= $block->escapeHtml($totalSelector); ?>"></span><?= $block->escapeHtml(__(' SMS)')); ?>
-    <?php //@codingStandardsIgnoreEnd?>
+    <?php // phpcs:enable?>
 </p>

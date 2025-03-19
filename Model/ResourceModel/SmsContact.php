@@ -34,7 +34,7 @@ class SmsContact extends ContactResource
      * @param string|null $to
      * @return int
      */
-    public function reset(string $from = null, string $to = null)
+    public function reset(?string $from = null, ?string $to = null)
     {
         $conn = $this->getConnection();
 

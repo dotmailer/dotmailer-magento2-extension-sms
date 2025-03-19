@@ -39,8 +39,8 @@ class SmsOrder extends AbstractModel implements SmsOrderInterface
         Utility $numberUtility,
         Context $context,
         Registry $registry,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         $this->numberUtility = $numberUtility;
