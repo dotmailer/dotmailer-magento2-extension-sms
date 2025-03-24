@@ -5,8 +5,8 @@
         <annotations>
             <features value="Dotdigital module"/>
             <stories value="Dotdigital SMS"/>
-            <title value="Consent at my account subscription - validation"/>
-            <description value="Confirm that the consent fieldset appears within the 'My Account' subscriptions form, and that submitted mobile numbers are validated."/>
+            <title value="Consent at my account subscription - subscribe and unsubscribe"/>
+            <description value="Confirm that customers can subscribe and unsubscribe from marketing consent in the 'My Account' subscriptions form."/>
             <severity value="BLOCKER"/>
             <group value="dotdigitalSms"/>
         </annotations>

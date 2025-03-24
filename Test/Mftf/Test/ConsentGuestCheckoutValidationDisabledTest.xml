@@ -16,6 +16,7 @@
 
             <!-- Create simple product -->
             <createData entity="SimpleProduct_100" stepKey="createProduct"/>
+            <createData entity="FlatRateShippingMethodDefault" stepKey="setDefaultFlatRateShippingMethod"/>
 
             <actionGroup ref="SetDotmailerAccountData" stepKey="SetDotmailerAccountData"/>
             <actionGroup ref="SetPhoneNumberValidation" stepKey="EnablePhoneNumberValidation">
