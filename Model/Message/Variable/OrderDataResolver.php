@@ -34,6 +34,7 @@ class OrderDataResolver implements ResolverInterface
         'last_name',
         'email',
         'store_name',
+        'entity_id',
         'order_id',
         'order_status',
         'tracking_number',
@@ -130,6 +131,18 @@ class OrderDataResolver implements ResolverInterface
     {
         $groupId = $this->storeManager->getStore($sms->getStoreId())->getStoreGroupId();
         return $this->storeManager->getGroup($groupId)->getName();
+    }
+
+    /**
+     * Get true order id.
+     *
+     * @param SmsOrderInterface $sms
+     * @return int|null
+     */
+    private function getEntityId($sms)
+    {
+        $order = $this->orderRepository->get($sms->getOrderId());
+        return $order->getEntityId();
     }
 
     /**
