@@ -1,7 +1,9 @@
 ### 2.6.2
 
 ##### Improvements
-- We updated our code for compatibility with PHP 8.4.
+- `{{ entity_id }}` is added to the available template variables for transactional SMS.
+- We removed implicitly null types for compatibility with PHP 8.4.
+- We fixed some MFTF test annotation errors.
 
 ### 2.6.1
 
