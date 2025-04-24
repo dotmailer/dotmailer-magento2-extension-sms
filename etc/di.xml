@@ -9,6 +9,9 @@
     <type name="Magento\Shipping\Controller\Adminhtml\Order\Shipment\AddTrack">
         <plugin name="ddg_update_shipment_plugin" type="Dotdigitalgroup\Sms\Plugin\Order\Shipment\ShipmentUpdatePlugin" sortOrder="3"/>
     </type>
+    <type name="Magento\Sales\Api\ShipOrderInterface">
+        <plugin name="ddg_new_shipment_rest_plugin" type="Dotdigitalgroup\Sms\Plugin\Order\Shipment\NewShipmentRestPlugin" sortOrder="1"/>
+    </type>
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>
             <argument name="collections" xsi:type="array">
