@@ -15,7 +15,7 @@ class Utility
      */
     public function prepareMobileNumberForStorage(?string $number)
     {
-        return (int) str_replace(' ', '', (string) $number);
+        return (int) preg_replace('/[^0-9]/', '', (string) $number);
     }
 
     /**
