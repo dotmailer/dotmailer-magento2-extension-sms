@@ -1,3 +1,11 @@
+### 2.7.0
+
+##### What's new
+- We added a new plugin to send New Shipment transactional SMS for merchants creating shipments via the REST API.
+
+##### Bug fixes
+- We fixed an issue with phone numbers containing dashes being stored incorrectly in `email_contact`.
+
 ### 2.6.2
 
 ##### Improvements
@@ -21,7 +29,7 @@
 
 ### 2.5.0
 
-##### What’s new
+##### What's new
 - We have added an `isRequired()` method to the `TelephoneCheckoutConfig` class for use in Hyva Checkout.
 
 ##### Improvements
