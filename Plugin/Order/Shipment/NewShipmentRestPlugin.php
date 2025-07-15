@@ -11,6 +11,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\ShipOrderInterface;
 use Psr\Log\LoggerInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 class NewShipmentRestPlugin
 {
@@ -45,6 +46,11 @@ class NewShipmentRestPlugin
     private $newShipment;
 
     /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
      * NewShipmentPlugin constructor.
      *
      * @param Data $helper
@@ -53,6 +59,7 @@ class NewShipmentRestPlugin
      * @param Configuration $moduleConfig
      * @param OrderRepositoryInterface $orderRepository
      * @param NewShipment $newShipment
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         Data $helper,
@@ -60,7 +67,8 @@ class NewShipmentRestPlugin
         LoggerInterface $logger,
         Configuration $moduleConfig,
         OrderRepositoryInterface $orderRepository,
-        NewShipment $newShipment
+        NewShipment $newShipment,
+        StoreManagerInterface $storeManager
     ) {
         $this->helper = $helper;
         $this->state = $state;
@@ -68,6 +76,7 @@ class NewShipmentRestPlugin
         $this->moduleConfig = $moduleConfig;
         $this->orderRepository = $orderRepository;
         $this->newShipment = $newShipment;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -93,15 +102,15 @@ class NewShipmentRestPlugin
         $notify = false,
         $appendComment = false,
         ?\Magento\Sales\Api\Data\ShipmentCommentCreationInterface $comment = null,
-        array $tracks = [],
+        array $tracks = []
     ) {
-        if (!$this->helper->isEnabled() &&
-            $this->state->getAreaCode() !== \Magento\Framework\App\Area::AREA_WEBAPI_REST) {
-            return $result;
-        }
-
         try {
             $order = $this->orderRepository->get($orderId);
+            $websiteId = $this->storeManager->getStore($order->getStoreId())->getWebsiteId();
+            if (!$this->helper->isEnabled($websiteId) &&
+                $this->state->getAreaCode() !== \Magento\Framework\App\Area::AREA_WEBAPI_REST) {
+                return $result;
+            }
         } catch (\Exception $e) {
             $this->logger->error(
                 'Could not load order for shipment',
