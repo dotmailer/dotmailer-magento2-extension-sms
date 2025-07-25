@@ -178,6 +178,9 @@ define([
         updateTelephoneField: function (UiClass, value, triggerDOM = true) {
             if (typeof window.intlTelInputGlobals === 'undefined') { return; }
             const element = document.getElementById(UiClass.uid);
+            if (!element) {
+                return;
+            }
             const intlElement = window.intlTelInputGlobals.getInstance(element);
 
             intlElement.setNumber(value);
