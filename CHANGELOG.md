@@ -2,6 +2,7 @@
 
 ##### Bug fixes
 - We fixed a console error related to the SMS consent telephone input at checkout.
+- The enabled check in the NewShipmentRestPlugin now checks at website level.
 
 ### 2.7.0
 
