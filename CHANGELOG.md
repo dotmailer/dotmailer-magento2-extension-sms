@@ -1,3 +1,8 @@
+### 2.7.1
+
+##### Bug fixes
+- We fixed a console error related to the SMS consent telephone input at checkout.
+
 ### 2.7.0
 
 ##### What's new
