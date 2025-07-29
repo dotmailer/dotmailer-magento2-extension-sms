@@ -5,8 +5,8 @@
  * @var $view \Dotdigitalgroup\Sms\ViewModel\Customer\Account\MarketingConsent
  */
 // phpcs:disable Magento2.Legacy.EscapeMethodsOnBlockClass
-// @codingStandardsIgnoreFile
 $view = $block->getData('config');
+$isEnabled = $view->isPhoneNumberValidationEnabled();
 ?>
 
 <fieldset class="fieldset">
@@ -14,7 +14,8 @@ $view = $block->getData('config');
         <legend class="legend"><span><?= $block->escapeHtml(__('SMS Marketing Subscription')) ?></span></legend>
     <?php endif; ?>
     <div class="field choice">
-        <input type="checkbox" name="is_sms_subscribed" id="dd_sms_consent_checkbox" value="1" title="SMS Marketing Subscription"
+        <input type="checkbox" name="is_sms_subscribed" id="dd_sms_consent_checkbox" value="1"
+               title="SMS Marketing Subscription"
             <?php if ($view->isSubscribed()): ?> checked="checked"<?php endif; ?> class="checkbox">
         <label for="dd_sms_consent_checkbox" class="label">
             <span><?= $block->escapeHtml($view->getSmsSignUpText()) ?></span>
@@ -26,10 +27,11 @@ $view = $block->getData('config');
                id="dd_sms_consent_mobile_number"
                class="input-text"
                value="<?= $block->escapeHtml($view->getStoredMobileNumber()) ?>"
-               data-validate='{"validate-phone-number-with-checkbox": <?= $view->isPhoneNumberValidationEnabled(); ?>}'
+               data-validate='{"validate-phone-number-with-checkbox": <?= $block->escapeHtml($isEnabled); ?>}'
         />
     </div>
     <div id="dd_sms_consent_text" class="dd-sms-consent-text">
         <p><span><?= $block->escapeHtml($view->getSmsMarketingConsentText()); ?></span><p>
     </div>
 </fieldset>
+<?php //phpcs:enable ?>
