@@ -3,13 +3,12 @@
  * @var $block \Magento\Framework\View\Element\Template
  * @var $view \Dotdigitalgroup\Sms\ViewModel\TelephoneInputConfig
  */
-// @codingStandardsIgnoreFile
 $view = $block->getData('config');
 ?>
 <script type="text/x-magento-init">
     {
         "*": {
-            "Dotdigitalgroup_Sms/js/internationalTelephoneInputCheckout": <?= $view->getConfig(); ?>
+            "Dotdigitalgroup_Sms/js/internationalTelephoneInputCheckout": <?= /* @noEscape */ $view->getConfig(); ?>
     },
 
     ".form-address-edit": {
@@ -23,4 +22,3 @@ $view = $block->getData('config');
     }
 }
 </script>
-

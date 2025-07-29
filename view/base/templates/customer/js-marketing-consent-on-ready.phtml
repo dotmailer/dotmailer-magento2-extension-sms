@@ -3,7 +3,6 @@
  * @var $block \Magento\Framework\View\Element\Template
  * @var $view \Dotdigitalgroup\Sms\ViewModel\TelephoneInputConfig
  */
-// @codingStandardsIgnoreFile
 $view = $block->getData('config');
 ?>
 <script type="application/javascript">
@@ -20,7 +19,7 @@ $view = $block->getData('config');
         if (!telephoneInput) {
             return;
         }
-        let iti = window.intlTelInput(telephoneInput, <?= $view->getConfig(); ?>);
+        let iti = window.intlTelInput(telephoneInput, <?= /* @noEscape */ $view->getConfig(); ?>);
 
         telephoneInput.addEventListener('blur', function() {
             telephoneInput.value = iti.getNumber();

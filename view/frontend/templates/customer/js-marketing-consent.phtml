@@ -5,15 +5,15 @@
  * @var $consentConfig \Dotdigitalgroup\Sms\ViewModel\Customer\Account\MarketingConsent
  */
 
-// @codingStandardsIgnoreFile
 $telephoneInputConfig = $block->getData('telephoneInputConfig');
 $consentConfig = $block->getData('consentConfig');
+$inputConfig = $telephoneInputConfig->getConfig();
 ?>
 <?php if ($consentConfig->shouldValidatePhoneNumberWithCheckbox()) { ?>
-<script type="text/x-magento-init">
-    {
-        "input[name='mobile_number']": {
-            "Dotdigitalgroup_Sms/js/internationalTelephoneInput": <?= $telephoneInputConfig->getConfig(); ?>
+    <script type="text/x-magento-init">
+        {
+            "input[name='mobile_number']": {
+                "Dotdigitalgroup_Sms/js/internationalTelephoneInput": <?= /* @noEscape */ $inputConfig; ?>
         },
         "#connector-newsletter-form-validate, #form-validate": {
             "validation": {
@@ -25,5 +25,5 @@ $consentConfig = $block->getData('consentConfig');
             }
         }
     }
-</script>
+    </script>
 <?php } ?>
