@@ -19,13 +19,20 @@
                 <argument name="configSelector" value="{{AdminSmsConsentSection.consentEnabledCheckout}}"/>
             </actionGroup>
 
-            <!-- Create simple product -->
-            <createData entity="SimpleProduct_100" stepKey="createProduct"/>
-            <createData entity="FlatRateShippingMethodDefault" stepKey="setDefaultFlatRateShippingMethod"/>
+            <!-- Create the category -->
+            <comment userInput="Create the category" stepKey="createCategoryComment"/>
+            <createData entity="ApiCategory" stepKey="createCategory"/>
+
+            <!-- Create Simple Product -->
+            <comment userInput="Create Simple Product" stepKey="createSimpleProductComment"/>
+            <createData entity="simpleProductDefault" stepKey="simpleProduct">
+                <requiredEntity createDataKey="createCategory"/>
+            </createData>
         </before>
 
         <after>
-            <deleteData createDataKey="createProduct" stepKey="deleteProduct"/>
+            <deleteData createDataKey="simpleProduct" stepKey="deleteSimpleProduct"/>
+            <deleteData createDataKey="createCategory" stepKey="deleteCategory"/>
 
             <actionGroup ref="SetPhoneNumberValidation" stepKey="DisablePhoneNumberValidation">
                 <argument name="enabled" value="No"/>
@@ -39,9 +46,20 @@
             <actionGroup ref="AdminLogoutActionGroup" stepKey="logout"/>
         </after>
 
+        <!-- Assign default source to simple product -->
+        <actionGroup ref="DotAdminAssignDefaultSourceToSimpleProductsActionGroup" stepKey="bulkAssignSourcesToAllProducts">
+            <argument name="product1Sku" value="$$simpleProduct.sku$$"/>
+            <argument name="source1_code" value="default"/>
+        </actionGroup>
+
+        <!-- Reindex data -->
+        <actionGroup ref="CliIndexerReindexActionGroup" stepKey="performReindex">
+            <argument name="indices" value="cataloginventory_stock inventory"/>
+        </actionGroup>
+
         <!-- Add product to cart -->
-        <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPage">
-            <argument name="productUrlKey" value="$$createProduct.custom_attributes[url_key]$$"/>
+        <actionGroup ref="StorefrontOpenProductEntityPageActionGroup" stepKey="openProductPageOnStorefront">
+            <argument name="product" value="$$simpleProduct$$"/>
         </actionGroup>
         <actionGroup ref="StorefrontAddToTheCartActionGroup" stepKey="addProductToCart"/>
 
@@ -73,9 +91,6 @@
         <seeInField userInput="{{US_Address_TX.telephone}}" selector="{{CheckoutConsentFormSection.consentMobileNumber}}" stepKey="seeAutoPopulatedMobileNumber"/>
 
         <!-- Go to *Next* -->
-        <!-- Note that the test fails occasionally at this point because seemingly with the consent input popped out it can't find elements lower down. -->
-        <waitForElement selector="{{CheckoutShippingMethodsSection.checkShippingMethodByName('Flat Rate')}}" stepKey="waitForFlatRateShippingMethod"/>
-        <click selector="{{CheckoutShippingMethodsSection.checkShippingMethodByName('Flat Rate')}}" stepKey="selectFlatRateShippingMethod"/>
         <scrollTo selector="{{CheckoutShippingMethodsSection.next}}" stepKey="scrollToButtonNext1"/>
         <actionGroup ref="StorefrontCheckoutClickNextButtonActionGroup" stepKey="goNext1"/>
 

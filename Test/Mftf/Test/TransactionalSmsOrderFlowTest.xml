@@ -24,12 +24,23 @@
             <createData entity="ApiCategory" stepKey="createCategory"/>
             <!-- Create Simple Product -->
             <comment userInput="Create Simple Product" stepKey="createSimpleProductComment"/>
-            <createData entity="SimpleProductPrice10Qty1" stepKey="simpleProduct">
+            <createData entity="simpleProductDefault" stepKey="simpleProduct">
                 <requiredEntity createDataKey="createCategory"/>
             </createData>
 
             <actionGroup ref="SetDotmailerAccountData" stepKey="SetDotmailerAccountData"/>
             <actionGroup ref="EnableSms" stepKey="EnableSmsOptions" />
+
+            <!-- Assign default source to simple product -->
+            <actionGroup ref="DotAdminAssignDefaultSourceToSimpleProductsActionGroup" stepKey="bulkAssignSourcesToAllProducts">
+                <argument name="product1Sku" value="$$simpleProduct.sku$$"/>
+                <argument name="source1_code" value="default"/>
+            </actionGroup>
+
+            <!-- Reindex data -->
+            <actionGroup ref="CliIndexerReindexActionGroup" stepKey="performReindex">
+                <argument name="indices" value="cataloginventory_stock inventory"/>
+            </actionGroup>
 
             <actionGroup ref="CreateOrderActionGroup" stepKey="createNewOrder">
                 <argument name="product" value="$$simpleProduct$$"/>
@@ -40,6 +51,7 @@
         <after>
             <deleteData createDataKey="simpleCustomer" stepKey="deleteSimpleCustomer"/>
             <deleteData createDataKey="simpleProduct" stepKey="deleteSimpleProduct"/>
+            <deleteData createDataKey="createCategory" stepKey="deleteCategory"/>
             <actionGroup ref="EnableSms" stepKey="DisableSmsOptions">
                 <argument name="enabled" value="No"/>
             </actionGroup>
