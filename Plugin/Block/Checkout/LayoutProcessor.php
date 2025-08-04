@@ -143,6 +143,6 @@ class LayoutProcessor
             return;
         }
 
-        $layoutNode['dd_sms_consent_collapse_group'] = $this->consentCollapseGroup->render();
+        $layoutNode['dd_sms_consent_collapse_group'] = $this->consentCollapseGroup->render($storeId);
     }
 }

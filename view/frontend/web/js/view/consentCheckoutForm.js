@@ -76,7 +76,9 @@ define([
                     .regions['consent-checkout-form-fields-checkbox']()[0]
                     .getChild('dd_sms_consent_checkbox');
 
-            this.attachIntlTelInput(consentTelephoneInput);
+            if (typeof this.config.intlTelInputConfig !== 'undefined') {
+                this.attachIntlTelInput(consentTelephoneInput);
+            }
             this.isChecked(consentCheckbox.value());
             this.consentPhoneInput(consentTelephoneInput);
 
@@ -106,7 +108,9 @@ define([
 
             quote.shippingAddress.subscribe((address) => {
 
-                if (typeof window.intlTelInputUtils === 'undefined') {
+                if (typeof window.intlTelInputUtils === 'undefined' ||
+                    typeof this.config.intlTelInputConfig === 'undefined'
+                ) {
                     return true;
                 }
 
@@ -176,15 +180,20 @@ define([
          * @param {boolean} [triggerDOM=true] - Whether to trigger a DOM change event.
          */
         updateTelephoneField: function (UiClass, value, triggerDOM = true) {
-            if (typeof window.intlTelInputGlobals === 'undefined') { return; }
             const element = document.getElementById(UiClass.uid);
             if (!element) {
                 return;
             }
-            const intlElement = window.intlTelInputGlobals.getInstance(element);
 
-            intlElement.setNumber(value);
-            element.value = value
+            if (typeof window.intlTelInputGlobals === 'undefined' ||
+                typeof this.config.intlTelInputConfig === 'undefined'
+            ) {
+                element.value = value
+            } else {
+                const intlElement = window.intlTelInputGlobals.getInstance(element);
+                intlElement.setNumber(value);
+                element.value = value
+            }
 
             if (triggerDOM) {
                 ko.utils.triggerEvent(
