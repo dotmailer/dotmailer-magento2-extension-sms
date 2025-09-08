@@ -24,5 +24,7 @@ interface DotdigitalConfigInterface
         ConfigInterface::XML_PATH_CONSENT_SMS_MARKETING_TEXT,
         ConfigInterface::XML_PATH_SMS_SIGNUP_ENABLED,
         ConfigInterface::XML_PATH_SMS_NEW_ACCOUNT_SIGNUP_ENABLED,
+        ConfigInterface::XML_PATH_CONNECTOR_SMS_SUBSCRIBER_SYNC_ENABLED,
+        ConfigInterface::XML_PATH_CONNECTOR_SMS_SUBSCRIBER_ADDRESS_BOOK_ID,
     ];
 }
