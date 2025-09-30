@@ -10,6 +10,9 @@ interface ConfigInterface
     public const XML_PATH_SMS_PHONE_NUMBER_VALIDATION = 'transactional_sms/sms_settings/phone_number_validation';
     public const XML_PATH_TRANSACTIONAL_SMS_BATCH_SIZE = 'transactional_sms/sms_settings/batch_size';
 
+    public const XML_PATH_TRANSACTIONAL_SMS_CONSENT_ENABLED = 'transactional_sms/consent/enabled';
+    public const XML_PATH_TRANSACTIONAL_SMS_CONSENT_TEXT = 'transactional_sms/consent/text';
+
     public const XML_PATH_SMS_NEW_ORDER_ENABLED = 'transactional_sms/sms_templates/new_order_confirmation_enabled';
     public const XML_PATH_SMS_NEW_ORDER_MESSAGE = 'transactional_sms/sms_templates/new_order_confirmation_message';
 
