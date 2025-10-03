@@ -230,12 +230,26 @@ class NewsletterControllerPlugin
                     $contactModel->setSmsSubscriberStatus(Subscriber::STATUS_UNSUBSCRIBED);
                     $this->contactResource->save($contactModel);
 
+                } elseif ($this->contactSubscribedMobileNumberIsUpdated(
+                    $contactModel,
+                    $consentMobileNumber
+                )) {
+                    $this->publisher->publish(
+                        Subscriber::TOPIC_SMS_SUBSCRIPTION,
+                        $this->smsSubscriptionDataFactory->create()
+                            ->setWebsiteId((int) $websiteId)
+                            ->setContactId((int) $contactModel->getId())
+                            ->setType('subscribe')
+                    );
+
+                    $contactModel->setMobileNumber($consentMobileNumber);
+                    $contactModel->setSmsSubscriberImported(Contact::EMAIL_CONTACT_NOT_IMPORTED);
+                    $this->contactResource->save($contactModel);
                 } elseif ($this->contactMobileNumberIsUpdated(
                     $contactModel,
                     $consentMobileNumber
                 )) {
                     $contactModel->setMobileNumber($consentMobileNumber);
-                    $contactModel->setSmsSubscriberImported(Contact::EMAIL_CONTACT_NOT_IMPORTED);
                     $this->contactResource->save($contactModel);
                 }
             }
@@ -277,6 +291,20 @@ class NewsletterControllerPlugin
     private function contactHasJustOptedOut(Contact $contact, ?bool $hasProvidedConsent): bool
     {
         return $contact->getSmsSubscriberStatus() == Subscriber::STATUS_SUBSCRIBED && !$hasProvidedConsent;
+    }
+
+    /**
+     * Status has not changed, but contact is subscribed, and mobile number has been updated.
+     *
+     * @param Contact $contact
+     * @param string $consentMobileNumber
+     *
+     * @return bool
+     */
+    private function contactSubscribedMobileNumberIsUpdated(Contact $contact, string $consentMobileNumber): bool
+    {
+        return $contact->getSmsSubscriberStatus() == Subscriber::STATUS_SUBSCRIBED &&
+            $contact->getMobileNumber() != $consentMobileNumber;
     }
 
     /**
