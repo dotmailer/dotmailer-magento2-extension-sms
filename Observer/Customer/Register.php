@@ -105,7 +105,6 @@ class Register implements ObserverInterface
      *
      * @param Observer $observer
      * @return $this
-     * @throws \Magento\Framework\Exception\AlreadyExistsException
      */
     public function execute(Observer $observer)
     {
@@ -125,6 +124,14 @@ class Register implements ObserverInterface
                     $customer->getEmail(),
                     $customer->getWebsiteId()
                 );
+
+            if (!$contactModel) {
+                $this->logger->error(
+                    'Error in SMS register observer - contact was not created',
+                    ['email' => $customer->getEmail(), 'website_id' => $customer->getWebsiteId()]
+                );
+                return $this;
+            }
 
             if ($contactModel && $contactModel->getId()) {
                 $contactModel->setMobileNumber($request->get('mobile_number'));
