@@ -169,7 +169,9 @@ define([
          */
         attachIntlTelInput: function (uiComponent) {
             $.async(`input[name="${uiComponent.inputName}"]`, (node) => {
-                window.intlTelInput(node, JSON.parse(this.config.intlTelInputConfig));
+                window.intlTelInput(node, JSON.parse(this.config.intlTelInputConfig))
+                const intlElement = window.intlTelInputGlobals.getInstance(node);
+                intlElement.telInput.addEventListener('blur', (event) => this.updateTelephoneField(uiComponent, intlElement.getNumber()));
             })
         },
 
