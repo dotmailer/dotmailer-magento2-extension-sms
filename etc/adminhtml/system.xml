@@ -66,12 +66,17 @@
                 <field id="enabled" translate="label" sortOrder="15" type="select" showInStore="1" showInWebsite="1" showInDefault="1">
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <backend_model>Dotdigitalgroup\Sms\Model\Config\Backend\TransactionalConsent\RequireConsentText</backend_model>
+                    <backend_model>Dotdigitalgroup\Sms\Model\Config\Backend\TransactionalConsent\RequireOptOutConsent</backend_model>
                 </field>
                 <field id="text" translate="label" sortOrder="35" type="textarea" showInWebsite="1" showInStore="1" showInDefault="1">
                     <label>Transactional SMS consent text </label>
                     <backend_model>Dotdigitalgroup\Sms\Model\Config\Backend\TransactionalConsent\PreventConsentTextDeletion</backend_model>
                     <comment><![CDATA[[Required] The text here is displayed next to the checkbox when opting in.]]></comment>
+                </field>
+                <field id="opt_out_text" translate="comment label" sortOrder="40" type="textarea" showInStore="1" showInWebsite="1" showInDefault="1">
+                    <label>Append opt-out text</label>
+                    <tooltip><![CDATA[Opt-out keyword is set to STOP, opt-out text will add to your SMS character count.]]></tooltip>
+                    <frontend_model>Dotdigitalgroup\Sms\Block\Adminhtml\AppendNote</frontend_model>
                 </field>
             </group>
             <group id="sms_templates" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">

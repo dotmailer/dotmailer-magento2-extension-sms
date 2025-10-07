@@ -15,6 +15,9 @@
             <consent>
                 <enabled>0</enabled>
                 <text></text>
+                <opt_out_text>Reply with STOP to opt-out.</opt_out_text>
+                <cpaas_optout_id></cpaas_optout_id>
+                <cpaas_optout_generated>0</cpaas_optout_generated>
             </consent>
             <sms_templates>
                 <new_order_confirmation_enabled>0</new_order_confirmation_enabled>
