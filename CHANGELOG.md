@@ -1,3 +1,16 @@
+### 2.7.2
+
+#### Improvements
+
+- We added "SMS Subscriber Enabled" and "Add SMS Subscribers To" to Integration Insight data.
+
+#### Bug fixes
+
+- Our telephone input validator was loading at checkout even if the setting was disabled; this has been fixed.
+- Updated telephone numbers for SMS subscribers will now be published to Dotdigital even without a subscription status change.
+- We prevented a potential fatal error when subscribing to SMS while the main Dotdigital connector was disabled.
+- The on-blur behaviour of the SMS consent telephone input is now aligned with other telephone inputs.
+
 ### 2.7.1
 
 ##### Bug fixes
