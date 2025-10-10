@@ -4,6 +4,7 @@
         <element name="consentForm" type="block" selector=".form-create-account" />
         <element name="consentCheckbox" type="checkbox" selector="#dd_sms_consent_checkbox" />
         <element name="consentMobileNumber" type="input" selector="#dd_sms_consent_mobile_number" />
+        <element name="consentMobileNumberFlaggedAsInvalid" type="input" selector="#dd_sms_consent_mobile_number.mage-error" />
         <element name="consentMobileNumberMessageContainsText" type="text" selector="//div[contains(string(), '{{text}}')]" parameterized="true"/>
     </section>
 </sections>

@@ -52,7 +52,7 @@
         <checkOption selector="{{StorefrontCustomerAccountSubscriptionsSection.consentCheckbox}}" stepKey="checkSmsConsentCheckbox1"/>
         <fillField selector="{{StorefrontCustomerAccountSubscriptionsSection.consentMobileNumber}}" userInput="im-not-a-number" stepKey="setConsentInvalidMobileNumber"/>
 
-        <!-- Submit valid number -->
+        <!-- Submit invalid number -->
         <actionGroup ref="StorefrontClickSaveCustomerAccountSubscriptionsFormActionGroup" stepKey="submitCustomerAccountSubscriptionsFormForInvalidNumber"/>
 
         <!-- Observes error message -->
