@@ -6,4 +6,5 @@ interface SchemaInterface
 {
     public const EMAIL_SMS_MESSAGE_QUEUE_TABLE = 'email_sms_message_queue';
     public const SMS_SUBSCRIBERS_TEMPORARY_TABLE = 'dd_sms_subscribers_temp';
+    public const SMS_ORDERS_OPTIN_TEMPORARY_TABLE = 'dd_sms_orders_optin_temp';
 }
