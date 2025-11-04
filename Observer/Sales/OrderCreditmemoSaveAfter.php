@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Dotdigitalgroup\Sms\Observer\Sales;
 
 use Dotdigitalgroup\Email\Logger\Logger;
+use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
-use Dotdigitalgroup\Sms\Model\Queue\OrderItem\NewCreditMemo;
+use Dotdigitalgroup\Sms\Model\Queue\Publisher\SmsMessagePublisher;
 use Dotdigitalgroup\Sms\Model\Sales\SmsSalesService;
 use Magento\Framework\Event\Observer;
-use Magento\Store\Model\StoreManagerInterface;
 
 class OrderCreditmemoSaveAfter implements \Magento\Framework\Event\ObserverInterface
 {
@@ -24,9 +24,9 @@ class OrderCreditmemoSaveAfter implements \Magento\Framework\Event\ObserverInter
     private $moduleConfig;
 
     /**
-     * @var NewCreditMemo
+     * @var SmsMessagePublisher
      */
-    private $newCreditMemo;
+    private $smsMessagePublisher;
 
     /**
      * @var SmsSalesService
@@ -34,22 +34,20 @@ class OrderCreditmemoSaveAfter implements \Magento\Framework\Event\ObserverInter
     private $smsSalesService;
 
     /**
-     * OrderCreditmemoSaveAfter constructor.
-     *
      * @param Logger $logger
      * @param Configuration $moduleConfig
-     * @param NewCreditMemo $newCreditMemo
+     * @param SmsMessagePublisher $smsMessagePublisher
      * @param SmsSalesService $smsSalesService
      */
     public function __construct(
         Logger $logger,
         Configuration $moduleConfig,
-        NewCreditMemo $newCreditMemo,
+        SmsMessagePublisher $smsMessagePublisher,
         SmsSalesService $smsSalesService
     ) {
         $this->logger = $logger;
         $this->moduleConfig = $moduleConfig;
-        $this->newCreditMemo = $newCreditMemo;
+        $this->smsMessagePublisher = $smsMessagePublisher;
         $this->smsSalesService = $smsSalesService;
     }
 
@@ -75,9 +73,13 @@ class OrderCreditmemoSaveAfter implements \Magento\Framework\Event\ObserverInter
                 return $this;
             }
 
-            $this->newCreditMemo
-                ->buildAdditionalData($order, $creditmemo)
-                ->queue();
+            $this->smsMessagePublisher->publish(
+                ConfigInterface::SMS_TYPE_NEW_CREDIT_MEMO,
+                [
+                    'order' => $order,
+                    'creditmemo' => $creditmemo
+                ]
+            );
 
             $this->smsSalesService->setIsOrderCreditmemoSaveAfterExecuted();
         } catch (\Exception $e) {

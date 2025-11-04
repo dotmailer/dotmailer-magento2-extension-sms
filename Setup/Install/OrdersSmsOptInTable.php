@@ -6,7 +6,7 @@ use Dotdigitalgroup\Sms\Setup\SchemaInterface;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Ddl\Table;
 
-class SmsOrdersOptInTable
+class OrdersSmsOptInTable
 {
     /**
      * @var ResourceConnection

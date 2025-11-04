@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Dotdigitalgroup\Sms\Model\Message\Text;
 
-use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterface;
+use Dotdigitalgroup\Sms\Api\Data\SmsMessageInterface;
 use Dotdigitalgroup\Sms\Model\Message\Variable\ResolverInterface;
 use Magento\Framework\Exception\LocalizedException;
 
@@ -30,7 +30,7 @@ class Compiler
      * Compile text with variables
      *
      * @param string $text
-     * @param SmsOrderInterface $sms
+     * @param SmsMessageInterface $sms
      *
      * @return string
      * @throws LocalizedException

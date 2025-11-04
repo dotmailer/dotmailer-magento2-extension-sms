@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Dotdigitalgroup\Sms\Model\Message\Variable;
 
 use Dotdigitalgroup\Email\Logger\Logger;
-use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterface;
+use Dotdigitalgroup\Sms\Api\Data\SmsMessageInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 
 class Utility
@@ -66,7 +66,7 @@ class Utility
     /**
      * Get additional data by key.
      *
-     * @param SmsOrderInterface $sms
+     * @param SmsMessageInterface $sms
      * @param string $key
      * @return string
      */

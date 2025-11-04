@@ -5,6 +5,13 @@ namespace Dotdigitalgroup\Sms\Api;
 use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterface;
 use Magento\Framework\Api\SearchCriteriaInterface;
 
+/**
+ * Class SmsOrderRepositoryInterface
+ *
+ * @deprecated This class has been renamed to SmsMessageRepositoryInterface
+ * @see \Dotdigitalgroup\Sms\Api\SmsMessageRepositoryInterface
+ */
+
 interface SmsOrderRepositoryInterface
 {
     /**

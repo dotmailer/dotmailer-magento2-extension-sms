@@ -7,13 +7,13 @@ namespace Dotdigitalgroup\Sms\Observer\Sales;
 use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Email\Model\Contact;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
-use Dotdigitalgroup\Sms\Model\Queue\Item\SmsSignup;
-use Dotdigitalgroup\Sms\Model\Queue\Item\TransactionalMessageEnqueuer;
+use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
+use Dotdigitalgroup\Sms\Model\Consent\ConsentManager;
 use Dotdigitalgroup\Sms\Model\Queue\Message\SmsSubscriptionDataFactory;
+use Dotdigitalgroup\Sms\Model\Queue\Publisher\SmsMessagePublisher;
 use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory;
 use Dotdigitalgroup\Sms\Model\SmsContactFactory;
 use Dotdigitalgroup\Sms\Model\Subscriber;
-use Dotdigitalgroup\Sms\Model\Consent\ConsentManager;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
@@ -41,16 +41,6 @@ class CheckoutConsentObserver implements ObserverInterface
      * @var ContactResource
      */
     private $contactResource;
-
-    /**
-     * @var SmsSignup
-     */
-    private $smsSignupQueueItem;
-
-    /**
-     * @var TransactionalMessageEnqueuer
-     */
-    private $transactionalMessageEnqueuer;
 
     /**
      * @var CollectionFactory
@@ -83,44 +73,44 @@ class CheckoutConsentObserver implements ObserverInterface
     private $smsSubscriptionDataFactory;
 
     /**
-     * CheckoutConsentObserver constructor.
-     *
+     * @var SmsMessagePublisher
+     */
+    private $smsMessagePublisher;
+
+    /**
      * @param Logger $logger
      * @param SmsContactFactory $contactFactory
      * @param ContactResource $contactResource
-     * @param SmsSignup $smsSignupQueueItem
-     * @param TransactionalMessageEnqueuer $transactionalMessageEnqueuer
      * @param CollectionFactory $contactCollectionFactory
      * @param CheckoutSession $checkoutSession
      * @param StoreManagerInterface $storeManager
      * @param ConsentManager $consentManager
      * @param PublisherInterface $publisher
      * @param SmsSubscriptionDataFactory $smsSubscriptionDataFactory
+     * @param SmsMessagePublisher $smsMessagePublisher
      */
     public function __construct(
         Logger $logger,
         SmsContactFactory $contactFactory,
         ContactResource $contactResource,
-        SmsSignup $smsSignupQueueItem,
-        TransactionalMessageEnqueuer $transactionalMessageEnqueuer,
         CollectionFactory $contactCollectionFactory,
         CheckoutSession $checkoutSession,
         StoreManagerInterface $storeManager,
         ConsentManager $consentManager,
         PublisherInterface $publisher,
-        SmsSubscriptionDataFactory $smsSubscriptionDataFactory
+        SmsSubscriptionDataFactory $smsSubscriptionDataFactory,
+        SmsMessagePublisher $smsMessagePublisher
     ) {
         $this->logger = $logger;
         $this->contactFactory = $contactFactory;
         $this->contactResource = $contactResource;
-        $this->smsSignupQueueItem = $smsSignupQueueItem;
-        $this->transactionalMessageEnqueuer = $transactionalMessageEnqueuer;
         $this->contactCollectionFactory = $contactCollectionFactory;
         $this->checkoutSession = $checkoutSession;
         $this->consentManager = $consentManager;
         $this->smsSubscriptionDataFactory = $smsSubscriptionDataFactory;
         $this->storeManager = $storeManager;
         $this->publisher = $publisher;
+        $this->smsMessagePublisher = $smsMessagePublisher;
     }
 
     /**
@@ -164,6 +154,8 @@ class CheckoutConsentObserver implements ObserverInterface
             $contactModel->setSmsSubscriberImported(Contact::EMAIL_CONTACT_NOT_IMPORTED);
             $this->contactResource->save($contactModel);
             $this->consentManager->createConsentRecord($contactModel->getId(), $storeId);
+
+            // Publish SMS subscription message
             $this->publisher->publish(
                 Subscriber::TOPIC_SMS_SUBSCRIPTION,
                 $this->smsSubscriptionDataFactory->create()
@@ -172,19 +164,18 @@ class CheckoutConsentObserver implements ObserverInterface
                     ->setType('subscribe')
             );
 
-            if ($this->transactionalMessageEnqueuer->canQueue($this->smsSignupQueueItem, (int) $storeId)) {
-                $this->smsSignupQueueItem->prepare(
-                    $consentMobileNumber,
-                    $order->getCustomerEmail(),
-                    (int) $websiteId,
-                    (int) $storeId,
-                    $this->findFirstName($order),
-                    $this->findLastName($order)
-                );
-                $this->transactionalMessageEnqueuer->queue(
-                    $this->smsSignupQueueItem
-                );
-            }
+            // Publish SMS signup message
+            $this->smsMessagePublisher->publish(
+                ConfigInterface::SMS_TYPE_SIGN_UP,
+                [
+                    'websiteId' => (int) $websiteId,
+                    'storeId' => (int) $storeId,
+                    'mobileNumber' => $consentMobileNumber,
+                    'email' => $order->getCustomerEmail(),
+                    'firstName' => $this->findFirstName($order),
+                    'lastName' => $this->findLastName($order)
+                ]
+            );
         } catch (LocalizedException|\Exception $e) {
             $this->logger->debug((string) $e);
         }

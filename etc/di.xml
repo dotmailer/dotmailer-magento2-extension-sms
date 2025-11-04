@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Dotdigitalgroup\Email\Model\Contact" type="Dotdigitalgroup\Sms\Model\SmsContact" />
-    <preference for="Dotdigitalgroup\Sms\Api\SmsOrderRepositoryInterface" type="Dotdigitalgroup\Sms\Model\SmsOrderRepository" />
-    <preference for="Dotdigitalgroup\Sms\Api\Data\SmsOrderInterface" type="Dotdigitalgroup\Sms\Model\SmsOrder" />
+    <preference for="Dotdigitalgroup\Sms\Api\SmsMessageRepositoryInterface" type="Dotdigitalgroup\Sms\Model\SmsMessageRepository" />
+    <preference for="Dotdigitalgroup\Sms\Api\Data\SmsMessageInterface" type="Dotdigitalgroup\Sms\Model\SmsMessage" />
     <type name="Magento\Shipping\Controller\Adminhtml\Order\Shipment\Save">
         <plugin name="ddg_new_shipment_plugin" type="Dotdigitalgroup\Sms\Plugin\Order\Shipment\NewShipmentPlugin" sortOrder="1"/>
     </type>
@@ -15,7 +15,7 @@
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>
             <argument name="collections" xsi:type="array">
-                <item name="sms_report_grid_data_source" xsi:type="string">Dotdigitalgroup\Sms\Ui\Model\ResourceModel\SmsOrder\Collection</item>
+                <item name="sms_report_grid_data_source" xsi:type="string">Dotdigitalgroup\Sms\Ui\Model\ResourceModel\SmsMessage\Collection</item>
             </argument>
         </arguments>
     </type>

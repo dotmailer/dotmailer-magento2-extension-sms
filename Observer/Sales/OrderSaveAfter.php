@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Dotdigitalgroup\Sms\Observer\Sales;
 
 use Dotdigitalgroup\Email\Logger\Logger;
+use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
-use Dotdigitalgroup\Sms\Model\Queue\OrderItem\UpdateOrder;
-use Dotdigitalgroup\Sms\Model\Queue\OrderItem\NewOrder;
+use Dotdigitalgroup\Sms\Model\Queue\Publisher\SmsMessagePublisher;
 use Dotdigitalgroup\Sms\Model\Sales\SmsSalesService;
 use Magento\Framework\Event\Observer;
 use Magento\Sales\Api\Data\OrderInterface;
@@ -25,41 +25,31 @@ class OrderSaveAfter implements \Magento\Framework\Event\ObserverInterface
     private $moduleConfig;
 
     /**
-     * @var UpdateOrder
-     */
-    private $updateOrder;
-
-    /**
-     * @var NewOrder
-     */
-    private $newOrder;
-
-    /**
      * @var SmsSalesService
      */
     private $smsSalesService;
 
     /**
-     * OrderSaveAfter constructor.
-     *
+     * @var SmsMessagePublisher
+     */
+    private $smsMessagePublisher;
+
+    /**
      * @param Logger $logger
      * @param Configuration $moduleConfig
-     * @param UpdateOrder $updateOrder
-     * @param NewOrder $newOrder
      * @param SmsSalesService $smsSalesService
+     * @param SmsMessagePublisher $smsMessagePublisher
      */
     public function __construct(
         Logger $logger,
         Configuration $moduleConfig,
-        UpdateOrder $updateOrder,
-        NewOrder $newOrder,
-        SmsSalesService $smsSalesService
+        SmsSalesService $smsSalesService,
+        SmsMessagePublisher $smsMessagePublisher
     ) {
         $this->logger = $logger;
         $this->moduleConfig = $moduleConfig;
-        $this->updateOrder = $updateOrder;
-        $this->newOrder = $newOrder;
         $this->smsSalesService = $smsSalesService;
+        $this->smsMessagePublisher = $smsMessagePublisher;
     }
 
     /**
@@ -84,15 +74,17 @@ class OrderSaveAfter implements \Magento\Framework\Event\ObserverInterface
             }
 
             if ($this->isCanceledOrHolded($order)) {
-                $this->updateOrder
-                    ->buildAdditionalData($order)
-                    ->queue();
+                $this->smsMessagePublisher->publish(
+                    ConfigInterface::SMS_TYPE_UPDATE_ORDER,
+                    ['order' => $order]
+                );
             }
 
             if ($this->isNewOrder($order)) {
-                $this->newOrder
-                    ->buildAdditionalData($order)
-                    ->queue();
+                $this->smsMessagePublisher->publish(
+                    ConfigInterface::SMS_TYPE_NEW_ORDER,
+                    ['order' => $order]
+                );
             }
 
             $this->smsSalesService->setIsOrderSaveAfterExecuted();

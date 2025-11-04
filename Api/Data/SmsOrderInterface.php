@@ -2,6 +2,13 @@
 
 namespace Dotdigitalgroup\Sms\Api\Data;
 
+/**
+ * Class SmsOrderInterface
+ *
+ * @deprecated This class has been renamed to SmsMessageInterface
+ * @see \Dotdigitalgroup\Sms\Api\Data\SmsMessageInterface
+ */
+
 interface SmsOrderInterface
 {
     public const ID = 'id';

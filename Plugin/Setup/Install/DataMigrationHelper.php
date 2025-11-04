@@ -5,7 +5,7 @@ namespace Dotdigitalgroup\Sms\Plugin\Setup\Install;
 use Dotdigitalgroup\Email\Setup\Install\DataMigrationHelper as EmailDataMigrationHelper;
 use Dotdigitalgroup\Email\Setup\SchemaInterface;
 use Dotdigitalgroup\Sms\Setup\Install\SmsSubscribersTable;
-use Dotdigitalgroup\Sms\Setup\Install\SmsOrdersOptInTable;
+use Dotdigitalgroup\Sms\Setup\Install\OrdersSmsOptInTable;
 use Dotdigitalgroup\Sms\Setup\Install\Type\BackupEmailContactTableSmsSubscribers;
 use Dotdigitalgroup\Sms\Setup\Install\Type\BackupEmailOrderTableSmsOptIn;
 
@@ -17,9 +17,9 @@ class DataMigrationHelper
     private $tempSmsSubscribersTable;
 
     /**
-     * @var SmsOrdersOptInTable
+     * @var OrdersSmsOptInTable
      */
-    private $tempSmsOrdersOptInTable;
+    private $tempOrdersSmsOptInTable;
 
     /**
      * @var BackupEmailContactTableSmsSubscribers
@@ -33,18 +33,18 @@ class DataMigrationHelper
 
     /**
      * @param SmsSubscribersTable $tempSmsSubscribersTable
-     * @param SmsOrdersOptInTable $tempSmsOrdersOptInTable
+     * @param OrdersSmsOptInTable $tempOrdersSmsOptInTable
      * @param BackupEmailContactTableSmsSubscribers $backupEmailContactTableSmsSubscribers
      * @param BackupEmailOrderTableSmsOptIn $backupEmailOrderTableSmsOptIn
      */
     public function __construct(
         SmsSubscribersTable $tempSmsSubscribersTable,
-        SmsOrdersOptInTable $tempSmsOrdersOptInTable,
+        OrdersSmsOptInTable $tempOrdersSmsOptInTable,
         BackupEmailContactTableSmsSubscribers $backupEmailContactTableSmsSubscribers,
         BackupEmailOrderTableSmsOptIn $backupEmailOrderTableSmsOptIn
     ) {
         $this->tempSmsSubscribersTable = $tempSmsSubscribersTable;
-        $this->tempSmsOrdersOptInTable = $tempSmsOrdersOptInTable;
+        $this->tempOrdersSmsOptInTable = $tempOrdersSmsOptInTable;
         $this->backupEmailContactTableSmsSubscribers = $backupEmailContactTableSmsSubscribers;
         $this->backupEmailOrderTableSmsOptIn = $backupEmailOrderTableSmsOptIn;
     }
@@ -70,7 +70,7 @@ class DataMigrationHelper
         }
 
         if (empty($table) || $table === SchemaInterface::EMAIL_ORDER_TABLE) {
-            $this->tempSmsOrdersOptInTable->create();
+            $this->tempOrdersSmsOptInTable->create();
 
             $backupOrderStep = $this->backupEmailOrderTableSmsOptIn->execute();
             if ($backupOrderStep->getRowsAffected()) {
@@ -90,7 +90,7 @@ class DataMigrationHelper
     public function afterRun(EmailDataMigrationHelper $migrationHelper, $result)
     {
         $this->tempSmsSubscribersTable->drop();
-        $this->tempSmsOrdersOptInTable->drop();
+        $this->tempOrdersSmsOptInTable->drop();
         return $result;
     }
 }

@@ -6,7 +6,7 @@
             <features value="Dotdigital module"/>
             <stories value="dotdigital Transactional SMS"/>
             <title value="Test SMS order flow"/>
-            <description value="Validate that order creation creates new SMS message records."/>
+            <description value="Validate that order creation creates a queued SMS send."/>
             <severity value="MINOR"/>
             <group value="FS/mftf-130088"/>
             <group value="dotdigitalSms"/>
@@ -56,50 +56,19 @@
                 <argument name="enabled" value="No"/>
             </actionGroup>
             <actionGroup ref="ResetDotmailerAccountData" stepKey="resetAccountData"/>
-            <actionGroup ref="ClearTransactionalSmsFilterFields" stepKey="ClearFilterFields"/>
-            <actionGroup ref="DeleteSmsReportRows" stepKey="DeleteSmsRows"/>
             <actionGroup ref="AdminLogoutActionGroup" stepKey="logout"/>
         </after>
 
-        <!-- Go to SMS Sends Report grid and wait for page load -->
-        <amOnPage url="{{AdminTransactionalSmsReportPage.url}}" stepKey="amOnDotdigitalTransactionalSmsReportPage"/>
-        <waitForPageLoad stepKey="waitForPageLoad1"/>
-
-        <!-- Check initial Pending state -->
-        <actionGroup ref="FilterTransactionalSmsStatusFields" stepKey="selectStatusPending">
-            <argument name="smsStatus" value="SmsMessages.statusPending"/>
+        <!-- Verify SMS message was queued -->
+        <comment userInput="Navigate to message queue and verify SMS message exists" stepKey="checkQueueComment"/>
+        <amOnPage url="{{AdminMessageQueuePage.url}}" stepKey="goToMessageQueuePage"/>
+        <waitForPageLoad stepKey="waitForQueuePage"/>
+        <actionGroup ref="AdminGridFilterSearchResultsByInput" stepKey="filterByTopicName">
+            <argument name="selector" value="AdminMessageQueueFilterSection.topicName"/>
+            <argument name="value" value="ddg.sms.message"/>
         </actionGroup>
-        <seeElement selector="{{AdminTransactionalSmsReportSection.textInGridRow('Pending')}}" stepKey="seeStatusPending"/>
-        <seeElement selector="{{AdminTransactionalSmsReportSection.textInGridRow(Simple_US_Customer_CA.email)}}" stepKey="seeCustomerEmail1"/>
+        <seeElement selector="{{AdminMessageQueueSection.textInGridRow('Pending')}}" stepKey="seeStatusPending"/>
 
-        <!-- Run SmsSenderManager -->
-        <magentoCLI command="dotdigital:task SmsSenderManager" stepKey="triggerSmsSends"/>
-        <wait time="5" stepKey="waitFiveSeconds1"/>
-
-        <!-- Check In Progress state -->
-        <actionGroup ref="FilterTransactionalSmsStatusFields" stepKey="selectStatusInProgress">
-            <argument name="smsStatus" value="SmsMessages.statusInProgress"/>
-        </actionGroup>
-        <seeElement selector="{{AdminTransactionalSmsReportSection.textInGridRow('In progress')}}" stepKey="seeStatusInProgress"/>
-        <seeElement selector="{{AdminTransactionalSmsReportSection.textInGridRow(Simple_US_Customer_CA.email)}}" stepKey="seeCustomerEmail2"/>
-        <seeElement selector="{{AdminTransactionalSmsReportSection.textInGridRow('your order has been placed on')}}" stepKey="seeContent"/>
-
-        <!-- Run SmsSenderManager -->
-        <magentoCLI command="dotdigital:task SmsSenderManager" stepKey="triggerSmsSends2"/>
-        <wait time="5" stepKey="waitFiveSeconds2"/>
-
-        <!-- Check expected Failed state (number is not valid) -->
-        <actionGroup ref="FilterTransactionalSmsStatusFields" stepKey="selectStatusFailed">
-            <argument name="smsStatus" value="SmsMessages.statusFailed"/>
-        </actionGroup>
-        <seeElement selector="{{AdminTransactionalSmsReportSection.textInGridRow('Failed')}}" stepKey="seeStatusFailed"/>
-
-        <!-- Check no rows returned for Delivered -->
-        <actionGroup ref="FilterTransactionalSmsStatusFields" stepKey="selectStatusDelivered">
-            <argument name="smsStatus" value="SmsMessages.statusDelivered"/>
-        </actionGroup>
-        <dontSeeElement selector=".data-row" stepKey="seeRecordNotFound"/>
-        <seeInSource html="We couldn't find any records." stepKey="seeNotFoundMessage"/>
     </test>
 </tests>
 

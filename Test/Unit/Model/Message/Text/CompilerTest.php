@@ -4,16 +4,16 @@ namespace Dotdigitalgroup\Sms\Test\Unit\Model\Message\Text;
 
 use Dotdigitalgroup\Sms\Model\Message\Text\Compiler;
 use Dotdigitalgroup\Sms\Model\Message\Variable\Resolver;
-use Dotdigitalgroup\Sms\Model\SmsOrder;
+use Dotdigitalgroup\Sms\Model\SmsMessage;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class CompilerTest extends TestCase
 {
     /**
-     * @var SmsOrder|MockObject
+     * @var SmsMessage|MockObject
      */
-    private $smsOrderMock;
+    private $smsMessageMock;
 
     /**
      * @var Resolver|MockObject
@@ -28,7 +28,7 @@ class CompilerTest extends TestCase
     protected function setUp() :void
     {
         $this->variableResolverMock = $this->createMock(Resolver::class);
-        $this->smsOrderMock = $this->createMock(SmsOrder::class);
+        $this->smsMessageMock = $this->createMock(SmsMessage::class);
 
         $this->compiler = new Compiler([
             "1" => $this->variableResolverMock
@@ -39,7 +39,7 @@ class CompilerTest extends TestCase
     {
         $rawText = $this->getRawText();
 
-        $this->smsOrderMock->expects($this->exactly(6))
+        $this->smsMessageMock->expects($this->exactly(6))
             ->method('getTypeId')
             ->willReturn("1");
 
@@ -53,7 +53,7 @@ class CompilerTest extends TestCase
                 'processing'
             );
 
-        $compiledText = $this->compiler->compile($rawText, $this->smsOrderMock);
+        $compiledText = $this->compiler->compile($rawText, $this->smsMessageMock);
         $this->assertEquals($compiledText, $this->getTargetText());
     }
 

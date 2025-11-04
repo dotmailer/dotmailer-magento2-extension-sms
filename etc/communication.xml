@@ -7,4 +7,10 @@
             method="process"
         />
     </topic>
+    <topic name="ddg.sms.message" request="Dotdigitalgroup\Sms\Model\Queue\Message\SmsMessageData">
+        <handler
+            name="smsMessageHandler"
+            type="Dotdigitalgroup\Sms\Model\Queue\Consumer\SmsMessageConsumer"
+            method="process" />
+    </topic>
 </config>

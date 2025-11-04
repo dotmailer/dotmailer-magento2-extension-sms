@@ -4,4 +4,8 @@
               queue="ddg.sms.queue"
               handler="Dotdigitalgroup\Sms\Model\Queue\Consumer\SmsSubscriptionConsumer::process"
               connection="db" />
+    <consumer name="ddg.sms.message"
+              queue="ddg.sms.message.queue"
+              handler="Dotdigitalgroup\Sms\Model\Queue\Consumer\SmsMessageConsumer::process"
+              connection="db" />
 </config>

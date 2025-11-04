@@ -1,17 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Dotdigitalgroup\Sms\Plugin\Order\Shipment;
 
 use Dotdigitalgroup\Email\Helper\Data;
+use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
-use Dotdigitalgroup\Sms\Model\Queue\OrderItem\NewShipment;
+use Dotdigitalgroup\Sms\Model\Queue\Publisher\SmsMessagePublisher;
 use Magento\Framework\App\State;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\ShipOrderInterface;
-use Psr\Log\LoggerInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Psr\Log\LoggerInterface;
 
 class NewShipmentRestPlugin
 {
@@ -41,9 +44,9 @@ class NewShipmentRestPlugin
     private $orderRepository;
 
     /**
-     * @var NewShipment
+     * @var SmsMessagePublisher
      */
-    private $newShipment;
+    private $smsMessagePublisher;
 
     /**
      * @var StoreManagerInterface
@@ -51,14 +54,12 @@ class NewShipmentRestPlugin
     private $storeManager;
 
     /**
-     * NewShipmentPlugin constructor.
-     *
      * @param Data $helper
      * @param State $state
      * @param LoggerInterface $logger
      * @param Configuration $moduleConfig
      * @param OrderRepositoryInterface $orderRepository
-     * @param NewShipment $newShipment
+     * @param SmsMessagePublisher $smsMessagePublisher
      * @param StoreManagerInterface $storeManager
      */
     public function __construct(
@@ -67,7 +68,7 @@ class NewShipmentRestPlugin
         LoggerInterface $logger,
         Configuration $moduleConfig,
         OrderRepositoryInterface $orderRepository,
-        NewShipment $newShipment,
+        SmsMessagePublisher $smsMessagePublisher,
         StoreManagerInterface $storeManager
     ) {
         $this->helper = $helper;
@@ -75,7 +76,7 @@ class NewShipmentRestPlugin
         $this->logger = $logger;
         $this->moduleConfig = $moduleConfig;
         $this->orderRepository = $orderRepository;
-        $this->newShipment = $newShipment;
+        $this->smsMessagePublisher = $smsMessagePublisher;
         $this->storeManager = $storeManager;
     }
 
@@ -126,12 +127,14 @@ class NewShipmentRestPlugin
         if (is_array($tracks)) {
             foreach ($tracks as $tracking) {
                 if ($tracking instanceof \Magento\Sales\Api\Data\ShipmentTrackCreationInterface) {
-                    $this->newShipment
-                        ->buildAdditionalData(
-                            $order,
-                            $tracking->getTrackNumber(),
-                            $tracking->getTitle()
-                        )->queue();
+                    $this->smsMessagePublisher->publish(
+                        ConfigInterface::SMS_TYPE_NEW_SHIPMENT,
+                        [
+                            'order' => $order,
+                            'trackingNumber' => $tracking->getTrackNumber(),
+                            'trackingCarrier' => $tracking->getTitle()
+                        ]
+                    );
                 }
             }
         }

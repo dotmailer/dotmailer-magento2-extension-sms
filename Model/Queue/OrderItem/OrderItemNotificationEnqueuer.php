@@ -5,13 +5,21 @@ declare(strict_types=1);
 namespace Dotdigitalgroup\Sms\Model\Queue\OrderItem;
 
 use Dotdigitalgroup\Email\Logger\Logger;
-use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterfaceFactory;
-use Dotdigitalgroup\Sms\Api\SmsOrderRepositoryInterface;
+use Dotdigitalgroup\Sms\Api\Data\SmsMessageInterfaceFactory;
+use Dotdigitalgroup\Sms\Api\SmsMessageRepositoryInterface;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Store\Model\StoreManagerInterface;
+
+/**
+ * Class AfterSendProcessor
+ *
+ * @deprecated This class is deprecated and will be removed in a future version.
+ * The queue system now uses a publisher and consumer.
+ * @see \Dotdigitalgroup\Sms\Model\Queue\Publisher\SmsMessagePublisher
+ */
 
 class OrderItemNotificationEnqueuer
 {
@@ -21,14 +29,14 @@ class OrderItemNotificationEnqueuer
     private $logger;
 
     /**
-     * @var SmsOrderInterfaceFactory
+     * @var SmsMessageInterfaceFactory
      */
-    private $smsOrderInterfaceFactory;
+    private $smsMessageInterfaceFactory;
 
     /**
-     * @var SmsOrderRepositoryInterface
+     * @var SmsMessageRepositoryInterface
      */
-    private $smsOrderRepositoryInterface;
+    private $smsMessageRepositoryInterface;
 
     /**
      * @var Configuration
@@ -44,22 +52,22 @@ class OrderItemNotificationEnqueuer
      * OrderItemNotificationEnqueuer constructor.
      *
      * @param Logger $logger
-     * @param SmsOrderInterfaceFactory $smsOrderInterfaceFactory
-     * @param SmsOrderRepositoryInterface $smsOrderRepositoryInterface
+     * @param SmsMessageInterfaceFactory $smsMessageInterfaceFactory
+     * @param SmsMessageRepositoryInterface $smsMessageRepositoryInterface
      * @param Configuration $moduleConfig
      * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         Logger $logger,
-        SmsOrderInterfaceFactory $smsOrderInterfaceFactory,
-        SmsOrderRepositoryInterface $smsOrderRepositoryInterface,
+        SmsMessageInterfaceFactory $smsMessageInterfaceFactory,
+        SmsMessageRepositoryInterface $smsMessageRepositoryInterface,
         Configuration $moduleConfig,
         StoreManagerInterface $storeManager
     ) {
         $this->logger = $logger;
         $this->storeManager = $storeManager;
-        $this->smsOrderInterfaceFactory = $smsOrderInterfaceFactory;
-        $this->smsOrderRepositoryInterface = $smsOrderRepositoryInterface;
+        $this->smsMessageInterfaceFactory = $smsMessageInterfaceFactory;
+        $this->smsMessageRepositoryInterface = $smsMessageRepositoryInterface;
         $this->moduleConfig = $moduleConfig;
     }
 
@@ -93,7 +101,7 @@ class OrderItemNotificationEnqueuer
         }
 
         $orderId = (int) $order->getId();
-        $smsOrder = $this->smsOrderInterfaceFactory
+        $smsMessage = $this->smsMessageInterfaceFactory
             ->create()
             ->setOrderId($orderId)
             ->setStoreId($storeId)
@@ -104,7 +112,7 @@ class OrderItemNotificationEnqueuer
             ->setEmail($order->getCustomerEmail())
             ->setAdditionalData($additionalData);
 
-        $this->smsOrderRepositoryInterface
-            ->save($smsOrder);
+        $this->smsMessageRepositoryInterface
+            ->save($smsMessage);
     }
 }

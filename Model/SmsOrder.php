@@ -13,6 +13,14 @@ use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
 
+/**
+ * Class SmsOrder
+ *
+ * @deprecated This class has been renamed to SmsMessage
+ * @see \Dotdigitalgroup\Sms\Model\SmsMessage
+ *
+ *  Class renamed for functionality clarity.
+ */
 class SmsOrder extends AbstractModel implements SmsOrderInterface
 {
     /**

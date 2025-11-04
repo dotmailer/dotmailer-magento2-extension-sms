@@ -10,6 +10,12 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 
+/**
+ * Class AbstractOrderItem
+ *
+ * @deprecated This class is deprecated and will be removed in a future version.
+ */
+
 abstract class AbstractOrderItem
 {
     /**

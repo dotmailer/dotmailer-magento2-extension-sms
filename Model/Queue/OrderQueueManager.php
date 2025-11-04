@@ -8,6 +8,15 @@ use Dotdigitalgroup\Sms\Model\ResourceModel\SmsOrderFactory as SmsOrderResourceF
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Intl\DateTimeFactory;
 
+/**
+ * Class OrderQueueManager
+ *
+ * @deprecated This class has been renamed to SmsMessageQueueManager
+ * @see \Dotdigitalgroup\Sms\Model\Queue\SmsMessageQueueManager
+ *
+ *  Class renamed for clarity.
+ */
+
 class OrderQueueManager
 {
     public const SMS_STATUS_PENDING = 0;

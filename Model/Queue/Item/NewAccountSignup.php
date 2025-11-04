@@ -8,6 +8,14 @@ use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Framework\DataObject;
 
+/**
+ * Class NewAccountSignup
+ *
+ * @deprecated This class is deprecated and will be removed in a future version.
+ * @see \Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\NewAccountSignup
+ * See the SmsMessage\Types namespace for all current message types.
+ */
+
 class NewAccountSignup extends DataObject implements QueueItemInterface
 {
     /**

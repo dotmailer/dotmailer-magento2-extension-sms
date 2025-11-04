@@ -5,5 +5,9 @@
                  topic="ddg.sms.subscription"
                  destinationType="queue"
                  destination="ddg.sms.queue"/>
+        <binding id="dotdigitalSmsMessageBinding"
+                 topic="ddg.sms.message"
+                 destinationType="queue"
+                 destination="ddg.sms.message.queue"/>
     </exchange>
 </config>

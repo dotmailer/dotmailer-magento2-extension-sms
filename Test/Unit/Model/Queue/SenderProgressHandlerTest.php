@@ -3,9 +3,9 @@
 namespace Dotdigitalgroup\Sms\Test\Unit\Queue;
 
 use Dotdigitalgroup\Sms\Model\Apiconnector\Client;
-use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterface;
-use Dotdigitalgroup\Sms\Api\SmsOrderRepositoryInterface;
-use Dotdigitalgroup\Sms\Model\Queue\OrderQueueManager;
+use Dotdigitalgroup\Sms\Api\Data\SmsMessageInterface;
+use Dotdigitalgroup\Sms\Api\SmsMessageRepositoryInterface;
+use Dotdigitalgroup\Sms\Model\Queue\SmsMessageQueueManager;
 use Dotdigitalgroup\Sms\Model\Queue\SenderProgressHandler;
 use Magento\Framework\Api\SearchResultsInterface;
 use Magento\Framework\DataObject;
@@ -25,14 +25,14 @@ class SenderProgressHandlerTest extends TestCase
     private $clientMock;
 
     /**
-     * @var SmsOrderRepositoryInterface
+     * @var SmsMessageRepositoryInterface
      */
-    private $smsOrderRepositoryMock;
+    private $smsMessageRepositoryMock;
 
     /**
-     * @var OrderQueueManager
+     * @var SmsMessageQueueManager
      */
-    private $orderQueueManagerMock;
+    private $smsMessageQueueManagerMock;
 
     /**
      * @var DateTime
@@ -51,15 +51,15 @@ class SenderProgressHandlerTest extends TestCase
 
     protected function setUp() :void
     {
-        $this->smsOrderRepositoryMock = $this->createMock(SmsOrderRepositoryInterface::class);
-        $this->orderQueueManagerMock = $this->createMock(OrderQueueManager::class);
+        $this->smsMessageRepositoryMock = $this->createMock(SmsMessageRepositoryInterface::class);
+        $this->smsMessageQueueManagerMock = $this->createMock(SmsMessageQueueManager::class);
         $this->dateTimeMock = $this->createMock(DateTime::class);
         $this->dataObjectMock = $this->createMock(DataObject::class);
         $this->searchResultsInterfaceMock = $this->createMock(SearchResultsInterface::class);
 
         $this->senderProgressHandler = new SenderProgressHandler(
-            $this->smsOrderRepositoryMock,
-            $this->orderQueueManagerMock,
+            $this->smsMessageRepositoryMock,
+            $this->smsMessageQueueManagerMock,
             $this->dateTimeMock,
             ['client' => $this->createMock(Client::class)]
         );
@@ -69,7 +69,7 @@ class SenderProgressHandlerTest extends TestCase
     {
         $storeIds = $this->getStoreIds();
 
-        $this->orderQueueManagerMock->expects($this->once())
+        $this->smsMessageQueueManagerMock->expects($this->once())
             ->method('getInProgressQueue')
             ->with($storeIds)
             ->willReturn($this->searchResultsInterfaceMock);
@@ -78,7 +78,7 @@ class SenderProgressHandlerTest extends TestCase
             ->method('getTotalCount')
             ->willReturn(0);
 
-        $this->smsOrderRepositoryMock->expects($this->never())
+        $this->smsMessageRepositoryMock->expects($this->never())
             ->method('save');
 
         $this->senderProgressHandler->updateSendsInProgress($storeIds);
@@ -89,7 +89,7 @@ class SenderProgressHandlerTest extends TestCase
         $storeIds = $this->getStoreIds();
         $messageStateMock = $this->getDeliveredMessageState();
 
-        $this->orderQueueManagerMock->expects($this->once())
+        $this->smsMessageQueueManagerMock->expects($this->once())
             ->method('getInProgressQueue')
             ->with($storeIds)
             ->willReturn($this->searchResultsInterfaceMock);
@@ -110,7 +110,7 @@ class SenderProgressHandlerTest extends TestCase
             ->method('formatDate')
             ->willReturn($messageStateMock->sentOn);
 
-        $this->smsOrderRepositoryMock->expects($this->atLeastOnce())
+        $this->smsMessageRepositoryMock->expects($this->atLeastOnce())
             ->method('save');
 
         $this->senderProgressHandler->updateSendsInProgress($storeIds);
@@ -121,7 +121,7 @@ class SenderProgressHandlerTest extends TestCase
         $storeIds = $this->getStoreIds();
         $messageStateMock = $this->getFailedMessageState();
 
-        $this->orderQueueManagerMock->expects($this->once())
+        $this->smsMessageQueueManagerMock->expects($this->once())
             ->method('getInProgressQueue')
             ->with($storeIds)
             ->willReturn($this->searchResultsInterfaceMock);
@@ -141,7 +141,7 @@ class SenderProgressHandlerTest extends TestCase
         $this->dateTimeMock->expects($this->never())
             ->method('formatDate');
 
-        $this->smsOrderRepositoryMock->expects($this->atLeastOnce())
+        $this->smsMessageRepositoryMock->expects($this->atLeastOnce())
             ->method('save');
 
         $this->senderProgressHandler->updateSendsInProgress($storeIds);
@@ -152,7 +152,7 @@ class SenderProgressHandlerTest extends TestCase
         $storeIds = $this->getStoreIds();
         $messageStateMock = $this->getNoMessageState();
 
-        $this->orderQueueManagerMock->expects($this->once())
+        $this->smsMessageQueueManagerMock->expects($this->once())
             ->method('getInProgressQueue')
             ->with($storeIds)
             ->willReturn($this->searchResultsInterfaceMock);
@@ -169,7 +169,7 @@ class SenderProgressHandlerTest extends TestCase
             ->method('getMessageByMessageId')
             ->willReturn($messageStateMock);
 
-        $this->smsOrderRepositoryMock->expects($this->atLeastOnce())
+        $this->smsMessageRepositoryMock->expects($this->atLeastOnce())
             ->method('save');
 
         $this->senderProgressHandler->updateSendsInProgress($storeIds);
@@ -218,9 +218,9 @@ class SenderProgressHandlerTest extends TestCase
 
     private function getDeliveredSmsMockArray($multiple)
     {
-        $smsOrderMocks = [];
+        $smsMessageMocks = [];
         for ($i = 0; $i < $multiple; $i++) {
-            $mock = $this->createMock(SmsOrderInterface::class);
+            $mock = $this->createMock(SmsMessageInterface::class);
             $mock->expects($this->any())
                 ->method('getMessageId')
                 ->willReturn($mock);
@@ -234,17 +234,17 @@ class SenderProgressHandlerTest extends TestCase
                 ->method('setSentAt')
                 ->willReturn($mock);
 
-            $smsOrderMocks[] = $mock;
+            $smsMessageMocks[] = $mock;
         }
 
-        return $smsOrderMocks;
+        return $smsMessageMocks;
     }
 
     private function getFailedSmsMockArray($multiple)
     {
-        $smsOrderMocks = [];
+        $smsMessageMocks = [];
         for ($i = 0; $i < $multiple; $i++) {
-            $mock = $this->createMock(SmsOrderInterface::class);
+            $mock = $this->createMock(SmsMessageInterface::class);
             $mock->expects($this->any())
                 ->method('getMessageId')
                 ->willReturn($mock);
@@ -255,15 +255,15 @@ class SenderProgressHandlerTest extends TestCase
                 ->method('setMessage')
                 ->willReturn($mock);
 
-            $smsOrderMocks[] = $mock;
+            $smsMessageMocks[] = $mock;
         }
 
-        return $smsOrderMocks;
+        return $smsMessageMocks;
     }
 
     private function getErrorUnknownSmsMock()
     {
-        $mock = $this->createMock(SmsOrderInterface::class);
+        $mock = $this->createMock(SmsMessageInterface::class);
         $mock->expects($this->once())
             ->method('setStatus')
             ->willReturn($mock);

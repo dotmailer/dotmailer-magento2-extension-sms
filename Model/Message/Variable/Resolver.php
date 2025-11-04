@@ -6,7 +6,7 @@ namespace Dotdigitalgroup\Sms\Model\Message\Variable;
 
 use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Email\Model\SalesRule\DotdigitalCouponRequestProcessorFactory;
-use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterface;
+use Dotdigitalgroup\Sms\Api\Data\SmsMessageInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\StoreManagerInterface;
@@ -67,7 +67,7 @@ class Resolver implements ResolverInterface
     /**
      * @inheritDoc
      */
-    public function resolve(string $variable, SmsOrderInterface $sms)
+    public function resolve(string $variable, SmsMessageInterface $sms)
     {
         $args = [];
         if (strpos($variable, '|') !== false) {
@@ -89,7 +89,7 @@ class Resolver implements ResolverInterface
     /**
      * Get email.
      *
-     * @param SmsOrderInterface $sms
+     * @param SmsMessageInterface $sms
      * @param array $args
      *
      * @return string|null
@@ -102,7 +102,7 @@ class Resolver implements ResolverInterface
     /**
      * Get first name.
      *
-     * @param SmsOrderInterface $sms
+     * @param SmsMessageInterface $sms
      * @param array $args
      *
      * @return string|null
@@ -115,7 +115,7 @@ class Resolver implements ResolverInterface
     /**
      * Get last name.
      *
-     * @param SmsOrderInterface $sms
+     * @param SmsMessageInterface $sms
      * @param array $args
      *
      * @return string|null
@@ -128,7 +128,7 @@ class Resolver implements ResolverInterface
     /**
      * Get store name.
      *
-     * @param SmsOrderInterface $sms
+     * @param SmsMessageInterface $sms
      * @param array $args
      *
      * @return string
@@ -143,7 +143,7 @@ class Resolver implements ResolverInterface
     /**
      * Get store view name.
      *
-     * @param SmsOrderInterface $sms
+     * @param SmsMessageInterface $sms
      * @param array $args
      *
      * @return string
@@ -157,7 +157,7 @@ class Resolver implements ResolverInterface
     /**
      * Get website name.
      *
-     * @param SmsOrderInterface $sms
+     * @param SmsMessageInterface $sms
      * @param array $args
      *
      * @return string
@@ -171,7 +171,7 @@ class Resolver implements ResolverInterface
     /**
      * Get coupon.
      *
-     * @param SmsOrderInterface $sms
+     * @param SmsMessageInterface $sms
      * @param array $args
      *
      * @return string

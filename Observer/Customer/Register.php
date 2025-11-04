@@ -6,10 +6,10 @@ namespace Dotdigitalgroup\Sms\Observer\Customer;
 
 use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
+use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
 use Dotdigitalgroup\Sms\Model\Consent\ConsentManager;
-use Dotdigitalgroup\Sms\Model\Queue\Item\NewAccountSignup;
-use Dotdigitalgroup\Sms\Model\Queue\Item\TransactionalMessageEnqueuer;
 use Dotdigitalgroup\Sms\Model\Queue\Message\SmsSubscriptionDataFactory;
+use Dotdigitalgroup\Sms\Model\Queue\Publisher\SmsMessagePublisher;
 use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory as ContactCollectionFactory;
 use Dotdigitalgroup\Sms\Model\Subscriber;
 use Magento\Framework\App\Action\Context;
@@ -41,16 +41,6 @@ class Register implements ObserverInterface
     private $consentManager;
 
     /**
-     * @var NewAccountSignup
-     */
-    private $newAccountSignupQueueItem;
-
-    /**
-     * @var TransactionalMessageEnqueuer
-     */
-    private $transactionalMessageEnqueuer;
-
-    /**
      * @var Context
      */
     private $context;
@@ -66,38 +56,38 @@ class Register implements ObserverInterface
     private $smsSubscriptionDataFactory;
 
     /**
-     * Register constructor.
-     *
+     * @var SmsMessagePublisher
+     */
+    private $smsMessagePublisher;
+
+    /**
      * @param Logger $logger
      * @param ContactCollectionFactory $contactCollectionFactory
      * @param ContactResource $contactResource
      * @param ConsentManager $consentManager
-     * @param TransactionalMessageEnqueuer $transactionalMessageEnqueuer
-     * @param NewAccountSignup $newAccountSignupQueueItem
      * @param Context $context
      * @param PublisherInterface $publisher
      * @param SmsSubscriptionDataFactory $smsSubscriptionDataFactory
+     * @param SmsMessagePublisher $smsMessagePublisher
      */
     public function __construct(
         Logger $logger,
         ContactCollectionFactory $contactCollectionFactory,
         ContactResource $contactResource,
         ConsentManager $consentManager,
-        TransactionalMessageEnqueuer $transactionalMessageEnqueuer,
-        NewAccountSignup $newAccountSignupQueueItem,
         Context $context,
         PublisherInterface $publisher,
-        SmsSubscriptionDataFactory $smsSubscriptionDataFactory
+        SmsSubscriptionDataFactory $smsSubscriptionDataFactory,
+        SmsMessagePublisher $smsMessagePublisher
     ) {
         $this->logger = $logger;
         $this->consentManager = $consentManager;
         $this->contactCollectionFactory = $contactCollectionFactory;
         $this->contactResource = $contactResource;
-        $this->transactionalMessageEnqueuer = $transactionalMessageEnqueuer;
-        $this->newAccountSignupQueueItem = $newAccountSignupQueueItem;
         $this->publisher = $publisher;
         $this->smsSubscriptionDataFactory = $smsSubscriptionDataFactory;
         $this->context = $context;
+        $this->smsMessagePublisher = $smsMessagePublisher;
     }
 
     /**
@@ -119,6 +109,8 @@ class Register implements ObserverInterface
         try {
             $customer = $observer->getEvent()->getCustomer();
             $storeId = $customer->getStoreId();
+            $mobileNumber = $request->get('mobile_number');
+
             $contactModel = $this->contactCollectionFactory->create()
                 ->loadByCustomerEmail(
                     $customer->getEmail(),
@@ -134,22 +126,23 @@ class Register implements ObserverInterface
             }
 
             if ($contactModel && $contactModel->getId()) {
-                $contactModel->setMobileNumber($request->get('mobile_number'));
+                $contactModel->setMobileNumber($mobileNumber);
                 $contactModel->setSmsSubscriberStatus(Subscriber::STATUS_SUBSCRIBED);
                 $this->contactResource->save($contactModel);
             }
+
             $this->consentManager->createConsentRecord($contactModel->getId(), $storeId);
 
-            if ($this->transactionalMessageEnqueuer->canQueue($this->newAccountSignupQueueItem, (int) $storeId)) {
-                $this->newAccountSignupQueueItem->prepare(
-                    $customer,
-                    $request->get('mobile_number')
-                );
-                $this->transactionalMessageEnqueuer->queue(
-                    $this->newAccountSignupQueueItem
-                );
-            }
+            // Publish new account signup SMS message
+            $this->smsMessagePublisher->publish(
+                ConfigInterface::SMS_TYPE_NEW_ACCOUNT_SIGN_UP,
+                [
+                    'customer' => $customer,
+                    'mobileNumber' => $mobileNumber
+                ]
+            );
 
+            // Publish SMS subscription message
             $this->publisher->publish(
                 Subscriber::TOPIC_SMS_SUBSCRIPTION,
                 $this->smsSubscriptionDataFactory->create()

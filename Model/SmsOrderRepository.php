@@ -11,6 +11,15 @@ use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\NoSuchEntityException;
 
+/**
+ * Class SmsOrderRepository
+ *
+ * @deprecated This class has been renamed to SmsMessageRepository
+ * @see \Dotdigitalgroup\Sms\Model\SmsMessageRepository
+ *
+ *  Class renamed for functionality clarity.
+ */
+
 class SmsOrderRepository implements SmsOrderRepositoryInterface
 {
     /**

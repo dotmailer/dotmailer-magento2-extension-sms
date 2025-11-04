@@ -9,6 +9,14 @@ use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 
+/**
+ * Class NewCreditMemo
+ *
+ * @deprecated This class is deprecated and will be removed in a future version.
+ * @see \Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\NewCreditMemo
+ * See the SmsMessage\Types namespace for all current message types.
+ */
+
 class NewCreditMemo extends AbstractOrderItem
 {
     /**

@@ -61,12 +61,40 @@ interface ConfigInterface
     public const SMS_TYPE_NEW_ACCOUNT_SIGN_UP = 7;
 
     public const TRANSACTIONAL_SMS_MESSAGE_TYPES_MAP = [
-        self::SMS_TYPE_NEW_ORDER => self::XML_PATH_SMS_NEW_ORDER_MESSAGE,
-        self::SMS_TYPE_UPDATE_ORDER => self::XML_PATH_SMS_ORDER_UPDATE_MESSAGE,
-        self::SMS_TYPE_NEW_SHIPMENT => self::XML_PATH_SMS_NEW_SHIPMENT_MESSAGE,
-        self::SMS_TYPE_UPDATE_SHIPMENT => self::XML_PATH_SMS_SHIPMENT_UPDATE_MESSAGE,
-        self::SMS_TYPE_NEW_CREDIT_MEMO => self::XML_PATH_SMS_NEW_CREDIT_MEMO_MESSAGE,
-        self::SMS_TYPE_SIGN_UP => self::XML_PATH_SMS_SIGNUP_MESSAGE,
-        self::SMS_TYPE_NEW_ACCOUNT_SIGN_UP => self::XML_PATH_SMS_NEW_ACCOUNT_SIGNUP_MESSAGE
+        self::SMS_TYPE_NEW_ORDER => [
+            'enabled_path' => self::XML_PATH_SMS_NEW_ORDER_ENABLED,
+            'message_path' => self::XML_PATH_SMS_NEW_ORDER_MESSAGE,
+            'class' => \Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\NewOrder::class,
+        ],
+        self::SMS_TYPE_UPDATE_ORDER => [
+            'enabled_path' => self::XML_PATH_SMS_ORDER_UPDATE_ENABLED,
+            'message_path' => self::XML_PATH_SMS_ORDER_UPDATE_MESSAGE,
+            'class' => \Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\UpdateOrder::class,
+        ],
+        self::SMS_TYPE_NEW_SHIPMENT => [
+            'enabled_path' => self::XML_PATH_SMS_NEW_SHIPMENT_ENABLED,
+            'message_path' => self::XML_PATH_SMS_NEW_SHIPMENT_MESSAGE,
+            'class' => \Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\NewShipment::class,
+        ],
+        self::SMS_TYPE_UPDATE_SHIPMENT => [
+            'enabled_path' => self::XML_PATH_SMS_SHIPMENT_UPDATE_ENABLED,
+            'message_path' => self::XML_PATH_SMS_SHIPMENT_UPDATE_MESSAGE,
+            'class' => \Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\UpdateShipment::class,
+        ],
+        self::SMS_TYPE_NEW_CREDIT_MEMO => [
+            'enabled_path' => self::XML_PATH_SMS_NEW_CREDIT_MEMO_ENABLED,
+            'message_path' => self::XML_PATH_SMS_NEW_CREDIT_MEMO_MESSAGE,
+            'class' => \Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\NewCreditMemo::class,
+        ],
+        self::SMS_TYPE_SIGN_UP => [
+            'enabled_path' => self::XML_PATH_SMS_SIGNUP_ENABLED,
+            'message_path' => self::XML_PATH_SMS_SIGNUP_MESSAGE,
+            'class' => \Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\SmsSignup::class,
+        ],
+        self::SMS_TYPE_NEW_ACCOUNT_SIGN_UP => [
+            'enabled_path' => self::XML_PATH_SMS_NEW_ACCOUNT_SIGNUP_ENABLED,
+            'message_path' => self::XML_PATH_SMS_NEW_ACCOUNT_SIGNUP_MESSAGE,
+            'class' => \Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\NewAccountSignup::class,
+        ],
     ];
 }
