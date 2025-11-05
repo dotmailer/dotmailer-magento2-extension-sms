@@ -3,17 +3,17 @@
 namespace Dotdigitalgroup\Sms\Model\Apiconnector;
 
 use Dotdigitalgroup\Email\Logger\Logger;
-use Dotdigitalgroup\Email\Model\Apiconnector\Rest;
+use Dotdigitalgroup\Email\Model\Apiconnector\Client as EmailApiClient;
 use Exception;
 use stdClass;
 
-class Client extends Rest
+class Client extends EmailApiClient
 {
-    public const REST_CPAAS_MESSAGES_API_URL = 'https://api-cpaas.dotdigital.com/cpaas/messages';
-    public const REST_CPAAS_DEDICATED_NUMBERS = 'https://api-cpaas.dotdigital.com/cpaas/sms/dedicatedNumbers';
-    public const REST_CPAAS_KEYWORDS = 'https://api-cpaas.dotdigital.com/cpaas/sms/keywords';
-    public const REST_CPAAS_SHORTCODES = 'https://api-cpaas.dotdigital.com/cpaas/sms/shortcodes';
-    public const REST_CPAAS_OPTOUT_RULES = 'https://api-cpaas.dotdigital.com/cpaas/automation/inboundrules/optout';
+    public const REST_CPAAS_MESSAGES_API_URL = '/cpaas/messages';
+    public const REST_CPAAS_DEDICATED_NUMBERS = '/cpaas/sms/dedicatedNumbers';
+    public const REST_CPAAS_KEYWORDS = '/cpaas/sms/keywords';
+    public const REST_CPAAS_SHORTCODES = '/cpaas/sms/shortcodes';
+    public const REST_CPAAS_OPTOUT_RULES = '/cpaas/automation/inboundrules/optout';
 
     /**
      * Send a single SMS message request.
@@ -24,7 +24,8 @@ class Client extends Rest
      */
     public function sendSmsSingle($data)
     {
-        $this->setUrl(self::REST_CPAAS_MESSAGES_API_URL)
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_MESSAGES_API_URL;
+        $this->setUrl($url)
             ->setVerb('POST')
             ->buildPostBody($data);
 
@@ -50,7 +51,8 @@ class Client extends Rest
      */
     public function getMessageByMessageId($messageId)
     {
-        $this->setUrl(self::REST_CPAAS_MESSAGES_API_URL . '/' . $messageId)
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_MESSAGES_API_URL . '/' . $messageId;
+        $this->setUrl($url)
             ->setVerb('GET');
 
         $response = $this->execute();
@@ -80,7 +82,8 @@ class Client extends Rest
      */
     public function sendSmsBatch($data)
     {
-        $this->setUrl(self::REST_CPAAS_MESSAGES_API_URL . '/batch')
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_MESSAGES_API_URL . '/batch';
+        $this->setUrl($url)
             ->setVerb('POST')
             ->buildPostBody($data);
 
@@ -108,7 +111,7 @@ class Client extends Rest
      */
     public function getDedicatedNumbers()
     {
-        $url = self::REST_CPAAS_DEDICATED_NUMBERS;
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_DEDICATED_NUMBERS;
         $this->setUrl($url)
             ->setVerb('GET');
 
@@ -129,7 +132,7 @@ class Client extends Rest
      */
     public function getKeywords()
     {
-        $url = self::REST_CPAAS_KEYWORDS;
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_KEYWORDS;
         $this->setUrl($url)
             ->setVerb('GET');
 
@@ -150,7 +153,7 @@ class Client extends Rest
      */
     public function getShortCodes()
     {
-        $url = self::REST_CPAAS_SHORTCODES;
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_SHORTCODES;
         $this->setUrl($url)
             ->setVerb('GET');
 
@@ -171,7 +174,7 @@ class Client extends Rest
      */
     public function getCpaasOptOutRules()
     {
-        $url = self::REST_CPAAS_OPTOUT_RULES;
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_OPTOUT_RULES;
         $this->setUrl($url)
             ->setVerb('GET');
 
@@ -207,7 +210,7 @@ class Client extends Rest
             ]
         ];
 
-        $url = self::REST_CPAAS_OPTOUT_RULES;
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_OPTOUT_RULES;
         $this->setUrl($url)
             ->setVerb('POST')
             ->buildPostBody($rule);
@@ -234,7 +237,7 @@ class Client extends Rest
      */
     public function deleteCpaasOptOutRule($cpaasOptOutRuleId)
     {
-        $url = self::REST_CPAAS_OPTOUT_RULES . '/' . $cpaasOptOutRuleId;
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_OPTOUT_RULES . '/' . $cpaasOptOutRuleId;
         $this->setUrl($url)
             ->setVerb('DELETE');
 
