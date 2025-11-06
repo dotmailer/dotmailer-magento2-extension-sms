@@ -2,11 +2,12 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
     <event name="sales_order_save_after">
         <observer name="ddg_sms_sales_order_save_after" instance="Dotdigitalgroup\Sms\Observer\Sales\OrderSaveAfter"/>
+        <observer name="ddg_sms_checkout_transactional_consent" instance="Dotdigitalgroup\Sms\Observer\Sales\CheckoutTransactionalConsentObserver" />
     </event>
     <event name="sales_order_creditmemo_save_after">
         <observer name="ddg_sms_sales_order_creditmemo_save_after" instance="Dotdigitalgroup\Sms\Observer\Sales\OrderCreditmemoSaveAfter" />
     </event>
     <event name="sales_order_place_after">
-        <observer name="ddg_sms_checkout_consent" instance="Dotdigitalgroup\Sms\Observer\Sales\CheckoutConsentObserver" />
+        <observer name="ddg_sms_checkout_marketing_consent" instance="Dotdigitalgroup\Sms\Observer\Sales\CheckoutMarketingConsentObserver" />
     </event>
 </config>

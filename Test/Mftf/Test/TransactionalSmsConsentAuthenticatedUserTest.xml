@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="TransactionalSmsConsentAuthenticatedUserTest">
+        <annotations>
+            <features value="Sms"/>
+            <stories value="Transactional SMS Consent for Authenticated User"/>
+            <title value="Verify transactional SMS consent changes when authenticated user switches between US and UK addresses"/>
+            <description value="Authenticated user with US (default) and UK addresses should see correct consent options when switching between addresses"/>
+            <severity value="MINOR"/>
+            <group value="dotdigitalSms"/>
+            <group value="transactionalSmsConsent"/>
+        </annotations>
+
+        <before>
+            <!-- Login to admin -->
+            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup1"/>
+
+            <!-- Configure Dotmailer API credentials -->
+            <actionGroup ref="SetDotmailerAccountData" stepKey="SetDotmailerAccountData">
+                <argument name="email" value="{{_ENV.MAGENTOCLOUD_RELATIONSHIPS_MAIL_0_USERNAME}}"/>
+                <argument name="password" value="{{_ENV.MAGENTOCLOUD_RELATIONSHIPS_MAIL_0_PASSWORD}}"/>
+            </actionGroup>
+
+            <!-- Enable phone number validation -->
+            <actionGroup ref="SetPhoneNumberValidation" stepKey="EnablePhoneNumberValidation">
+                <argument name="enabled" value="Yes"/>
+            </actionGroup>
+
+            <!-- Enable SMS consent -->
+            <actionGroup ref="SetSmsConsentOptions" stepKey="SetSmsConsentOptions">
+                <argument name="configSelector" value="{{AdminSmsConsentSection.consentEnabledCheckout}}"/>
+            </actionGroup>
+
+            <!-- Enable transactional SMS consent -->
+            <actionGroup ref="SetTransactionalSmsConsentOptions" stepKey="SetTransactionalSmsConsentOptions">
+                <argument name="enabled" value="Yes"/>
+                <argument name="consentText" value="I agree to receive transactional SMS messages for US phone numbers"/>
+            </actionGroup>
+
+            <!-- Create category -->
+            <createData entity="ApiCategory" stepKey="createCategory"/>
+
+            <!-- Create simple product -->
+            <createData entity="simpleProductDefault" stepKey="simpleProduct">
+                <requiredEntity createDataKey="createCategory"/>
+            </createData>
+
+            <!-- Assign default source to product -->
+            <actionGroup ref="DotAdminAssignDefaultSourceToSimpleProductsActionGroup" stepKey="assignDefaultSource">
+                <argument name="product1Sku" value="$$simpleProduct.sku$$"/>
+                <argument name="source1_code" value="default"/>
+            </actionGroup>
+
+            <!-- Reindex -->
+            <actionGroup ref="CliIndexerReindexActionGroup" stepKey="performReindex">
+                <argument name="indices" value="cataloginventory_stock inventory"/>
+            </actionGroup>
+
+            <!-- Create customer with US and UK addresses -->
+            <createData entity="Simple_US_Customer_Multiple_Addresses" stepKey="createCustomer"/>
+        </before>
+
+        <after>
+            <!-- Delete test data -->
+            <deleteData createDataKey="simpleProduct" stepKey="deleteSimpleProduct"/>
+            <deleteData createDataKey="createCategory" stepKey="deleteCategory"/>
+            <deleteData createDataKey="createCustomer" stepKey="deleteCustomer"/>
+
+            <!-- Reset transactional SMS consent options -->
+            <actionGroup ref="ResetTransactionalSmsConsentOptions" stepKey="ResetTransactionalSmsConsentOptions"/>
+
+            <!-- Logout from admin -->
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="logout"/>
+        </after>
+
+        <!-- Login as customer on storefront -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginAsCustomer">
+            <argument name="Customer" value="$$createCustomer$$"/>
+        </actionGroup>
+
+        <!-- Navigate to product page -->
+        <amOnPage url="{{StorefrontProductPage.url($$simpleProduct.custom_attributes[url_key]$$)}}" stepKey="navigateToProductPage"/>
+        <waitForPageLoad stepKey="waitForProductPageLoad"/>
+
+        <!-- Add product to cart -->
+        <actionGroup ref="AddToCartFromStorefrontProductPageActionGroup" stepKey="addToCartFromStorefrontProductPage">
+            <argument name="productName" value="$$simpleProduct.name$$"/>
+        </actionGroup>
+
+        <!-- Go to checkout -->
+        <actionGroup ref="GoToCheckoutFromMinicartActionGroup" stepKey="goToCheckoutFromMinicart"/>
+        <waitForPageLoad stepKey="waitForCheckoutPageLoad"/>
+
+        <!-- Test with US address (default) -->
+        <comment userInput="Testing with US address as default" stepKey="commentTestUSAddress"/>
+
+        <!-- Verify US address is pre-selected -->
+        <see selector="{{CheckoutShippingSection.selectedShippingAddress}}" userInput="{{US_Address_NY.street[0]}}" stepKey="seeUSAddressSelected"/>
+
+        <!-- Update the US phone number to a valid format -->
+        <actionGroup ref="SelectPhoneCountryActionGroup" stepKey="updateUSPhoneNumber">
+            <argument name="countryCode" value="us"/>
+            <argument name="phoneNumber" value="+1 201 555 0123"/>
+        </actionGroup>
+        <wait time="1" stepKey="waitAfterUSPhoneUpdate"/>
+
+        <!-- Scroll to consent form -->
+        <scrollTo selector="{{CheckoutConsentFormSection.consentForm}}" stepKey="scrollToConsentFormUS"/>
+        <waitForElementVisible selector="{{CheckoutConsentFormSection.consentCheckbox}}" stepKey="waitForMarketingConsentCheckboxUS"/>
+
+        <!-- Verify marketing consent checkbox is visible -->
+        <seeElement selector="{{CheckoutConsentFormSection.consentCheckbox}}" stepKey="seeMarketingConsentCheckboxUS"/>
+
+        <!-- Verify transactional consent checkbox is visible for US -->
+        <seeElement selector="{{CheckoutConsentFormSection.transactionalConsentCheckbox}}" stepKey="seeTransactionalConsentForUS"/>
+        <see userInput="I agree to receive transactional SMS messages for US phone numbers" stepKey="seeTransactionalConsentTextUS"/>
+
+        <!-- Switch to UK address -->
+        <comment userInput="Switching to UK address" stepKey="commentSwitchToUK"/>
+        <click selector="{{CheckoutShippingSection.shipHereButton('172, Westminster Bridge Rd')}}" stepKey="selectUKAddress"/>
+        <waitForPageLoad stepKey="waitAfterAddressChange"/>
+        <wait time="1" stepKey="waitForAddressSwitch"/>
+
+        <!-- Update the UK phone number to a valid format -->
+        <actionGroup ref="SelectPhoneCountryActionGroup" stepKey="updateUKPhoneNumber">
+            <argument name="countryCode" value="gb"/>
+            <argument name="phoneNumber" value="+44 20 7946 0958"/>
+        </actionGroup>
+        <wait time="2" stepKey="waitForConsentUpdate"/>
+
+        <!-- Verify UK address is now selected -->
+        <see selector="{{CheckoutShippingSection.selectedShippingAddress}}" userInput="{{UK_Not_Default_Address.street[0]}}" stepKey="seeUKAddressSelected"/>
+
+        <!-- Scroll to consent form -->
+        <scrollTo selector="{{CheckoutConsentFormSection.consentForm}}" stepKey="scrollToConsentFormUK"/>
+        <waitForElementVisible selector="{{CheckoutConsentFormSection.consentCheckbox}}" stepKey="waitForMarketingConsentCheckboxUK"/>
+
+        <!-- Verify marketing consent checkbox is still visible -->
+        <seeElement selector="{{CheckoutConsentFormSection.consentCheckbox}}" stepKey="seeMarketingConsentCheckboxUK"/>
+
+        <!-- Verify transactional consent checkbox is NOT visible for UK -->
+        <dontSeeElement selector="{{CheckoutConsentFormSection.transactionalConsentCheckbox}}" stepKey="dontSeeTransactionalConsentForUK"/>
+    </test>
+</tests>
+

@@ -70,11 +70,11 @@ define([
             const parentComponent = ko.contextFor(element).$parent,
                 parentTelephoneInput = parentComponent?.getChild('telephone'),
                 consentTelephoneInput = UiClass
-                    .regions['consent-checkout-form-fields']()[0]
-                    .getChild('dd_sms_consent_telephone'),
+                    .regions['marketing-consent-checkout-form-fields']()[0]
+                    .getChild('dd_sms_marketing_consent_telephone'),
                 consentCheckbox = UiClass
                     .regions['consent-checkout-form-fields-checkbox']()[0]
-                    .getChild('dd_sms_consent_checkbox');
+                    .getChild('dd_sms_marketing_consent_checkbox');
 
             if (typeof this.config.intlTelInputConfig !== 'undefined') {
                 this.attachIntlTelInput(consentTelephoneInput);
@@ -85,7 +85,7 @@ define([
             document.addEventListener('numberIsValid', (validationEvent) => {
                 if (!consentTelephoneInput.value()) {
                     this.isValid(true);
-                    this.updateTelephoneField(consentTelephoneInput, validationEvent.detail.value);
+                    this.updateTelephoneField(consentTelephoneInput, validationEvent.detail.number);
                 }
             });
 
@@ -192,9 +192,13 @@ define([
             ) {
                 element.value = value
             } else {
-                const intlElement = window.intlTelInputGlobals.getInstance(element);
-                intlElement.setNumber(value);
-                element.value = value
+                try {
+                    const intlElement = window.intlTelInputGlobals.getInstance(element);
+                    intlElement?.setNumber(value);
+                    element.value = value
+                } catch (e) {
+                    element.value = value
+                }
             }
 
             if (triggerDOM) {

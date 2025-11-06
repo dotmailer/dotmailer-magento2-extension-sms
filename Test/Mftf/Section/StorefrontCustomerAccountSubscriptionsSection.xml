@@ -2,7 +2,7 @@
           xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
     <section name="StorefrontCustomerAccountSubscriptionsSection">
         <element name="consentForm" type="block" selector="#connector-newsletter-form-validate" />
-        <element name="consentCheckbox" type="checkbox" selector="#dd_sms_consent_checkbox" />
+        <element name="consentCheckbox" type="checkbox" selector="#dd_sms_marketing_consent_checkbox" />
         <element name="consentMobileNumber" type="input" selector="#dd_sms_consent_mobile_number" />
         <element name="consentMobileNumberMessageContainsText" type="text" selector="//div[contains(text(), '{{text}}')]" parameterized="true"/>
         <element name="saveButton" type="button" selector="#connector-newsletter-form-validate button[type='submit']" />

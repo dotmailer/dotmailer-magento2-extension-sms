@@ -8,7 +8,6 @@ use Magento\Framework\App\Config\ReinitableConfigInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\RequestInterface;
-use Magento\Store\Api\Data\WebsiteInterface;
 use Magento\Store\Api\StoreWebsiteRelationInterface;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -410,5 +409,46 @@ class Configuration
             ScopeInterface::SCOPE_WEBSITE,
             $websiteId
         );
+    }
+
+    /**
+     * Is transactional consent enabled.
+     *
+     * @param string $storeId
+     * @return bool
+     */
+    public function isTransactionalConsentEnabled(string $storeId): bool
+    {
+        return $this->scopeConfig->isSetFlag(
+            ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_CONSENT_ENABLED,
+            ScopeInterface::SCOPE_STORES,
+            $storeId
+        );
+    }
+
+    /**
+     * Get transactional consent text.
+     *
+     * @param string $storeId
+     * @return string
+     */
+    public function getTransactionalConsentText(string $storeId): string
+    {
+        return (string) $this->scopeConfig->getValue(
+            ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_CONSENT_TEXT,
+            ScopeInterface::SCOPE_STORES,
+            $storeId
+        );
+    }
+
+    /**
+     * Get transactional consent applicable country codes.
+     *
+     * @param string $storeId
+     * @return array
+     */
+    public function transactionalConsentApplicableCodes(string $storeId): array
+    {
+        return ConfigInterface::SMS_ISO_COUNTRY_CODES_WITH_TRANSACTIONAL_CONSENT;
     }
 }

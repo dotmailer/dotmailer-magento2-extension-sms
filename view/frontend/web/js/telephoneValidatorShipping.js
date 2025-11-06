@@ -14,48 +14,44 @@ define([
      * @param {Function} selectShippingAddress
      * @returns {Function}
      */
-    return function (selectShippingAddress) {
+    return  function (selectShippingAddress) {
         return wrapper.wrap(selectShippingAddress, function (originalSelectShippingAddress, config, element) {
             originalSelectShippingAddress(config, element);
-            const validateQuotePhone = () => {
-                let shippingAddress = quote.shippingAddress(),
-                    regex = /^\+(?:[0-9] ?){6,14}[0-9]$/,
-                    ddgContainerSelector = $('#telephone-resubmission'),
-                    phoneNumber = shippingAddress.telephone,
-                    isLoggedIn = customer.isLoggedIn(),
-                    hasStoredAddresses = $('.shipping-address-items').length,
-                    isValid = regex.test(phoneNumber);
 
+            const validateQuotePhone = (element) => {
+                const ddgContainerSelector= $('#telephone-resubmission')
+                const shippingAddress = quote.shippingAddress()
+                const ValidatePhoneNumber = new Promise((resolve,reject) => {
+                    return setTimeout(() => {
+                        let intlInput = window.intlTelInputGlobals.getInstance(element)
+                        intlInput.setNumber(shippingAddress.telephone);
+                        return (intlInput.isValidNumber()) ? resolve(intlInput) : reject(intlInput);
+                    }, 500); //wait for intlTelInput to initialize
+                });
+
+                //This is required for UI issue in magento2 v2.4.4
+                //https://github.com/magento/magento2/issues/35651
+                messageList.clear();
                 ddgContainerSelector.hide();
 
-                if (!phoneNumber) {
-                    return;
-                }
-
-                if (!isValid && ddgContainerSelector.length && isLoggedIn && hasStoredAddresses) {
-                    ddgContainerSelector.show();
-                    let event = new CustomEvent('numberIsInvalid', {'detail': {'number': phoneNumber}});
-
-                    document.dispatchEvent(event);
-
-                    if (!messageList.hasMessages()) {
-                        messageList.addErrorMessage({
-                            message: $t('Enter a valid phone number to receive SMS order notifications.')
-                        });
-                    }
-                } else {
-                    //This is required for UI issue in magento2 v2.4.4
-                    //https://github.com/magento/magento2/issues/35651
-                    messageList.clear();
-                    let event = new CustomEvent('numberIsValid', {'detail': {'number': phoneNumber}});
-
-                    document.dispatchEvent(event);
-                }
-            };
+                ValidatePhoneNumber
+                    .then((intlInput) => document.dispatchEvent(new CustomEvent('numberIsValid', {'detail': {'number': shippingAddress.telephone}})))
+                    .catch((intlInput) => {
+                        ddgContainerSelector.show();
+                        document.dispatchEvent(new CustomEvent('numberIsInvalid', {'detail': {'number': shippingAddress.telephone}}));
+                        if (!messageList.hasMessages()) {
+                            messageList.addErrorMessage({
+                                message: $t('Enter a valid phone number to receive SMS order notifications.')
+                            });
+                        }
+                    })
+            }
 
             (async () => {
-                while (!$('#telephone-resubmission').length) { await new Promise(resolve => setTimeout(resolve, 1)); }
-                validateQuotePhone();
+                if(!customer.isLoggedIn()) return;
+                $.async('#telephone-resubmission input[name="telephone"]' , (element)=> {
+                    validateQuotePhone(element);
+                })
             })();
         });
     };

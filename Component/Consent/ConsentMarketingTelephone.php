@@ -4,7 +4,7 @@ namespace Dotdigitalgroup\Sms\Component\Consent;
 
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
 
-class ConsentTelephone
+class ConsentMarketingTelephone
 {
     /**
      * @var Configuration
@@ -32,12 +32,12 @@ class ConsentTelephone
         $layout =  [
             'component' => 'Magento_Ui/js/form/element/abstract',
             'config' => [
-                'id' => 'dd_sms_consent_telephone',
+                'id' => 'dd_sms_marketing_consent_telephone',
                 'customScope' => 'shippingAddress.custom_attributes',
                 'customEntry' => null,
                 'template' => 'ui/form/field',
             ],
-            'dataScope' => 'shippingAddress.dd_consent.dd_sms_consent_telephone',
+            'dataScope' => 'shippingAddress.dd_consent.dd_sms_marketing_consent_telephone',
             'label' => null,
             'provider' => 'checkoutProvider',
             'sortOrder' => 200,
@@ -50,7 +50,7 @@ class ConsentTelephone
             'customEntry' => null,
             'visible' => true,
             'focused' => false,
-            'id' => 'dd_sms_consent_telephone',
+            'id' => 'dd_sms_marketing_consent_telephone',
         ];
 
         if ($this->moduleConfig->isPhoneNumberValidationEnabled($storeId)) {

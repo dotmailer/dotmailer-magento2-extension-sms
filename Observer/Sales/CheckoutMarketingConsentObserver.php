@@ -25,7 +25,7 @@ use Magento\Store\Model\StoreManagerInterface;
 /**
  * Observer for storing consent at checkout.
  */
-class CheckoutConsentObserver implements ObserverInterface
+class CheckoutMarketingConsentObserver implements ObserverInterface
 {
     /**
      * @var Logger
@@ -73,6 +73,8 @@ class CheckoutConsentObserver implements ObserverInterface
     private $smsSubscriptionDataFactory;
 
     /**
+     * CheckoutMarketingConsentObserver constructor.
+     *
      * @var SmsMessagePublisher
      */
     private $smsMessagePublisher;
@@ -122,8 +124,8 @@ class CheckoutConsentObserver implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        if (false === $this->checkoutSession->getData('dd_sms_consent_checkbox') ||
-            empty($this->checkoutSession->getData('dd_sms_consent_telephone'))) {
+        if (false === $this->checkoutSession->getData('dd_sms_marketing_consent_checkbox') ||
+            empty($this->checkoutSession->getData('dd_sms_marketing_consent_telephone'))) {
             return $this;
         }
 
@@ -131,7 +133,7 @@ class CheckoutConsentObserver implements ObserverInterface
             $order = $observer->getEvent()->getOrder();
             $websiteId = $this->storeManager->getStore($order->getStoreId())->getWebsiteId();
             $storeId = $order->getStoreId();
-            $consentMobileNumber = $this->checkoutSession->getData('dd_sms_consent_telephone');
+            $consentMobileNumber = $this->checkoutSession->getData('dd_sms_marketing_consent_telephone');
 
             $contactModel = $this->contactCollectionFactory->create()
                 ->loadByCustomerEmail(

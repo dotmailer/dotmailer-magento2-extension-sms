@@ -50,12 +50,16 @@ class ShippingInformationManagementPlugin
         }
 
         $this->checkoutSession->setData(
-            'dd_sms_consent_checkbox',
-            $shippingExtensionAttributes->getDdSmsConsentCheckbox()
+            'dd_sms_marketing_consent_checkbox',
+            $shippingExtensionAttributes->getDdSmsMarketingConsentCheckbox()
         );
         $this->checkoutSession->setData(
-            'dd_sms_consent_telephone',
-            $shippingExtensionAttributes->getDdSmsConsentTelephone()
+            'dd_sms_marketing_consent_telephone',
+            $shippingExtensionAttributes->getDdSmsMarketingConsentTelephone()
+        );
+        $this->checkoutSession->setData(
+            'dd_sms_transactional_consent_checkbox',
+            $shippingExtensionAttributes->getDdSmsTransactionalConsentCheckbox()
         );
 
         return null;

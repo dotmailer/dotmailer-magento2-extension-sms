@@ -162,7 +162,7 @@ class Dotdigital extends Generic implements TabInterface
         );
 
         $checkbox = $fieldset->addField(
-            'dd_sms_consent_checkbox',
+            'dd_sms_marketing_consent_checkbox',
             'checkbox',
             [
                 'label' => __('Subscribed to SMS marketing'),

@@ -2,28 +2,32 @@
 
 namespace Dotdigitalgroup\Sms\Component;
 
-use Dotdigitalgroup\Sms\Component\Consent\ConsentCheckbox;
-use Dotdigitalgroup\Sms\Component\Consent\ConsentTelephone;
-use Dotdigitalgroup\Sms\Component\Consent\ConsentText;
+use Dotdigitalgroup\Sms\Component\Consent\ConsentMarketingCheckbox;
+use Dotdigitalgroup\Sms\Component\Consent\ConsentMarketingTelephone;
+use Dotdigitalgroup\Sms\Component\Consent\ConsentMarketingText;
+use Dotdigitalgroup\Sms\Component\Consent\ConsentTransactionalCheckbox;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\ViewModel\TelephoneInputConfig;
-use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Store\Model\StoreManagerInterface;
 
 class ConsentCollapseGroup
 {
     /**
-     * @var ConsentCheckbox
+     * @var ConsentMarketingCheckbox
      */
     private $consentCheckbox;
 
     /**
-     * @var ConsentTelephone
+     * @var ConsentTransactionalCheckbox
+     */
+    private $transactionalConsentCheckbox;
+
+    /**
+     * @var ConsentMarketingTelephone
      */
     private $consentTelephone;
 
     /**
-     * @var ConsentText
+     * @var ConsentMarketingText
      */
     private $consentText;
 
@@ -38,20 +42,23 @@ class ConsentCollapseGroup
     private $telephoneInputConfig;
 
     /**
-     * @param ConsentCheckbox $consentCheckbox
-     * @param ConsentTelephone $consentTelephone
-     * @param ConsentText $consentText
+     * @param ConsentMarketingCheckbox $consentCheckbox
+     * @param ConsentTransactionalCheckbox $transactionalConsentCheckbox
+     * @param ConsentMarketingTelephone $consentTelephone
+     * @param ConsentMarketingText $consentText
      * @param Configuration $moduleConfig
      * @param TelephoneInputConfig $telephoneInputConfig
      */
     public function __construct(
-        ConsentCheckbox $consentCheckbox,
-        ConsentTelephone $consentTelephone,
-        ConsentText $consentText,
-        Configuration $moduleConfig,
-        TelephoneInputConfig $telephoneInputConfig
+        ConsentMarketingCheckbox     $consentCheckbox,
+        ConsentTransactionalCheckbox $transactionalConsentCheckbox,
+        ConsentMarketingTelephone    $consentTelephone,
+        ConsentMarketingText         $consentText,
+        Configuration                $moduleConfig,
+        TelephoneInputConfig         $telephoneInputConfig
     ) {
         $this->consentCheckbox = $consentCheckbox;
+        $this->transactionalConsentCheckbox = $transactionalConsentCheckbox;
         $this->consentTelephone = $consentTelephone;
         $this->consentText = $consentText;
         $this->moduleConfig = $moduleConfig;
@@ -70,7 +77,7 @@ class ConsentCollapseGroup
         $group = [
             'component' => 'Dotdigitalgroup_Sms/js/view/consentCheckoutForm',
             'config' => [
-                'template' => 'Dotdigitalgroup_Sms/consent-checkout-form'
+                'template' => 'Dotdigitalgroup_Sms/consent-checkout-form',
             ],
             'provider' => 'checkoutProvider',
             'children' => [
@@ -78,15 +85,16 @@ class ConsentCollapseGroup
                     'component' => 'uiComponent',
                     'displayArea' => 'consent-checkout-form-fields-checkbox',
                     'children' => [
-                        'dd_sms_consent_checkbox' => $this->consentCheckbox->render($storeId),
+                        'dd_sms_marketing_consent_checkbox' => $this->consentCheckbox->render($storeId),
+                        'dd_sms_transactional_consent_checkbox' => $this->transactionalConsentCheckbox->render($storeId)
                     ]
                 ],
-                'consent-checkout-form-fields' => [
+                'marketing-consent-checkout-form-fields' => [
                     'component' => 'uiComponent',
-                    'displayArea' => 'consent-checkout-form-fields',
+                    'displayArea' => 'marketing-consent-checkout-form-fields',
                     'children' => [
-                        'dd_sms_consent_telephone' => $this->consentTelephone->render($storeId),
-                        'dd_sms_consent_text' => $this->consentText->render($storeId),
+                        'dd_sms_marketing_consent_telephone' => $this->consentTelephone->render($storeId),
+                        'dd_sms_marketing_consent_text' => $this->consentText->render($storeId),
                     ]
                 ]
             ]

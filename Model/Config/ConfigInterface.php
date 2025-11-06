@@ -97,4 +97,6 @@ interface ConfigInterface
             'class' => \Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\NewAccountSignup::class,
         ],
     ];
+
+    public const SMS_ISO_COUNTRY_CODES_WITH_TRANSACTIONAL_CONSENT = ['us'];
 }

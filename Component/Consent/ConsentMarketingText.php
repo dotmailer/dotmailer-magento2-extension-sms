@@ -4,7 +4,7 @@ namespace Dotdigitalgroup\Sms\Component\Consent;
 
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
 
-class ConsentText
+class ConsentMarketingText
 {
     /**
      * @var Configuration
@@ -35,7 +35,7 @@ class ConsentText
                 'customEntry' => null,
                 'template' => 'Dotdigitalgroup_Sms/free-text',
             ],
-            'id' => 'dd_sms_consent_text',
+            'id' => 'dd_sms_marketing_consent_text',
             'class' => 'dd-sms-consent-text',
             'text' => $this->moduleConfig->getSmsMarketingConsentText($storeId),
             'provider' => 'checkoutProvider',

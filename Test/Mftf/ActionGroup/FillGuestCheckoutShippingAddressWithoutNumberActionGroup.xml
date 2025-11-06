@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="FillGuestCheckoutShippingAddressWithoutNumber">
+        <arguments>
+            <argument name="customer" defaultValue="Simple_US_Customer" type="entity"/>
+            <argument name="customerAddress" defaultValue="US_Address_TX" type="entity"/>
+        </arguments>
+        <waitForElementVisible selector="{{CheckoutShippingSection.emailAddress}}" stepKey="waitForCustomerEmailField" />
+        <fillField selector="{{CheckoutShippingSection.emailAddress}}" userInput="{{customer.email}}" stepKey="setCustomerEmail"/>
+        <fillField selector="{{CheckoutShippingSection.firstName}}" userInput="{{customer.firstname}}" stepKey="SetCustomerFirstName"/>
+        <fillField selector="{{CheckoutShippingSection.lastName}}" userInput="{{customer.lastname}}" stepKey="SetCustomerLastName"/>
+        <fillField selector="{{CheckoutShippingSection.street}}" userInput="{{customerAddress.street[0]}}" stepKey="SetCustomerStreetAddress"/>
+        <fillField selector="{{CheckoutShippingSection.city}}" userInput="{{customerAddress.city}}" stepKey="SetCustomerCity"/>
+        <selectOption selector="{{CheckoutShippingSection.region}}" userInput="{{customerAddress.state}}" stepKey="selectRegion"/>
+        <fillField selector="{{CheckoutShippingSection.postcode}}" userInput="{{customerAddress.postcode}}" stepKey="SetCustomerZipCode"/>
+        <selectOption selector="{{CheckoutShippingSection.country}}" userInput="{{customerAddress.country_id}}" stepKey="selectCountry"/>
+        <waitForLoadingMaskToDisappear stepKey="waitForLoadingMask"/>
+        <waitForElement selector="{{CheckoutShippingMethodsSection.checkShippingMethodByName('Flat Rate')}}" stepKey="waitForShippingMethod"/>
+        <click selector="{{CheckoutShippingMethodsSection.checkShippingMethodByName('Flat Rate')}}" stepKey="selectShippingMethod"/>
+        <waitForElement selector="{{CheckoutShippingMethodsSection.next}}" time="30" stepKey="waitForNextButton"/>
+        <click selector="{{CheckoutShippingMethodsSection.next}}" stepKey="clickNext"/>
+    </actionGroup>
+</actionGroups>

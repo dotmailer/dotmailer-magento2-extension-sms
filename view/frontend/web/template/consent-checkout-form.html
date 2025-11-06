@@ -1,10 +1,10 @@
-<form id="consent-checkout-form" class="form" data-bind="attr: {'data-hasrequired': $t('* Required Fields')}, afterRender: onReady ">
+<form id="consent-checkout-form" class="form" data-bind="attr: {'data-hasrequired': $t('* Required Fields')}, afterRender: onReady">
     <fieldset class="fieldset">
         <!-- ko foreach: getRegion('consent-checkout-form-fields-checkbox') -->
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
         <div class="field content opc-block-summary" id="ddg-consent-input" data-bind="style: { display: isChecked() ? 'block' : 'none' }" >
-            <!-- ko foreach: getRegion('consent-checkout-form-fields') -->
+            <!-- ko foreach: getRegion('marketing-consent-checkout-form-fields') -->
             <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>

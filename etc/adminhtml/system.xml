@@ -60,18 +60,30 @@
                     </depends>
                 </field>
             </group>
-            <group id="consent" translate="label" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1" >
+            <group id="consent" translate="label" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Transactional SMS Consent (for sending to US numbers)</label>
                 <comment><![CDATA[Ask customers to consent to receive SMS marketing messages at checkout when a US shipping number is entered.]]></comment>
+                <field id="validation_notice" translate="label" sortOrder="5" showInStore="1" showInWebsite="1" showInDefault="1">
+                    <frontend_model>Dotdigitalgroup\Sms\Block\Adminhtml\Config\TransactionalValidationNotice</frontend_model>
+                    <depends>
+                        <field id="transactional_sms/sms_settings/phone_number_validation" negative="1">1</field>
+                    </depends>
+                </field>
                 <field id="enabled" translate="label" sortOrder="15" type="select" showInStore="1" showInWebsite="1" showInDefault="1">
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <backend_model>Dotdigitalgroup\Sms\Model\Config\Backend\TransactionalConsent\RequireOptOutConsent</backend_model>
+                    <depends>
+                        <field id="transactional_sms/sms_settings/phone_number_validation">1</field>
+                    </depends>
                 </field>
                 <field id="text" translate="label" sortOrder="35" type="textarea" showInWebsite="1" showInStore="1" showInDefault="1">
                     <label>Transactional SMS consent text </label>
                     <backend_model>Dotdigitalgroup\Sms\Model\Config\Backend\TransactionalConsent\PreventConsentTextDeletion</backend_model>
                     <comment><![CDATA[[Required] The text here is displayed next to the checkbox when opting in.]]></comment>
+                    <depends>
+                        <field id="transactional_sms/sms_settings/phone_number_validation">1</field>
+                    </depends>
                 </field>
                 <field id="opt_out_text" translate="comment label" sortOrder="40" type="textarea" showInStore="1" showInWebsite="1" showInDefault="1">
                     <label>Append opt-out text</label>

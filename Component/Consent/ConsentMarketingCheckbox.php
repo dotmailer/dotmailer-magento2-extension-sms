@@ -4,7 +4,7 @@ namespace Dotdigitalgroup\Sms\Component\Consent;
 
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
 
-class ConsentCheckbox
+class ConsentMarketingCheckbox
 {
     /**
      * @var Configuration
@@ -35,10 +35,11 @@ class ConsentCheckbox
                 'template' => 'ui/form/field',
                 'elementTmpl' => 'ui/form/element/checkbox',
             ],
-            'dataScope' => 'shippingAddress.dd_consent.dd_sms_consent_checkbox',
+            'dataScope' => 'shippingAddress.dd_consent.dd_sms_marketing_consent_checkbox',
             'description' => $this->moduleConfig->getSmsSignUpText($storeId),
             'provider' => 'checkoutProvider',
-            'visible' => true,
+            'visible' => $this->moduleConfig->isSmsConsentCheckoutEnabled($storeId),
+            'disabled' => !$this->moduleConfig->isSmsConsentCheckoutEnabled($storeId),
             'checked' => false,
             'validation' => [],
             'sortOrder' => 180,
