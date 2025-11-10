@@ -7,10 +7,13 @@ namespace Dotdigitalgroup\Sms\Observer\Sales;
 use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Email\Model\OrderFactory;
 use Dotdigitalgroup\Email\Model\ResourceModel\Order as EmailOrderResource;
+use Dotdigitalgroup\Sms\Model\Consent\ConsentManager;
+use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Observer for storing consent at checkout.
@@ -38,23 +41,47 @@ class CheckoutTransactionalConsentObserver implements ObserverInterface
     private $emailOrderResource;
 
     /**
+     * @var CollectionFactory
+     */
+    private $contactCollectionFactory;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
+     * @var ConsentManager
+     */
+    private $consentManager;
+
+    /**
      * CheckoutTransactionalConsentObserver constructor.
      *
      * @param Logger $logger
      * @param CheckoutSession $checkoutSession
      * @param OrderFactory $emailOrderFactory
      * @param EmailOrderResource $emailOrderResource
+     * @param CollectionFactory $contactCollectionFactory
+     * @param StoreManagerInterface $storeManager
+     * @param ConsentManager $consentManager
      */
     public function __construct(
         Logger $logger,
         CheckoutSession $checkoutSession,
         OrderFactory $emailOrderFactory,
-        EmailOrderResource $emailOrderResource
+        EmailOrderResource $emailOrderResource,
+        CollectionFactory $contactCollectionFactory,
+        StoreManagerInterface $storeManager,
+        ConsentManager $consentManager
     ) {
         $this->logger = $logger;
         $this->checkoutSession = $checkoutSession;
         $this->emailOrderFactory = $emailOrderFactory;
         $this->emailOrderResource = $emailOrderResource;
+        $this->contactCollectionFactory = $contactCollectionFactory;
+        $this->consentManager = $consentManager;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -79,14 +106,39 @@ class CheckoutTransactionalConsentObserver implements ObserverInterface
                 $this->logger->warning('No valid order found in observer event.');
                 return $this;
             }
+            // Prevent processing for order updates
+            if ($order->getOrigData('entity_id') !== null) {
+                return $this;
+            }
 
             $emailOrder = $this->emailOrderFactory->create()
                 ->loadOrCreateOrder($order->getId(), $order->getQuoteId());
 
-            $emailOrder->setData('sms_transactional_requires_opt_in', $hasTransactionalConsent ? 1 : 0);
-            $emailOrder->setData('sms_transactional_opt_in', 1);
+            $emailOrder->setData('sms_transactional_requires_opt_in', 1);
+            $emailOrder->setData('sms_transactional_opt_in', ($hasTransactionalConsent) ? 1 : 0);
 
             $this->emailOrderResource->save($emailOrder);
+
+            if ($hasTransactionalConsent) {
+                $websiteId = $this->storeManager->getStore($order->getStoreId())->getWebsiteId();
+                $storeId = $order->getStoreId();
+                $contactModel = $this->contactCollectionFactory->create()
+                ->loadByCustomerEmail(
+                    $order->getCustomerEmail(),
+                    $websiteId
+                );
+
+                if ($contactModel && $contactModel->getId()) {
+                    $this->consentManager
+                    ->setTransactionalConsent(true)
+                    ->createConsentRecord($contactModel->getId(), $storeId);
+                } else {
+                    $this->logger->debug(
+                        'Failed to create consent record, contact not found.',
+                        ['email' => $order->getCustomerEmail() ,'websiteId' => $websiteId]
+                    );
+                }
+            }
 
         } catch (LocalizedException $e) {
             $this->logger->error('Error saving SMS transactional consent: ' . $e->getMessage());

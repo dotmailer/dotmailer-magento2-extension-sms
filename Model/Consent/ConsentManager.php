@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Dotdigitalgroup\Sms\Model\Consent;
 
 use Dotdigitalgroup\Email\Model\Consent;
@@ -20,6 +22,11 @@ class ConsentManager extends EmailConsentManager
      * @var Configuration
      */
     private $config;
+
+    /**
+     * @var bool
+     */
+    private $isTransactionalConsent = false;
 
     /**
      * @param Http $http
@@ -60,6 +67,18 @@ class ConsentManager extends EmailConsentManager
     }
 
     /**
+     * Set transactional consent mode.
+     *
+     * @param bool $isTransactional
+     * @return $this
+     */
+    public function setTransactionalConsent(bool $isTransactional): self
+    {
+        $this->isTransactionalConsent = $isTransactional;
+        return $this;
+    }
+
+    /**
      * Get consent text for store view.
      *
      * @param string $consentUrl
@@ -68,6 +87,9 @@ class ConsentManager extends EmailConsentManager
      */
     public function getConsentTextForStoreView(string $consentUrl, $storeId): string
     {
+        if ($this->isTransactionalConsent) {
+            return $this->config->getSmsTransactionalConsentText($storeId);
+        }
         return $this->config->getSmsMarketingConsentText($storeId);
     }
 }
