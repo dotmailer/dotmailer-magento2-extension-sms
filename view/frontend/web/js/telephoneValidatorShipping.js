@@ -23,7 +23,6 @@ define([
                     ddgContainerSelector = $('#telephone-resubmission'),
                     phoneNumber = shippingAddress.telephone,
                     isLoggedIn = customer.isLoggedIn(),
-                    hasStoredAddresses = $('.shipping-address-items').length,
                     isValid = regex.test(phoneNumber);
 
                 ddgContainerSelector.hide();
@@ -32,7 +31,7 @@ define([
                     return;
                 }
 
-                if (!isValid && ddgContainerSelector.length && isLoggedIn && hasStoredAddresses) {
+                if (!isValid && ddgContainerSelector.length && isLoggedIn) {
                     ddgContainerSelector.show();
                     let event = new CustomEvent('numberIsInvalid', {'detail': {'number': phoneNumber}});
 
