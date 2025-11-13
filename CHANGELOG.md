@@ -1,3 +1,9 @@
+### 2.7.3
+
+#### Bug fixes
+
+- We have fixed a race condition that could occur at checkout when saved addresses take longer than expected to load.
+
 ### 2.7.2
 
 #### Improvements
