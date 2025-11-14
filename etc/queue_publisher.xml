@@ -6,4 +6,7 @@
     <publisher topic="ddg.sms.message">
         <connection name="db" exchange="magento-db" />
     </publisher>
+    <publisher topic="ddg.sms.cpaas.config">
+        <connection name="db" exchange="magento-db" />
+    </publisher>
 </config>

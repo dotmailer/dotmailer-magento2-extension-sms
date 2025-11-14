@@ -72,7 +72,7 @@
                 <field id="enabled" translate="label" sortOrder="15" type="select" showInStore="1" showInWebsite="1" showInDefault="1">
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <backend_model>Dotdigitalgroup\Sms\Model\Config\Backend\TransactionalConsent\RequireOptOutConsent</backend_model>
+                    <backend_model>Dotdigitalgroup\Sms\Model\Config\Backend\TransactionalConsent\ConsentCpaasManager</backend_model>
                     <depends>
                         <field id="transactional_sms/sms_settings/phone_number_validation">1</field>
                     </depends>
@@ -89,6 +89,12 @@
                     <label>Append opt-out text</label>
                     <tooltip><![CDATA[Opt-out keyword is set to STOP, opt-out text will add to your SMS character count.]]></tooltip>
                     <frontend_model>Dotdigitalgroup\Sms\Block\Adminhtml\AppendNote</frontend_model>
+                    <depends>
+                        <field id="transactional_sms/sms_settings/phone_number_validation">1</field>
+                    </depends>
+                </field>
+                <field id="cpaas_status_notice" translate="label" sortOrder="20" showInStore="1" showInWebsite="1" showInDefault="1">
+                    <frontend_model>Dotdigitalgroup\Sms\Block\Adminhtml\Config\CpaasStatusNotice</frontend_model>
                 </field>
             </group>
             <group id="sms_templates" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">

@@ -44,9 +44,10 @@ class MessageBuilder
      * Build message text.
      *
      * @param SmsMessageInterface $item
+     * @param bool $requireOptIn
      * @return array
      */
-    public function buildMessage(SmsMessageInterface $item)
+    public function buildMessage(SmsMessageInterface $item, bool $requireOptIn = false)
     {
         $message = [
             'to' => [
@@ -70,6 +71,12 @@ class MessageBuilder
 
         if ($originator) {
             $message['channelOptions']['sms']['from'] = $originator;
+        }
+
+        if ($requireOptIn) {
+            $optOutText = $this->getOptOutText($item->getStoreId());
+            $message['requireOptIn'] = true;
+            $message['body'] .= "\n\n" . $optOutText;
         }
 
         return $message;
@@ -106,6 +113,21 @@ class MessageBuilder
         return $this->messageCompiler->compile(
             $this->smsTemplates[$item->getStoreId()][$item->getTypeId()],
             $item
+        );
+    }
+
+    /**
+     * Get opt-out text.
+     *
+     * @param string|int $storeId
+     * @return string|null
+     */
+    private function getOptOutText($storeId)
+    {
+        return $this->scopeConfig->getValue(
+            ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_OPTOUT_TEXT,
+            ScopeInterface::SCOPE_STORES,
+            $storeId
         );
     }
 

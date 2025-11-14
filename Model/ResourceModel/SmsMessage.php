@@ -84,4 +84,19 @@ class SmsMessage extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
             );
         }
     }
+
+    /**
+     * Get unique phone numbers from the queue
+     *
+     * @return array
+     */
+    public function getUniquePhoneNumbers()
+    {
+        $connection = $this->getConnection();
+        $select = $connection->select()
+            ->from($this->getMainTable(), ['phone_number'])
+            ->distinct(true);
+
+        return $connection->fetchCol($select);
+    }
 }

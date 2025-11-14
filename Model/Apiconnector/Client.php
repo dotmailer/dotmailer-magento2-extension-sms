@@ -14,6 +14,8 @@ class Client extends EmailApiClient
     public const REST_CPAAS_KEYWORDS = '/cpaas/sms/keywords';
     public const REST_CPAAS_SHORTCODES = '/cpaas/sms/shortcodes';
     public const REST_CPAAS_OPTOUT_RULES = '/cpaas/automation/inboundrules/optout';
+    public const REST_CPAAS_PROFILES = '/cpaas/profiles';
+    public const REST_CPAAS_PROFILES_OPTIN = '/cpaas/profiles/optin';
 
     /**
      * Send a single SMS message request.
@@ -36,6 +38,7 @@ class Client extends EmailApiClient
                 ->addClientLog('Validation failures', [
                     'data' => $response->validationFailures,
                 ], Logger::DEBUG);
+            throw new \Magento\Framework\Exception\LocalizedException('SMS send failed');
         }
 
         return $response;
@@ -172,7 +175,7 @@ class Client extends EmailApiClient
      * @return array
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getCpaasOptOutRules()
+    public function getOptOutRules()
     {
         $url = $this->getApiEndpoint() . self::REST_CPAAS_OPTOUT_RULES;
         $this->setUrl($url)
@@ -198,7 +201,7 @@ class Client extends EmailApiClient
      * @return stdClass
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function postCpaasOptOutRule($keyword)
+    public function postOptOutRule($keyword)
     {
         $rule = [
             "channel" => "sms",
@@ -235,7 +238,7 @@ class Client extends EmailApiClient
      * @return void
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function deleteCpaasOptOutRule($cpaasOptOutRuleId)
+    public function deleteOptOutRule($cpaasOptOutRuleId)
     {
         $url = $this->getApiEndpoint() . self::REST_CPAAS_OPTOUT_RULES . '/' . $cpaasOptOutRuleId;
         $this->setUrl($url)
@@ -249,5 +252,86 @@ class Client extends EmailApiClient
                 __('API Error: %1', $response->message)
             );
         }
+    }
+
+    /**
+     * Retrieves Cpaas profiles with optional filter.
+     *
+     * @param string $filter
+     *
+     * @return stdClass
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getProfiles($filter = '')
+    {
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_PROFILES;
+        $this->setUrl($url . $filter)
+        ->setVerb('GET');
+
+        $response = $this->execute();
+
+        if (isset($response->message)) {
+            $this->addClientLog('Error fetching CPAAS profiles', ['filter' => $filter], Logger::ERROR);
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('API Error: %1', $response->message)
+            );
+        }
+
+        return $response;
+    }
+
+    /**
+     * Updates a Cpaas profile opt-in settings by profile ID.
+     *
+     * @param string $profileId
+     * @param array $payload
+     *
+     * @return stdClass
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function updateProfileOptIn($profileId, $payload)
+    {
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_PROFILES.'/' . $profileId . '/optin';
+
+        $this->setUrl($url)
+            ->setVerb('PUT')
+            ->buildPostBody($payload);
+
+        $response = $this->execute();
+        if (isset($response->message)) {
+            $this->addClientLog('Error updating CPAAS profile opt-in', [], Logger::ERROR);
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('API Error: %1', $response->message)
+            );
+        }
+
+        return $response;
+    }
+
+    /**
+     * Updates Cpaas profiles default opt-in settings.
+     *
+     * @param array $payload
+     *
+     * @return stdClass
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function updateProfilesOptInDefaults($payload)
+    {
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_PROFILES_OPTIN;
+
+        $this->setUrl($url)
+            ->setVerb('PUT')
+            ->buildPostBody($payload);
+
+        $response = $this->execute();
+        if (isset($response->message)) {
+            $this->addClientLog('Error updating CPAAS profiles opt-in defaults', [], Logger::ERROR);
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('API Error: %1', $response->message)
+            );
+        }
+
+        return $response;
     }
 }

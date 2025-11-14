@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Dotdigitalgroup\Sms\Test\Unit\Model\Queue\Consumer;
 
 use Dotdigitalgroup\Email\Logger\Logger;
+use Dotdigitalgroup\Email\Model\ResourceModel\Order\CollectionFactory;
+use Dotdigitalgroup\Email\Model\ResourceModel\Order\Collection;
+use Dotdigitalgroup\Email\Model\Order;
 use Dotdigitalgroup\Sms\Api\Data\SmsMessageInterface;
 use Dotdigitalgroup\Sms\Api\Data\SmsMessageInterfaceFactory;
 use Dotdigitalgroup\Sms\Api\SmsMessageRepositoryInterface;
@@ -40,6 +43,11 @@ class SmsMessageConsumerTest extends TestCase
     private $smsMessageRepositoryMock;
 
     /**
+     * @var CollectionFactory|MockObject
+     */
+    private $orderCollectionFactoryMock;
+
+    /**
      * @var DateTime|MockObject
      */
     private $dateTimeMock;
@@ -60,6 +68,7 @@ class SmsMessageConsumerTest extends TestCase
         $this->messageBuilderMock = $this->createMock(MessageBuilder::class);
         $this->smsMessageInterfaceFactoryMock = $this->createMock(SmsMessageInterfaceFactory::class);
         $this->smsMessageRepositoryMock = $this->createMock(SmsMessageRepositoryInterface::class);
+        $this->orderCollectionFactoryMock = $this->createMock(CollectionFactory::class);
         $this->dateTimeMock = $this->createMock(DateTime::class);
         $this->loggerMock = $this->createMock(Logger::class);
 
@@ -68,6 +77,7 @@ class SmsMessageConsumerTest extends TestCase
             $this->messageBuilderMock,
             $this->smsMessageInterfaceFactoryMock,
             $this->smsMessageRepositoryMock,
+            $this->orderCollectionFactoryMock,
             $this->dateTimeMock,
             $this->loggerMock
         );
@@ -95,7 +105,8 @@ class SmsMessageConsumerTest extends TestCase
 
         $this->setupMessageCreation($messageData, $message);
         $this->setupClientCreation($message, $client);
-        $this->setupMessageBuilding($message, $messagePayload);
+        $this->setupOrderCollection($messageData->getOrderId(), true, true);
+        $this->setupMessageBuilding($message, $messagePayload, true);
 
         $client->expects($this->once())
             ->method('sendSmsSingle')
@@ -117,18 +128,10 @@ class SmsMessageConsumerTest extends TestCase
             ->with('Test SMS message')
             ->willReturnSelf();
 
-        $statusCallCount = 0;
-        $message->expects($this->exactly(2))
+        $message->expects($this->once())
             ->method('setStatus')
-            ->willReturnCallback(function ($status) use (&$statusCallCount, $message) {
-                if ($statusCallCount === 0) {
-                    $this->assertEquals(SmsMessageQueueManager::SMS_STATUS_IN_PROGRESS, $status);
-                } elseif ($statusCallCount === 1) {
-                    $this->assertEquals(SmsMessageQueueManager::SMS_STATUS_DELIVERED, $status);
-                }
-                $statusCallCount++;
-                return $message;
-            });
+            ->with(SmsMessageQueueManager::SMS_STATUS_DELIVERED)
+            ->willReturnSelf();
 
         $message->expects($this->once())
             ->method('setMessage')
@@ -166,29 +169,57 @@ class SmsMessageConsumerTest extends TestCase
 
         $this->setupMessageCreation($messageData, $message);
         $this->setupClientCreation($message, $client);
-        $this->setupMessageBuilding($message, $messagePayload);
+        $this->setupOrderCollection($messageData->getOrderId(), true, true);
+        $this->setupMessageBuilding($message, $messagePayload, true);
 
         $client->expects($this->once())
             ->method('sendSmsSingle')
             ->with($messagePayload)
             ->willReturn($response);
 
-        $statusCallCount = 0;
-        $message->expects($this->exactly(2))
+        $message->expects($this->once())
             ->method('setStatus')
-            ->willReturnCallback(function ($status) use (&$statusCallCount, $message) {
-                if ($statusCallCount === 0) {
-                    $this->assertEquals(SmsMessageQueueManager::SMS_STATUS_IN_PROGRESS, $status);
-                } elseif ($statusCallCount === 1) {
-                    $this->assertEquals(SmsMessageQueueManager::SMS_STATUS_FAILED, $status);
-                }
-                $statusCallCount++;
-                return $message;
-            });
+            ->with(SmsMessageQueueManager::SMS_STATUS_FAILED)
+            ->willReturnSelf();
 
         $message->expects($this->once())
             ->method('setMessage')
             ->with('Invalid phone number')
+            ->willReturnSelf();
+
+        $this->smsMessageRepositoryMock->expects($this->once())
+            ->method('save')
+            ->with($message);
+
+        $this->smsMessageConsumer->process($messageData);
+    }
+
+    public function testProcessHandlesInProgressStatusWhenNoStatusInResponse(): void
+    {
+        $messageData = $this->createMessageData();
+        $message = $this->createMessageMock();
+        $client = $this->getMockBuilder(\stdClass::class)
+            ->addMethods(['sendSmsSingle'])
+            ->getMock();
+        $messagePayload = ['body' => 'Test SMS message'];
+
+        $response = (object) [
+            'messageId' => 'msg-789'
+        ];
+
+        $this->setupMessageCreation($messageData, $message);
+        $this->setupClientCreation($message, $client);
+        $this->setupOrderCollection($messageData->getOrderId(), true, true);
+        $this->setupMessageBuilding($message, $messagePayload, true);
+
+        $client->expects($this->once())
+            ->method('sendSmsSingle')
+            ->with($messagePayload)
+            ->willReturn($response);
+
+        $message->expects($this->once())
+            ->method('setStatus')
+            ->with(SmsMessageQueueManager::SMS_STATUS_IN_PROGRESS)
             ->willReturnSelf();
 
         $this->smsMessageRepositoryMock->expects($this->once())
@@ -211,25 +242,18 @@ class SmsMessageConsumerTest extends TestCase
 
         $this->setupMessageCreation($messageData, $message);
         $this->setupClientCreation($message, $client);
-        $this->setupMessageBuilding($message, $messagePayload);
+        $this->setupOrderCollection($messageData->getOrderId(), true, true);
+        $this->setupMessageBuilding($message, $messagePayload, true);
 
         $client->expects($this->once())
             ->method('sendSmsSingle')
             ->with($messagePayload)
             ->willReturn($response);
 
-        $statusCallCount = 0;
-        $message->expects($this->exactly(2))
+        $message->expects($this->once())
             ->method('setStatus')
-            ->willReturnCallback(function ($status) use (&$statusCallCount, $message) {
-                if ($statusCallCount === 0) {
-                    $this->assertEquals(SmsMessageQueueManager::SMS_STATUS_IN_PROGRESS, $status);
-                } elseif ($statusCallCount === 1) {
-                    $this->assertEquals(SmsMessageQueueManager::SMS_STATUS_UNKNOWN, $status);
-                }
-                $statusCallCount++;
-                return $message;
-            });
+            ->with(SmsMessageQueueManager::SMS_STATUS_UNKNOWN)
+            ->willReturnSelf();
 
         $this->smsMessageRepositoryMock->expects($this->once())
             ->method('save')
@@ -267,6 +291,39 @@ class SmsMessageConsumerTest extends TestCase
         $this->smsMessageConsumer->process($messageData);
     }
 
+    public function testProcessSkipsWhenOptInRequiredButNotProvided(): void
+    {
+        $messageData = $this->createMessageData();
+        $message = $this->createMessageMock();
+        $client = $this->getMockBuilder(\stdClass::class)
+            ->addMethods(['sendSmsSingle'])
+            ->getMock();
+
+        $this->setupMessageCreation($messageData, $message);
+        $this->setupClientCreation($message, $client);
+        $this->setupOrderCollection($messageData->getOrderId(), true, false);
+
+        $this->loggerMock->expects($this->once())
+            ->method('info')
+            ->with(
+                'Transactional SMS send skipped - opt-in was required but was not provided',
+                $this->callback(function ($context) {
+                    return isset($context['website_id']) && isset($context['order_id']);
+                })
+            );
+
+        $this->messageBuilderMock->expects($this->never())
+            ->method('buildMessage');
+
+        $client->expects($this->never())
+            ->method('sendSmsSingle');
+
+        $this->smsMessageRepositoryMock->expects($this->never())
+            ->method('save');
+
+        $this->smsMessageConsumer->process($messageData);
+    }
+
     public function testProcessThrowsAndLogsErrorOnException(): void
     {
         $messageData = $this->createMessageData();
@@ -289,8 +346,8 @@ class SmsMessageConsumerTest extends TestCase
                 })
             );
 
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Test exception');
+        $this->smsMessageRepositoryMock->expects($this->never())
+            ->method('save');
 
         $this->smsMessageConsumer->process($messageData);
     }
@@ -360,6 +417,10 @@ class SmsMessageConsumerTest extends TestCase
             ->method('setStoreId')
             ->with($messageData->getStoreId())
             ->willReturnSelf();
+
+        $message->expects($this->any())
+            ->method('getOrderId')
+            ->willReturn($messageData->getOrderId());
     }
 
     /**
@@ -382,17 +443,66 @@ class SmsMessageConsumerTest extends TestCase
     }
 
     /**
-     * Setup message building.
+     * Setup order collection with opt-in status.
+     *
+     * @param int $orderId
+     * @param bool $requiresOptIn Whether the order requires opt-in
+     * @param bool $hasOptIn Whether the customer has opted in for SMS
+     * @return void
+     */
+    private function setupOrderCollection(int $orderId, bool $requiresOptIn, bool $hasOptIn): void
+    {
+        $orderCollectionMock = $this->createMock(Collection::class);
+        $orderItem = $this->createMock(Order::class);
+
+        $orderItem->expects($this->any())
+            ->method('getId')
+            ->willReturn($orderId);
+
+        $orderItem->expects($this->any())
+            ->method('getData')
+            ->willReturnCallback(function ($key) use ($requiresOptIn, $hasOptIn) {
+                if ($key === 'sms_transactional_requires_opt_in') {
+                    return $requiresOptIn;
+                }
+                if ($key === 'sms_transactional_opt_in') {
+                    return $hasOptIn;
+                }
+                return null;
+            });
+
+        $this->orderCollectionFactoryMock->expects($this->once())
+            ->method('create')
+            ->willReturn($orderCollectionMock);
+
+        $orderCollectionMock->expects($this->once())
+            ->method('getOrdersFromIds')
+            ->with([$orderId])
+            ->willReturnSelf();
+
+        $orderCollectionMock->expects($this->once())
+            ->method('setPageSize')
+            ->with(1)
+            ->willReturnSelf();
+
+        $orderCollectionMock->expects($this->once())
+            ->method('getFirstItem')
+            ->willReturn($orderItem);
+    }
+
+    /**
+     * Setup message building with opt-in flag.
      *
      * @param MockObject $message
      * @param array $messagePayload
+     * @param bool $optIn Whether opt-in is required and customer has opted in
      * @return void
      */
-    private function setupMessageBuilding(MockObject $message, array $messagePayload): void
+    private function setupMessageBuilding(MockObject $message, array $messagePayload, bool $optIn = false): void
     {
         $this->messageBuilderMock->expects($this->once())
             ->method('buildMessage')
-            ->with($message)
+            ->with($message, $optIn)
             ->willReturn($messagePayload);
     }
 }

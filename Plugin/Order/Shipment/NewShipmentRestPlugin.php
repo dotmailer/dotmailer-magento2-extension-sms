@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dotdigitalgroup\Sms\Plugin\Order\Shipment;
 
 use Dotdigitalgroup\Email\Helper\Data;
+use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\Model\Queue\Publisher\SmsMessagePublisher;
@@ -14,7 +15,6 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\ShipOrderInterface;
 use Magento\Store\Model\StoreManagerInterface;
-use Psr\Log\LoggerInterface;
 
 class NewShipmentRestPlugin
 {
@@ -29,7 +29,7 @@ class NewShipmentRestPlugin
     private $state;
 
     /**
-     * @var LoggerInterface
+     * @var Logger
      */
     private $logger;
 
@@ -56,7 +56,7 @@ class NewShipmentRestPlugin
     /**
      * @param Data $helper
      * @param State $state
-     * @param LoggerInterface $logger
+     * @param Logger $logger
      * @param Configuration $moduleConfig
      * @param OrderRepositoryInterface $orderRepository
      * @param SmsMessagePublisher $smsMessagePublisher
@@ -65,7 +65,7 @@ class NewShipmentRestPlugin
     public function __construct(
         Data $helper,
         State $state,
-        LoggerInterface $logger,
+        Logger $logger,
         Configuration $moduleConfig,
         OrderRepositoryInterface $orderRepository,
         SmsMessagePublisher $smsMessagePublisher,

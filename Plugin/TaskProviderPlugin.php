@@ -2,6 +2,7 @@
 
 namespace Dotdigitalgroup\Sms\Plugin;
 
+use Dotdigitalgroup\Sms\Model\Config\TransactionalSms\CpaasConfigManagerFactory;
 use Dotdigitalgroup\Sms\Model\SmsStatusManagerFactory;
 use Dotdigitalgroup\Email\Console\Command\Provider\TaskProvider;
 
@@ -13,12 +14,20 @@ class TaskProviderPlugin
     private $smsStatusManagerFactory;
 
     /**
+     * @var CpaasConfigManagerFactory
+     */
+    private $cpaasConfigManagerFactory;
+
+    /**
      * @param SmsStatusManagerFactory $smsStatusManagerFactory
+     * @param CpaasConfigManagerFactory $cpaasConfigManagerFactory
      */
     public function __construct(
-        SmsStatusManagerFactory $smsStatusManagerFactory
+        SmsStatusManagerFactory $smsStatusManagerFactory,
+        CpaasConfigManagerFactory $cpaasConfigManagerFactory
     ) {
         $this->smsStatusManagerFactory = $smsStatusManagerFactory;
+        $this->cpaasConfigManagerFactory = $cpaasConfigManagerFactory;
     }
 
     /**

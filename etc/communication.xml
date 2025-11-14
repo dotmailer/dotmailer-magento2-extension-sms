@@ -13,4 +13,10 @@
             type="Dotdigitalgroup\Sms\Model\Queue\Consumer\SmsMessageConsumer"
             method="process" />
     </topic>
+    <topic name="ddg.sms.cpaas.config" request="Dotdigitalgroup\Sms\Model\Queue\Message\CpaasConfigMessage">
+        <handler
+            name="cpaasConfigHandler"
+            type="Dotdigitalgroup\Sms\Model\Queue\Consumer\CpaasConfigConsumer"
+            method="process" />
+    </topic>
 </config>

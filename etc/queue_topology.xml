@@ -9,5 +9,9 @@
                  topic="ddg.sms.message"
                  destinationType="queue"
                  destination="ddg.sms.message.queue"/>
+        <binding id="dotdigitalCpaasConfigBinding"
+                 topic="ddg.sms.cpaas.config"
+                 destinationType="queue"
+                 destination="ddg.sms.cpaas.config.queue"/>
     </exchange>
 </config>
