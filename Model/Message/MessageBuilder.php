@@ -74,9 +74,11 @@ class MessageBuilder
         }
 
         if ($requireOptIn) {
-            $optOutText = $this->getOptOutText($item->getStoreId());
             $message['requireOptIn'] = true;
-            $message['body'] .= "\n\n" . $optOutText;
+            $optOutText = $this->getOptOutText($item->getStoreId());
+            if (!empty($optOutText)) {
+                $message['body'] .= "\n\n" . $optOutText;
+            }
         }
 
         return $message;
