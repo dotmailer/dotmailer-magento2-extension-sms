@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Dotdigitalgroup\Sms\Plugin\Order\Shipment;
 
+use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
-use Dotdigitalgroup\Sms\Model\Queue\OrderItem\UpdateShipment;
+use Dotdigitalgroup\Sms\Model\Queue\Publisher\SmsMessagePublisher;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\ResultInterface;
@@ -28,14 +29,14 @@ class ShipmentUpdatePlugin
     private $orderRepository;
 
     /**
-     * @var UpdateShipment
-     */
-    private $updateShipment;
-
-    /**
      * @var ShipmentRepositoryInterface
      */
     private $shipmentRepository;
+
+    /**
+     * @var SmsMessagePublisher
+     */
+    private $smsMessagePublisher;
 
     /**
      * @var RequestInterface
@@ -47,21 +48,21 @@ class ShipmentUpdatePlugin
      *
      * @param Configuration $moduleConfig
      * @param OrderRepositoryInterface $orderRepository
-     * @param UpdateShipment $updateShipment
      * @param ShipmentRepositoryInterface $shipmentRepository
+     * @param SmsMessagePublisher $smsMessagePublisher
      * @param Context $context
      */
     public function __construct(
         Configuration $moduleConfig,
         OrderRepositoryInterface $orderRepository,
-        UpdateShipment $updateShipment,
         ShipmentRepositoryInterface $shipmentRepository,
+        SmsMessagePublisher $smsMessagePublisher,
         Context $context
     ) {
         $this->moduleConfig = $moduleConfig;
         $this->orderRepository = $orderRepository;
-        $this->updateShipment = $updateShipment;
         $this->shipmentRepository = $shipmentRepository;
+        $this->smsMessagePublisher = $smsMessagePublisher;
         $this->request = $context->getRequest();
     }
 
@@ -92,12 +93,14 @@ class ShipmentUpdatePlugin
             $orderId
         );
 
-        $this->updateShipment
-            ->buildAdditionalData(
-                $order,
-                $this->request->getParam('number'),
-                $this->request->getParam('title')
-            )->queue();
+        $this->smsMessagePublisher->publish(
+            ConfigInterface::SMS_TYPE_UPDATE_SHIPMENT,
+            [
+                'order' => $order,
+                'trackingNumber' => $this->request->getParam('number'),
+                'trackingCarrier' => $this->request->getParam('title')
+            ]
+        );
 
         return $result;
     }
