@@ -44,14 +44,14 @@ class CpaasStatusNotice extends Field
         if ($status === 'pending') {
             return sprintf(
                 '<div class="message message-notice">%s</div>',
-                __('CPaaS configuration is pending. Changes will be applied shortly.')
+                __('Configuration is pending. Changes will be applied shortly.')
             );
         }
 
         if ($status === 'error') {
             return sprintf(
                 '<div class="message message-error">%s</div>',
-                __('CPaaS configuration failed. Please check logs for details.')
+                __('Configuration has failed. Please check logs for details.')
             );
         }
 
