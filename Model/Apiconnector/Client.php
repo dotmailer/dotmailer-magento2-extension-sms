@@ -183,14 +183,7 @@ class Client extends EmailApiClient
 
         $response = $this->execute();
 
-        if (isset($response->message)) {
-            $this->addClientLog('Error fetching opt-out rules', [], Logger::ERROR);
-            throw new \Magento\Framework\Exception\LocalizedException(
-                __('API Error: %1', $response->message)
-            );
-        }
-
-        return $response;
+        return $this->validateResponse($response);
     }
 
     /**
@@ -220,14 +213,7 @@ class Client extends EmailApiClient
 
         $response = $this->execute();
 
-        if (isset($response->message)) {
-            $this->addClientLog('Error creating opt-out rule', [], Logger::ERROR);
-            throw new \Magento\Framework\Exception\LocalizedException(
-                __('API Error: %1', $response->message)
-            );
-        }
-
-        return $response;
+        return $this->validateResponse($response);
     }
 
     /**
@@ -246,12 +232,7 @@ class Client extends EmailApiClient
 
         $response = $this->execute();
 
-        if (isset($response->message)) {
-            $this->addClientLog('Error deleting opt-out rule', [], Logger::ERROR);
-            throw new \Magento\Framework\Exception\LocalizedException(
-                __('API Error: %1', $response->message)
-            );
-        }
+        $this->validateResponse($response);
     }
 
     /**
@@ -270,14 +251,7 @@ class Client extends EmailApiClient
 
         $response = $this->execute();
 
-        if (isset($response->message)) {
-            $this->addClientLog('Error fetching CPAAS profiles', ['filter' => $filter], Logger::ERROR);
-            throw new \Magento\Framework\Exception\LocalizedException(
-                __('API Error: %1', $response->message)
-            );
-        }
-
-        return $response;
+        return $this->validateResponse($response);
     }
 
     /**
@@ -298,14 +272,8 @@ class Client extends EmailApiClient
             ->buildPostBody($payload);
 
         $response = $this->execute();
-        if (isset($response->message)) {
-            $this->addClientLog('Error updating CPAAS profile opt-in', [], Logger::ERROR);
-            throw new \Magento\Framework\Exception\LocalizedException(
-                __('API Error: %1', $response->message)
-            );
-        }
 
-        return $response;
+        return $this->validateResponse($response);
     }
 
     /**
@@ -325,11 +293,45 @@ class Client extends EmailApiClient
             ->buildPostBody($payload);
 
         $response = $this->execute();
+
+        return $this->validateResponse($response);
+    }
+
+    /**
+     * Check response for defined API errors and http error codes.
+     *
+     * @param string|array|stdClass $response
+     *
+     * @return string|array|stdClass
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    private function validateResponse($response)
+    {
         if (isset($response->message)) {
-            $this->addClientLog('Error updating CPAAS profiles opt-in defaults', [], Logger::ERROR);
-            throw new \Magento\Framework\Exception\LocalizedException(
-                __('API Error: %1', $response->message)
+            $errorMessage = sprintf(
+                'API Error: %s',
+                $response->message
             );
+            $this->addClientLog($errorMessage, [], Logger::ERROR);
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __($errorMessage)
+            );
+        }
+
+        $clientProperties = $this->expose();
+        if (isset($clientProperties['responseInfo']['http_code'])) {
+            $httpCode = $clientProperties['responseInfo']['http_code'];
+
+            if ($httpCode < 200 || $httpCode >= 300) {
+                $errorMessage = sprintf(
+                    'API Error: Request returned HTTP code %s',
+                    $httpCode
+                );
+                $this->addClientLog($errorMessage, ['apiEndpoint' => $this->getApiEndpoint()], Logger::ERROR);
+                throw new \Magento\Framework\Exception\LocalizedException(
+                    __($errorMessage)
+                );
+            }
         }
 
         return $response;
