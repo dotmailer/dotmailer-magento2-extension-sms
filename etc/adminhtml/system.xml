@@ -62,7 +62,7 @@
             </group>
             <group id="consent" translate="label" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Transactional SMS Consent (for sending to US numbers)</label>
-                <comment><![CDATA[Ask customers to consent to receive SMS marketing messages at checkout when a US shipping number is entered.]]></comment>
+                <comment><![CDATA[Ask customers to consent to receive transactional SMS messages at checkout when a US shipping number is entered.]]></comment>
                 <field id="validation_notice" translate="label" sortOrder="5" showInStore="1" showInWebsite="1" showInDefault="1">
                     <frontend_model>Dotdigitalgroup\Sms\Block\Adminhtml\Config\TransactionalValidationNotice</frontend_model>
                     <depends>
@@ -87,7 +87,7 @@
                 </field>
                 <field id="opt_out_text" translate="comment label" sortOrder="40" type="textarea" showInStore="1" showInWebsite="1" showInDefault="1">
                     <label>Append opt-out text</label>
-                    <tooltip><![CDATA[Opt-out keyword is set to STOP, opt-out text will add to your SMS character count.]]></tooltip>
+                    <tooltip><![CDATA[Use this field to add instructions for customers to opt out. You must include the keyword STOP to ensure users can unsubscribe. This text will increase your SMS character count.]]></tooltip>
                     <frontend_model>Dotdigitalgroup\Sms\Block\Adminhtml\AppendNote</frontend_model>
                     <depends>
                         <field id="transactional_sms/sms_settings/phone_number_validation">1</field>
