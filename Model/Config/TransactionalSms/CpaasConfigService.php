@@ -109,29 +109,43 @@ class CpaasConfigService
      * @return void
      * @throws LocalizedException
      */
-    public function configureCpaasOptOutRule(int $websiteId): void
+    public function configureCpaasInboundRules(int $websiteId): void
     {
         $client = $this->smsClientFactory->create($websiteId);
+        $enabled = $this->getCpaasConfig($websiteId, ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_CONSENT_ENABLED);
+        $optOutId = $this->getCpaasConfig($websiteId, ConfigInterface::XML_PATH_CPAAS_OPTOUT_ID);
+        $optOutGenerated = $this->getCpaasConfig($websiteId, ConfigInterface::XML_PATH_CPAAS_OPTOUT_GENERATED);
+        $optInId = $this->getCpaasConfig($websiteId, ConfigInterface::XML_PATH_CPAAS_OPTIN_ID);
+        $optInGenerated = $this->getCpaasConfig($websiteId, ConfigInterface::XML_PATH_CPAAS_OPTIN_GENERATED);
 
-        $enabled = $this->getConsentEnabled($websiteId);
         if ($enabled) {
-            $optOutId = $this->getConsentOptOutId($websiteId);
-            $optOutGenerated = $this->getConsentOptOutGenerated($websiteId);
             if (!$optOutId) {
-                $optOutRule = $this->getOrCreateOptOutRule($websiteId);
-                $optOutId = $optOutRule['optOutId'];
-                $optOutGenerated = $optOutRule['optOutGenerated'];
+                $optOutRule = $this->getOrCreateInboundRule($websiteId, 'STOP', 'out');
+                $optOutId = $optOutRule['ruleId'];
+                $optOutGenerated = $optOutRule['ruleGenerated'];
             }
-
-            $this->saveOptOutConfig($websiteId, $optOutId, (bool)$optOutGenerated);
+            if (!$optInId) {
+                $optInRule = $this->getOrCreateInboundRule($websiteId, 'START', 'in');
+                $optInId = $optInRule['ruleId'];
+                $optInGenerated = $optInRule['ruleGenerated'];
+            }
         } else {
-            $optOutId = $this->getConsentOptOutId($websiteId);
-            $optOutGenerated = $this->getConsentOptOutGenerated($websiteId);
-            if ($optOutGenerated) {
-                $client->deleteOptOutRule($optOutId);
+            if ($optOutId && $optOutGenerated) {
+                $client->deleteInboundRule($optOutId);
+                $optOutId = '';
+                $optOutGenerated = 0;
             }
-            $this->saveOptOutConfig($websiteId, '', false);
+            if ($optInId && $optInGenerated) {
+                $client->deleteInboundRule($optInId);
+                $optInId = '';
+                $optInGenerated = 0;
+            }
         }
+
+        $this->saveCpaasConfig($websiteId, ConfigInterface::XML_PATH_CPAAS_OPTOUT_ID, $optOutId);
+        $this->saveCpaasConfig($websiteId, ConfigInterface::XML_PATH_CPAAS_OPTOUT_GENERATED, $optOutGenerated);
+        $this->saveCpaasConfig($websiteId, ConfigInterface::XML_PATH_CPAAS_OPTIN_ID, $optInId);
+        $this->saveCpaasConfig($websiteId, ConfigInterface::XML_PATH_CPAAS_OPTIN_GENERATED, $optInGenerated);
     }
 
     /**
@@ -143,7 +157,8 @@ class CpaasConfigService
      */
     public function configureCpaasProfileDefaults(int $websiteId): void
     {
-        if (!$this->getConsentEnabled($websiteId)) {
+        $enabled = $this->getCpaasConfig($websiteId, ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_CONSENT_ENABLED);
+        if (!$enabled) {
             return;
         }
 
@@ -191,70 +206,58 @@ class CpaasConfigService
     }
 
     /**
-     * Get or create opt-out rule.
+     * Get or create CPaaS inbound rule.
      *
      * @param int $websiteId
+     * @param string $keyword
+     * @param string $action
+     *
      * @return array
      * @throws LocalizedException
      */
-    private function getOrCreateOptOutRule($websiteId)
+    private function getOrCreateInboundRule($websiteId, $keyword, $action)
     {
         $client = $this->smsClientFactory->create($websiteId);
-        $rules = $client->getOptOutRules();
-        $optOutId = null;
-        $optOutGenerated = 0;
+        $rules = $client->getInboundRules();
+        $ruleId = null;
+        $ruleGenerated = 0;
         if (is_iterable($rules)) {
             foreach ($rules as $rule) {
                 if ($rule->channel == 'sms' &&
                     $rule->inbound == '*' &&
-                    strtolower($rule->keyword) == 'stop' &&
-                    isset($rule->actionData->opt) && $rule->actionData->opt == 'out'
+                    strtolower($rule->keyword) == strtolower($keyword) &&
+                    isset($rule->actionData->opt) && $rule->actionData->opt == $action
                 ) {
-                    $optOutId = $rule->id;
-                    $optOutGenerated = 0;
+                    $ruleId = $rule->id;
+                    $ruleGenerated = 0;
                     break;
                 }
             }
         }
-        if (!$optOutId) {
-            $response = $client->postOptOutRule('STOP');
-            $optOutId = $response->id;
-            $optOutGenerated = 1;
+        if (!$ruleId) {
+            $response = $client->postInboundRule($keyword, $action);
+            $ruleId = $response->id;
+            $ruleGenerated = 1;
         }
-        return ['optOutId' => $optOutId, 'optOutGenerated' => $optOutGenerated];
+        return ['ruleId' => $ruleId, 'ruleGenerated' => $ruleGenerated];
     }
 
     /**
-     * Check if consent is enabled for website or websites sharing the same API user.
+     * Get websites sharing the same API user.
      *
      * @param int $websiteId
-     * @return bool
+     * @return array
      */
-    private function getConsentEnabled($websiteId)
+    private function getWebsitesSharingApiUser($websiteId)
     {
-        return $this->getCpaasConfig($websiteId, ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_CONSENT_ENABLED);
-    }
-
-    /**
-     * Get consent opt-out ID for website or websites sharing the same API user.
-     *
-     * @param int $websiteId
-     * @return string|null
-     */
-    private function getConsentOptOutId($websiteId)
-    {
-        return $this->getCpaasConfig($websiteId, ConfigInterface::XML_PATH_CPAAS_OPTOUT_ID);
-    }
-
-    /**
-     * Check if opt-out was generated for website or websites sharing the same API user.
-     *
-     * @param int $websiteId
-     * @return bool
-     */
-    private function getConsentOptOutGenerated($websiteId)
-    {
-        return $this->getCpaasConfig($websiteId, ConfigInterface::XML_PATH_CPAAS_OPTOUT_GENERATED);
+        $websiteIds = [];
+        $apiUsers = $this->getAPIUsersForEnabledWebsites();
+        foreach ($apiUsers as $apiUser) {
+            if (in_array($websiteId, $apiUser['websiteIds'])) {
+                $websiteIds = $apiUser['websiteIds'];
+            }
+        }
+        return $websiteIds;
     }
 
     /**
@@ -282,44 +285,20 @@ class CpaasConfigService
     }
 
     /**
-     * Get websites sharing the same API user.
+     * Saves CPaaS configuration for website and websites sharing the same API user.
      *
      * @param int $websiteId
-     * @return array
-     */
-    private function getWebsitesSharingApiUser($websiteId)
-    {
-        $websiteIds = [];
-        $apiUsers = $this->getAPIUsersForEnabledWebsites();
-        foreach ($apiUsers as $apiUser) {
-            if (in_array($websiteId, $apiUser['websiteIds'])) {
-                $websiteIds = $apiUser['websiteIds'];
-            }
-        }
-        return $websiteIds;
-    }
-
-    /**
-     * Save opt-out configuration for website and websites sharing the same API user.
-     *
-     * @param int $websiteId
-     * @param string $optOutId
-     * @param bool $generated
+     * @param string $configKey
+     * @param mixed $configValue
      * @return void
      */
-    private function saveOptOutConfig(int $websiteId, string $optOutId, bool $generated): void
+    private function saveCpaasConfig(int $websiteId, string $configKey, $configValue): void
     {
         $websiteIds = $this->getWebsitesSharingApiUser($websiteId);
         foreach ($websiteIds as $websiteId) {
             $this->configWriter->save(
-                ConfigInterface::XML_PATH_CPAAS_OPTOUT_ID,
-                $optOutId,
-                ScopeInterface::SCOPE_WEBSITES,
-                $websiteId
-            );
-            $this->configWriter->save(
-                ConfigInterface::XML_PATH_CPAAS_OPTOUT_GENERATED,
-                (int)$generated,
+                $configKey,
+                $configValue,
                 ScopeInterface::SCOPE_WEBSITES,
                 $websiteId
             );

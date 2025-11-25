@@ -101,7 +101,7 @@ class CpaasConfigManagerTest extends TestCase
             });
 
         $this->cpaasConfigService->expects($this->exactly(2))
-            ->method('configureCpaasOptOutRule')
+            ->method('configureCpaasInboundRules')
             ->willReturnCallback(function ($websiteId) {
                 static $callCount = 0;
                 $callCount++;
@@ -160,7 +160,7 @@ class CpaasConfigManagerTest extends TestCase
             });
 
         $this->cpaasConfigService->expects($this->once())
-            ->method('configureCpaasOptOutRule')
+            ->method('configureCpaasInboundRules')
             ->with(1)
             ->willThrowException(new \Exception('Configuration error'));
 
@@ -178,7 +178,7 @@ class CpaasConfigManagerTest extends TestCase
             ->willReturn([]);
 
         $this->cpaasConfigService->expects($this->never())
-            ->method('configureCpaasOptOutRule');
+            ->method('configureCpaasInboundRules');
 
         $this->logger->expects($this->never())
             ->method('info');
@@ -214,7 +214,7 @@ class CpaasConfigManagerTest extends TestCase
             });
 
         $this->cpaasConfigService->expects($this->once())
-            ->method('configureCpaasOptOutRule')
+            ->method('configureCpaasInboundRules')
             ->with(1);
 
         $this->cpaasConfigService->expects($this->once())

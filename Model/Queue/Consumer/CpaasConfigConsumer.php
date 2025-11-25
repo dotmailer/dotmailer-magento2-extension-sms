@@ -46,7 +46,7 @@ class CpaasConfigConsumer
         $websiteId = $message->getWebsiteId();
 
         try {
-            $this->cpaasConfigService->configureCpaasOptOutRule($websiteId);
+            $this->cpaasConfigService->configureCpaasInboundRules($websiteId);
             $this->cpaasConfigService->configureCpaasProfileDefaults($websiteId);
             $this->cpaasConfigService->saveCpaasProfilesStatus($websiteId, 'configured');
 

@@ -48,7 +48,7 @@ class CpaasConfigConsumerTest extends TestCase
             ->willReturn($websiteId);
 
         $this->cpaasConfigService->expects($this->once())
-            ->method('configureCpaasOptOutRule')
+            ->method('configureCpaasInboundRules')
             ->with($websiteId);
 
         $this->cpaasConfigService->expects($this->once())
@@ -76,7 +76,7 @@ class CpaasConfigConsumerTest extends TestCase
             ->willReturn($websiteId);
 
         $this->cpaasConfigService->expects($this->once())
-            ->method('configureCpaasOptOutRule')
+            ->method('configureCpaasInboundRules')
             ->with($websiteId)
             ->willThrowException(new \Exception($exceptionMessage));
 
@@ -100,7 +100,7 @@ class CpaasConfigConsumerTest extends TestCase
             ->willReturn($websiteId);
 
         $this->cpaasConfigService->expects($this->once())
-            ->method('configureCpaasOptOutRule')
+            ->method('configureCpaasInboundRules')
             ->with($websiteId);
 
         $this->cpaasConfigService->expects($this->once())

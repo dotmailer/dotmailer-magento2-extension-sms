@@ -15,6 +15,8 @@ interface ConfigInterface
     public const XML_PATH_TRANSACTIONAL_SMS_OPTOUT_TEXT = 'transactional_sms/consent/opt_out_text';
     public const XML_PATH_CPAAS_OPTOUT_ID = 'transactional_sms/consent/cpaas_optout_id';
     public const XML_PATH_CPAAS_OPTOUT_GENERATED = 'transactional_sms/consent/cpaas_optout_generated';
+    public const XML_PATH_CPAAS_OPTIN_ID = 'transactional_sms/consent/cpaas_optin_id';
+    public const XML_PATH_CPAAS_OPTIN_GENERATED = 'transactional_sms/consent/cpaas_optin_generated';
     public const XML_PATH_CPAAS_PROFILES_STATUS = 'transactional_sms/consent/cpaas_profiles_status';
 
     public const XML_PATH_SMS_NEW_ORDER_ENABLED = 'transactional_sms/sms_templates/new_order_confirmation_enabled';

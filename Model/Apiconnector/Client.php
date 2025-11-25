@@ -170,12 +170,12 @@ class Client extends EmailApiClient
     }
 
     /**
-     * Retrieves a Cpaas opt-out rules configuration list.
+     * Retrieves a CPaaS opt-out rules configuration list.
      *
      * @return array
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getOptOutRules()
+    public function getInboundRules()
     {
         $url = $this->getApiEndpoint() . self::REST_CPAAS_OPTOUT_RULES;
         $this->setUrl($url)
@@ -187,14 +187,15 @@ class Client extends EmailApiClient
     }
 
     /**
-     * Create a Cpaas opt-out message rule configuration.
+     * Create a CPaaS inbound message rule configuration.
      *
      * @param string $keyword
+     * @param string $action
      *
      * @return stdClass
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function postOptOutRule($keyword)
+    public function postInboundRule(string $keyword, string $action)
     {
         $rule = [
             "channel" => "sms",
@@ -202,7 +203,7 @@ class Client extends EmailApiClient
             "keyword" => $keyword,
             "action" => "optOutChange",
             "actionData" => [
-                "opt" => "out"
+                "opt" => $action
             ]
         ];
 
@@ -217,16 +218,16 @@ class Client extends EmailApiClient
     }
 
     /**
-     * Delete single Cpaas opt-out message rule configuration.
+     * Delete single CPaaS inbound message rule configuration.
      *
-     * @param string $cpaasOptOutRuleId
+     * @param string $inboundRuleId
      *
      * @return void
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function deleteOptOutRule($cpaasOptOutRuleId)
+    public function deleteInboundRule(string $inboundRuleId)
     {
-        $url = $this->getApiEndpoint() . self::REST_CPAAS_OPTOUT_RULES . '/' . $cpaasOptOutRuleId;
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_OPTOUT_RULES . '/' . $inboundRuleId;
         $this->setUrl($url)
             ->setVerb('DELETE');
 
@@ -236,14 +237,14 @@ class Client extends EmailApiClient
     }
 
     /**
-     * Retrieves Cpaas profiles with optional filter.
+     * Retrieves CPaaS profiles with optional filter.
      *
      * @param string $filter
      *
      * @return stdClass
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getProfiles($filter = '')
+    public function getProfiles(string $filter = '')
     {
         $url = $this->getApiEndpoint() . self::REST_CPAAS_PROFILES;
         $this->setUrl($url . $filter)
@@ -255,7 +256,7 @@ class Client extends EmailApiClient
     }
 
     /**
-     * Updates a Cpaas profile opt-in settings by profile ID.
+     * Updates a CPaaS profile opt-in settings by profile ID.
      *
      * @param string $profileId
      * @param array $payload
@@ -263,7 +264,7 @@ class Client extends EmailApiClient
      * @return stdClass
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function updateProfileOptIn($profileId, $payload)
+    public function updateProfileOptIn(string $profileId, array $payload)
     {
         $url = $this->getApiEndpoint() . self::REST_CPAAS_PROFILES.'/' . $profileId . '/optin';
 
@@ -277,14 +278,14 @@ class Client extends EmailApiClient
     }
 
     /**
-     * Updates Cpaas profiles default opt-in settings.
+     * Updates CPaaS profiles default opt-in settings.
      *
      * @param array $payload
      *
      * @return stdClass
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function updateProfilesOptInDefaults($payload)
+    public function updateProfilesOptInDefaults(array $payload)
     {
         $url = $this->getApiEndpoint() . self::REST_CPAAS_PROFILES_OPTIN;
 
