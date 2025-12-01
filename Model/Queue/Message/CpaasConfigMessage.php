@@ -23,6 +23,18 @@ class CpaasConfigMessage
     }
 
     /**
+     * Set website ID.
+     *
+     * @param int $websiteId
+     * @return CpaasConfigMessage
+     */
+    public function setWebsiteId(int $websiteId): CpaasConfigMessage
+    {
+        $this->websiteId = $websiteId;
+        return $this;
+    }
+
+    /**
      * Get website ID.
      *
      * @return int
