@@ -12,6 +12,7 @@ use Dotdigitalgroup\Sms\Api\Data\SmsMessageInterface;
 use Dotdigitalgroup\Sms\Api\Data\SmsMessageInterfaceFactory;
 use Dotdigitalgroup\Sms\Api\SmsMessageRepositoryInterface;
 use Dotdigitalgroup\Sms\Model\Apiconnector\SmsClientFactory;
+use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
 use Dotdigitalgroup\Sms\Model\Message\MessageBuilder;
 use Dotdigitalgroup\Sms\Model\Queue\Consumer\SmsMessageConsumer;
 use Dotdigitalgroup\Sms\Model\Queue\Message\SmsMessageData;
@@ -85,7 +86,7 @@ class SmsMessageConsumerTest extends TestCase
 
     public function testProcessSuccessfullyHandlesDeliveredMessage(): void
     {
-        $messageData = $this->createMessageData();
+        $messageData = $this->createMessageData(ConfigInterface::SMS_TYPE_NEW_ORDER);
         $message = $this->createMessageMock();
         $client = $this->getMockBuilder(\stdClass::class)
             ->addMethods(['sendSmsSingle'])
@@ -152,7 +153,7 @@ class SmsMessageConsumerTest extends TestCase
 
     public function testProcessHandlesFailedMessage(): void
     {
-        $messageData = $this->createMessageData();
+        $messageData = $this->createMessageData(ConfigInterface::SMS_TYPE_SIGN_UP);
         $message = $this->createMessageMock();
         $client = $this->getMockBuilder(\stdClass::class)
             ->addMethods(['sendSmsSingle'])
@@ -169,8 +170,7 @@ class SmsMessageConsumerTest extends TestCase
 
         $this->setupMessageCreation($messageData, $message);
         $this->setupClientCreation($message, $client);
-        $this->setupOrderCollection($messageData->getOrderId(), true, true);
-        $this->setupMessageBuilding($message, $messagePayload, true);
+        $this->setupMessageBuilding($message, $messagePayload, false);
 
         $client->expects($this->once())
             ->method('sendSmsSingle')
@@ -196,7 +196,7 @@ class SmsMessageConsumerTest extends TestCase
 
     public function testProcessHandlesInProgressStatusWhenNoStatusInResponse(): void
     {
-        $messageData = $this->createMessageData();
+        $messageData = $this->createMessageData(ConfigInterface::SMS_TYPE_SIGN_UP);
         $message = $this->createMessageMock();
         $client = $this->getMockBuilder(\stdClass::class)
             ->addMethods(['sendSmsSingle'])
@@ -209,8 +209,7 @@ class SmsMessageConsumerTest extends TestCase
 
         $this->setupMessageCreation($messageData, $message);
         $this->setupClientCreation($message, $client);
-        $this->setupOrderCollection($messageData->getOrderId(), true, true);
-        $this->setupMessageBuilding($message, $messagePayload, true);
+        $this->setupMessageBuilding($message, $messagePayload, false);
 
         $client->expects($this->once())
             ->method('sendSmsSingle')
@@ -231,7 +230,7 @@ class SmsMessageConsumerTest extends TestCase
 
     public function testProcessHandlesUnknownStatusWhenNoMessageId(): void
     {
-        $messageData = $this->createMessageData();
+        $messageData = $this->createMessageData(ConfigInterface::SMS_TYPE_SIGN_UP);
         $message = $this->createMessageMock();
         $client = $this->getMockBuilder(\stdClass::class)
             ->addMethods(['sendSmsSingle'])
@@ -242,8 +241,7 @@ class SmsMessageConsumerTest extends TestCase
 
         $this->setupMessageCreation($messageData, $message);
         $this->setupClientCreation($message, $client);
-        $this->setupOrderCollection($messageData->getOrderId(), true, true);
-        $this->setupMessageBuilding($message, $messagePayload, true);
+        $this->setupMessageBuilding($message, $messagePayload, false);
 
         $client->expects($this->once())
             ->method('sendSmsSingle')
@@ -264,7 +262,7 @@ class SmsMessageConsumerTest extends TestCase
 
     public function testProcessLogsErrorWhenClientCreationFails(): void
     {
-        $messageData = $this->createMessageData();
+        $messageData = $this->createMessageData(ConfigInterface::SMS_TYPE_SIGN_UP);
         $message = $this->createMessageMock();
 
         $this->setupMessageCreation($messageData, $message);
@@ -293,7 +291,7 @@ class SmsMessageConsumerTest extends TestCase
 
     public function testProcessSkipsWhenOptInRequiredButNotProvided(): void
     {
-        $messageData = $this->createMessageData();
+        $messageData = $this->createMessageData(ConfigInterface::SMS_TYPE_NEW_ORDER);
         $message = $this->createMessageMock();
         $client = $this->getMockBuilder(\stdClass::class)
             ->addMethods(['sendSmsSingle'])
@@ -326,7 +324,7 @@ class SmsMessageConsumerTest extends TestCase
 
     public function testProcessThrowsAndLogsErrorOnException(): void
     {
-        $messageData = $this->createMessageData();
+        $messageData = $this->createMessageData(ConfigInterface::SMS_TYPE_SIGN_UP);
         $exception = new \Exception('Test exception');
 
         $this->smsMessageInterfaceFactoryMock->expects($this->once())
@@ -352,17 +350,159 @@ class SmsMessageConsumerTest extends TestCase
         $this->smsMessageConsumer->process($messageData);
     }
 
+    public function testProcessHandlesNewAccountSignUpWithoutOrderData(): void
+    {
+        $messageData = $this->createMessageData(ConfigInterface::SMS_TYPE_NEW_ACCOUNT_SIGN_UP);
+        $message = $this->createMessageMock();
+        $client = $this->getMockBuilder(\stdClass::class)
+            ->addMethods(['sendSmsSingle'])
+            ->getMock();
+        $messagePayload = ['body' => 'Welcome to our store!'];
+
+        $response = (object) [
+            'messageId' => 'msg-new-account-123',
+            'status' => 'delivered',
+            'sentOn' => '2024-01-15 10:30:00',
+            'statusDetails' => (object) [
+                'channelStatus' => (object) [
+                    'statusdescription' => 'Account signup message delivered'
+                ]
+            ]
+        ];
+
+        $this->setupMessageCreation($messageData, $message);
+        $this->setupClientCreation($message, $client);
+
+        // Order collection should NOT be called for non-order SMS type
+        $this->orderCollectionFactoryMock->expects($this->never())
+            ->method('create');
+
+        $this->setupMessageBuilding($message, $messagePayload, false);
+
+        $client->expects($this->once())
+            ->method('sendSmsSingle')
+            ->with($messagePayload)
+            ->willReturn($response);
+
+        $this->dateTimeMock->expects($this->once())
+            ->method('formatDate')
+            ->with('2024-01-15 10:30:00')
+            ->willReturn('2024-01-15 10:30:00');
+
+        $message->expects($this->once())
+            ->method('setMessageId')
+            ->with('msg-new-account-123')
+            ->willReturnSelf();
+
+        $message->expects($this->once())
+            ->method('setContent')
+            ->with('Welcome to our store!')
+            ->willReturnSelf();
+
+        $message->expects($this->once())
+            ->method('setStatus')
+            ->with(SmsMessageQueueManager::SMS_STATUS_DELIVERED)
+            ->willReturnSelf();
+
+        $message->expects($this->once())
+            ->method('setMessage')
+            ->with('Account signup message delivered')
+            ->willReturnSelf();
+
+        $message->expects($this->once())
+            ->method('setSentAt')
+            ->with('2024-01-15 10:30:00')
+            ->willReturnSelf();
+
+        $this->smsMessageRepositoryMock->expects($this->once())
+            ->method('save')
+            ->with($message);
+
+        $this->smsMessageConsumer->process($messageData);
+    }
+
+    public function testProcessHandlesNewOrderWithOrderDataAndOptIn(): void
+    {
+        $messageData = $this->createMessageData(ConfigInterface::SMS_TYPE_NEW_ORDER);
+        $message = $this->createMessageMock();
+        $client = $this->getMockBuilder(\stdClass::class)
+            ->addMethods(['sendSmsSingle'])
+            ->getMock();
+        $messagePayload = ['body' => 'Your order has been placed'];
+
+        $response = (object) [
+            'messageId' => 'msg-order-456',
+            'status' => 'delivered',
+            'sentOn' => '2024-01-15 11:45:00',
+            'statusDetails' => (object) [
+                'channelStatus' => (object) [
+                    'statusdescription' => 'Order confirmation delivered'
+                ]
+            ]
+        ];
+
+        $this->setupMessageCreation($messageData, $message);
+        $this->setupClientCreation($message, $client);
+
+        // Order collection SHOULD be called for order SMS type
+        $this->setupOrderCollection($messageData->getOrderId(), true, true);
+
+        $this->setupMessageBuilding($message, $messagePayload, true);
+
+        $client->expects($this->once())
+            ->method('sendSmsSingle')
+            ->with($messagePayload)
+            ->willReturn($response);
+
+        $this->dateTimeMock->expects($this->once())
+            ->method('formatDate')
+            ->with('2024-01-15 11:45:00')
+            ->willReturn('2024-01-15 11:45:00');
+
+        $message->expects($this->once())
+            ->method('setMessageId')
+            ->with('msg-order-456')
+            ->willReturnSelf();
+
+        $message->expects($this->once())
+            ->method('setContent')
+            ->with('Your order has been placed')
+            ->willReturnSelf();
+
+        $message->expects($this->once())
+            ->method('setStatus')
+            ->with(SmsMessageQueueManager::SMS_STATUS_DELIVERED)
+            ->willReturnSelf();
+
+        $message->expects($this->once())
+            ->method('setMessage')
+            ->with('Order confirmation delivered')
+            ->willReturnSelf();
+
+        $message->expects($this->once())
+            ->method('setSentAt')
+            ->with('2024-01-15 11:45:00')
+            ->willReturnSelf();
+
+        $this->smsMessageRepositoryMock->expects($this->once())
+            ->method('save')
+            ->with($message);
+
+        $this->smsMessageConsumer->process($messageData);
+    }
+
     /**
      * Create test message data.
      *
+     * @param int $typeId
      * @return SmsMessageData
      */
-    private function createMessageData(): SmsMessageData
+    private function createMessageData(int $typeId = ConfigInterface::SMS_TYPE_SIGN_UP): SmsMessageData
     {
         $messageData = new SmsMessageData();
         $messageData->setWebsiteId(1)
             ->setStoreId(1)
-            ->setTypeId(1)
+            ->setTypeId($typeId)
             ->setOrderId(100)
             ->setPhoneNumber('+1234567890')
             ->setEmail('test@example.com')
@@ -421,6 +561,10 @@ class SmsMessageConsumerTest extends TestCase
         $message->expects($this->any())
             ->method('getOrderId')
             ->willReturn($messageData->getOrderId());
+
+        $message->expects($this->any())
+            ->method('getTypeId')
+            ->willReturn($messageData->getTypeId());
     }
 
     /**

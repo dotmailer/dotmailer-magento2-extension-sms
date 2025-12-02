@@ -11,6 +11,8 @@ use Dotdigitalgroup\Sms\Api\Data\SmsMessageInterface;
 use Dotdigitalgroup\Sms\Api\Data\SmsMessageInterfaceFactory;
 use Dotdigitalgroup\Sms\Api\SmsMessageRepositoryInterface;
 use Dotdigitalgroup\Sms\Model\Apiconnector\SmsClientFactory;
+use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
+use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\Model\Message\MessageBuilder;
 use Dotdigitalgroup\Sms\Model\Queue\Message\SmsMessageData;
 use Dotdigitalgroup\Sms\Model\Queue\SmsMessageQueueManager;
@@ -111,17 +113,21 @@ class SmsMessageConsumer
                 return;
             }
 
-            $order = $this->loadOrderById($messageData->getOrderId());
+            $requireOptIn = false;
+            if ($this->isOrderSmsType($message->getTypeId())) {
+                $order = $this->loadOrderById($messageData->getOrderId());
 
-            if ($this->orderRequiresOptInButHasNoOptIn($order)) {
-                $this->logger->info('Transactional SMS send skipped - opt-in was required but was not provided', [
-                    'website_id' => $message->getWebsiteId(),
-                    'order_id' => $message->getOrderId()
-                ]);
-                return;
+                if ($this->orderRequiresOptInButHasNoOptIn($order)) {
+                    $this->logger->info('Transactional SMS send skipped - opt-in was required but was not provided', [
+                        'website_id' => $message->getWebsiteId(),
+                        'order_id' => $message->getOrderId()
+                    ]);
+                    return;
+                }
+                $requireOptIn = $this->orderRequiresOptIn($order);
             }
 
-            $messagePayload = $this->messageBuilder->buildMessage($message, $this->orderRequiresOptIn($order));
+            $messagePayload = $this->messageBuilder->buildMessage($message, $requireOptIn);
             $response = $client->sendSmsSingle($messagePayload);
             $this->saveMessageWithResponse($message, $messagePayload, $response);
         } catch (\Throwable $e) {
@@ -221,5 +227,24 @@ class SmsMessageConsumer
     private function orderRequiresOptIn(Order $item): bool
     {
         return (bool) $item->getData('sms_transactional_requires_opt_in') && $item->getData('sms_transactional_opt_in');
+    }
+
+    /**
+     * Check if the SMS type is related to an order.
+     *
+     * @param int $typeId
+     * @return bool
+     */
+    private function isOrderSmsType(int $typeId): bool
+    {
+        $orderTypes = [
+            ConfigInterface::SMS_TYPE_NEW_ORDER,
+            ConfigInterface::SMS_TYPE_UPDATE_ORDER,
+            ConfigInterface::SMS_TYPE_NEW_SHIPMENT,
+            ConfigInterface::SMS_TYPE_UPDATE_SHIPMENT,
+            ConfigInterface::SMS_TYPE_NEW_CREDIT_MEMO
+        ];
+
+        return in_array($typeId, $orderTypes);
     }
 }
