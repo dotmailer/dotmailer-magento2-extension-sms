@@ -112,7 +112,7 @@ class CpaasConfigService
     public function configureCpaasInboundRules(int $websiteId): void
     {
         $client = $this->smsClientFactory->create($websiteId);
-        $enabled = $this->getCpaasConfig($websiteId, ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_CONSENT_ENABLED);
+        $enabled = $this->getCpaasConfig($websiteId, ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_CONSENT_ENABLED, true);
         $optOutId = $this->getCpaasConfig($websiteId, ConfigInterface::XML_PATH_CPAAS_OPTOUT_ID);
         $optOutGenerated = $this->getCpaasConfig($websiteId, ConfigInterface::XML_PATH_CPAAS_OPTOUT_GENERATED);
         $optInId = $this->getCpaasConfig($websiteId, ConfigInterface::XML_PATH_CPAAS_OPTIN_ID);
@@ -132,14 +132,14 @@ class CpaasConfigService
         } else {
             if ($optOutId && $optOutGenerated) {
                 $client->deleteInboundRule($optOutId);
-                $optOutId = '';
-                $optOutGenerated = 0;
             }
             if ($optInId && $optInGenerated) {
                 $client->deleteInboundRule($optInId);
-                $optInId = '';
-                $optInGenerated = 0;
             }
+            $optOutId = '';
+            $optOutGenerated = 0;
+            $optInId = '';
+            $optInGenerated = 0;
         }
 
         $this->saveCpaasConfig($websiteId, ConfigInterface::XML_PATH_CPAAS_OPTOUT_ID, $optOutId);
@@ -265,9 +265,12 @@ class CpaasConfigService
      *
      * @param int $websiteId
      * @param string $configKey
+     * @param bool $checkStoreScope
+     *
      * @return mixed
+     * @throws LocalizedException
      */
-    private function getCpaasConfig($websiteId, $configKey)
+    private function getCpaasConfig($websiteId, $configKey, $checkStoreScope = false)
     {
         $websiteIds = $this->getWebsitesSharingApiUser($websiteId);
 
@@ -279,6 +282,22 @@ class CpaasConfigService
             );
             if ($conf) {
                 return $conf;
+            }
+
+            if ($checkStoreScope) {
+                /** @var \Magento\Store\Model\Website $website */
+                $website = $this->storeManager->getWebsite($websiteId);
+                foreach ($website->getStores() as $store) {
+                    $storeConf = $this->scopeConfig->getValue(
+                        $configKey,
+                        ScopeInterface::SCOPE_STORES,
+                        $store->getId()
+                    );
+
+                    if ($storeConf) {
+                        return $storeConf;
+                    }
+                }
             }
         }
         return false;

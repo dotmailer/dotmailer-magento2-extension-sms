@@ -225,6 +225,13 @@ class CpaasConfigServiceTest extends TestCase
         $this->setupWebsitesSharingApiUser($websiteId, [$websiteId]);
         $this->setupConsentConfig($websiteId, false, 'opt-out-id', 1, 'opt-in-id', 1);
 
+        $website = $this->createMock(Website::class);
+        $website->method('getStores')->willReturn([]);
+        $this->storeManager->expects($this->any())
+            ->method('getWebsite')
+            ->with($websiteId)
+            ->willReturn($website);
+
         $client->expects($this->exactly(2))
             ->method('deleteInboundRule')
             ->willReturnCallback(function ($ruleId) {
@@ -256,6 +263,13 @@ class CpaasConfigServiceTest extends TestCase
 
         $this->setupWebsitesSharingApiUser($websiteId, [$websiteId]);
         $this->setupConsentConfig($websiteId, false, 'opt-out-id', 0, 'opt-in-id', 0);
+
+        $website = $this->createMock(Website::class);
+        $website->method('getStores')->willReturn([]);
+        $this->storeManager->expects($this->any())
+            ->method('getWebsite')
+            ->with($websiteId)
+            ->willReturn($website);
 
         $client->expects($this->never())
             ->method('deleteInboundRule');

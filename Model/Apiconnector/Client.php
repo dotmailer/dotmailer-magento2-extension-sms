@@ -233,7 +233,7 @@ class Client extends EmailApiClient
 
         $response = $this->execute();
 
-        $this->validateResponse($response);
+        $this->validateResponse($response, [404]);
     }
 
     /**
@@ -302,11 +302,12 @@ class Client extends EmailApiClient
      * Check response for defined API errors and http error codes.
      *
      * @param string|array|stdClass $response
+     * @param array $allowedHttpCodes
      *
      * @return string|array|stdClass
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    private function validateResponse($response)
+    private function validateResponse($response, $allowedHttpCodes = [])
     {
         if (isset($response->message)) {
             $errorMessage = sprintf(
@@ -324,6 +325,9 @@ class Client extends EmailApiClient
             $httpCode = $clientProperties['responseInfo']['http_code'];
 
             if ($httpCode < 200 || $httpCode >= 300) {
+                if (count($allowedHttpCodes) > 0 && in_array($httpCode, $allowedHttpCodes)) {
+                    return $response;
+                }
                 $errorMessage = sprintf(
                     'API Error: Request returned HTTP code %s',
                     $httpCode
