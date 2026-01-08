@@ -14,9 +14,15 @@
         <before>
             <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup1"/>
 
-            <!-- Create simple product -->
-            <createData entity="SimpleProduct_100" stepKey="createProduct"/>
-            <createData entity="FlatRateShippingMethodDefault" stepKey="setDefaultFlatRateShippingMethod"/>
+            <!-- Create the category -->
+            <comment userInput="Create the category" stepKey="createCategoryComment"/>
+            <createData entity="ApiCategory" stepKey="createCategory"/>
+
+            <!-- Create Simple Product -->
+            <comment userInput="Create Simple Product" stepKey="createSimpleProductComment"/>
+            <createData entity="simpleProductDefault" stepKey="simpleProduct">
+                <requiredEntity createDataKey="createCategory"/>
+            </createData>
 
             <actionGroup ref="SetDotmailerAccountData" stepKey="SetDotmailerAccountData"/>
             <actionGroup ref="SetPhoneNumberValidation" stepKey="EnablePhoneNumberValidation">
@@ -28,7 +34,8 @@
         </before>
 
         <after>
-            <deleteData createDataKey="createProduct" stepKey="deleteProduct"/>
+            <deleteData createDataKey="simpleProduct" stepKey="deleteSimpleProduct"/>
+            <deleteData createDataKey="createCategory" stepKey="deleteCategory"/>
 
             <actionGroup ref="SetPhoneNumberValidation" stepKey="DisablePhoneNumberValidation">
                 <argument name="enabled" value="No"/>
@@ -42,9 +49,20 @@
             <actionGroup ref="AdminLogoutActionGroup" stepKey="logout"/>
         </after>
 
+        <!-- Assign default source to simple product -->
+        <actionGroup ref="DotAdminAssignDefaultSourceToSimpleProductsActionGroup" stepKey="bulkAssignSourcesToAllProducts">
+            <argument name="product1Sku" value="$$simpleProduct.sku$$"/>
+            <argument name="source1_code" value="default"/>
+        </actionGroup>
+
+        <!-- Reindex data -->
+        <actionGroup ref="CliIndexerReindexActionGroup" stepKey="performReindex">
+            <argument name="indices" value="cataloginventory_stock inventory"/>
+        </actionGroup>
+
         <!-- Add product to cart -->
-        <actionGroup ref="OpenStoreFrontProductPageActionGroup" stepKey="openProductPage">
-            <argument name="productUrlKey" value="$$createProduct.custom_attributes[url_key]$$"/>
+        <actionGroup ref="StorefrontOpenProductEntityPageActionGroup" stepKey="openProductPageOnStorefront">
+            <argument name="product" value="$$simpleProduct$$"/>
         </actionGroup>
         <actionGroup ref="StorefrontAddToTheCartActionGroup" stepKey="addProductToCart"/>
 
@@ -70,7 +88,6 @@
         <seeElement selector="{{CheckoutConsentFormSection.consentMobileNumber}}" stepKey="seeConsentMobileNumber"/>
 
         <!-- Go to *Next* -->
-        <click selector="{{CheckoutShippingMethodsSection.checkShippingMethodByName('Flat Rate')}}" stepKey="selectFlatRateShippingMethod"/>
         <scrollTo selector="{{CheckoutShippingMethodsSection.next}}" stepKey="scrollToButtonNext1"/>
         <actionGroup ref="StorefrontCheckoutClickNextButtonActionGroup" stepKey="goNext1"/>
 

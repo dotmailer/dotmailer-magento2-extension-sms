@@ -16,5 +16,10 @@
         <element name="selectFromName" type="select" selector="#transactional_sms_sms_settings_default_sms_from_name" />
         <element name="alphanumericFromName" type="text" selector="#transactional_sms_sms_settings_alphanumeric_from_name" />
         <element name="save" type="button" selector="#save" />
+        <element name="transactionalConsentFieldsetToggle" type="button" selector="#transactional_sms_consent-head"/>
+        <element name="transactionalConsentFieldset" type="button" selector="#transactional_sms_consent"/>
+        <element name="transactionalConsentEnabled" type="select" selector="#transactional_sms_consent_enabled"/>
+        <element name="transactionalConsentText" type="textarea" selector="#transactional_sms_consent_text"/>
+        <element name="transactionalConsentValidationNotice" type="block" selector="#row_transactional_sms_consent_validation_notice .message-warning"/>
     </section>
 </sections>

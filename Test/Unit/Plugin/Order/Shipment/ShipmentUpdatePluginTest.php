@@ -2,8 +2,9 @@
 
 namespace Dotdigitalgroup\Sms\Test\Unit\Plugin\Order\Shipment;
 
+use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
-use Dotdigitalgroup\Sms\Model\Queue\OrderItem\UpdateShipment;
+use Dotdigitalgroup\Sms\Model\Queue\Publisher\SmsMessagePublisher;
 use Dotdigitalgroup\Sms\Plugin\Order\Shipment\ShipmentUpdatePlugin;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
@@ -23,9 +24,9 @@ class ShipmentUpdatePluginTest extends TestCase
     private $moduleConfigMock;
 
     /**
-     * @var UpdateShipment|\PHPUnit\Framework\MockObject\MockObject
+     * @var SmsMessagePublisher|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $updateShipmentMock;
+    private $smsMessagePublisherMock;
 
     /**
      * @var OrderRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject
@@ -65,7 +66,7 @@ class ShipmentUpdatePluginTest extends TestCase
     protected function setUp(): void
     {
         $this->moduleConfigMock = $this->createMock(Configuration::class);
-        $this->updateShipmentMock = $this->createMock(UpdateShipment::class);
+        $this->smsMessagePublisherMock = $this->createMock(SmsMessagePublisher::class);
         $this->orderRepositoryInterfaceMock = $this->createMock(OrderRepositoryInterface::class);
         $this->shipmentRepositoryInterfaceMock = $this->createMock(ShipmentRepositoryInterface::class);
         $this->updateShipmentActionMock = $this->createMock(UpdateShipmentAction::class);
@@ -81,8 +82,8 @@ class ShipmentUpdatePluginTest extends TestCase
         $this->plugin = new ShipmentUpdatePlugin(
             $this->moduleConfigMock,
             $this->orderRepositoryInterfaceMock,
-            $this->updateShipmentMock,
             $this->shipmentRepositoryInterfaceMock,
+            $this->smsMessagePublisherMock,
             $contextMock
         );
     }
@@ -90,27 +91,24 @@ class ShipmentUpdatePluginTest extends TestCase
     public function testAfterExecuteMethod()
     {
         $shipmentId = 1;
+        $orderId = 1;
         $trackingNumber = 12345;
         $trackingCode = 'chaz';
-
-        $this->moduleConfigMock->expects($this->once())
-            ->method('isTransactionalSmsEnabled')
-            ->willReturn(1);
 
         $this->requestInterfaceMock
             ->expects($this->exactly(3))
             ->method('getParam')
-            ->with($this->logicalOr(
-                $this->equalTo('shipment_id'),
-                $this->equalTo('number'),
-                $this->equalTo('title')
-            ))
             ->willReturnCallback(function ($param) use ($shipmentId, $trackingNumber, $trackingCode) {
-                return match ($param) {
-                    'shipment_id' => $shipmentId,
-                    'number' => $trackingNumber,
-                    'title' => $trackingCode,
-                };
+                if ($param === 'shipment_id') {
+                    return $shipmentId;
+                }
+                if ($param === 'number') {
+                    return $trackingNumber;
+                }
+                if ($param === 'title') {
+                    return $trackingCode;
+                }
+                return null;
             });
 
         $this->shipmentRepositoryInterfaceMock
@@ -121,8 +119,18 @@ class ShipmentUpdatePluginTest extends TestCase
 
         $this->shipmentInterfaceMock
             ->expects($this->once())
+            ->method('getStoreId')
+            ->willReturn(1);
+
+        $this->moduleConfigMock->expects($this->once())
+            ->method('isTransactionalSmsEnabled')
+            ->with(1)
+            ->willReturn(true);
+
+        $this->shipmentInterfaceMock
+            ->expects($this->once())
             ->method('getOrderId')
-            ->willReturn($orderId = 1);
+            ->willReturn($orderId);
 
         $this->orderRepositoryInterfaceMock
             ->expects($this->once())
@@ -130,18 +138,17 @@ class ShipmentUpdatePluginTest extends TestCase
             ->with($orderId)
             ->willReturn($this->orderInterfaceMock);
 
-        $this->updateShipmentMock
+        $this->smsMessagePublisherMock
             ->expects($this->once())
-            ->method('buildAdditionalData')
+            ->method('publish')
             ->with(
-                $this->orderInterfaceMock,
-                $trackingNumber,
-                $trackingCode
-            )->willReturn($this->updateShipmentMock);
-
-        $this->updateShipmentMock
-            ->expects($this->once())
-            ->method('queue');
+                ConfigInterface::SMS_TYPE_UPDATE_SHIPMENT,
+                [
+                    'order' => $this->orderInterfaceMock,
+                    'trackingNumber' => $trackingNumber,
+                    'trackingCarrier' => $trackingCode
+                ]
+            );
 
         $this->plugin->afterExecute(
             $this->updateShipmentActionMock,

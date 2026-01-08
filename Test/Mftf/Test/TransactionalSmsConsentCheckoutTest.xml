@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="TransactionalSmsConsentCheckoutTest">
+        <annotations>
+            <features value="Dotdigital module"/>
+            <stories value="Dotdigital SMS"/>
+            <title value="Transactional SMS consent checkbox appears for US numbers at checkout"/>
+            <description value="Verify that the transactional SMS consent checkbox appears only for US phone numbers when phone validation is enabled and transactional consent is configured"/>
+            <severity value="MINOR"/>
+            <group value="dotdigitalSms"/>
+            <group value="transactionalSmsConsent"/>
+        </annotations>
+
+        <before>
+            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup1"/>
+            <actionGroup ref="SetDotmailerAccountData" stepKey="SetDotmailerAccountData"/>
+            <actionGroup ref="SetPhoneNumberValidation" stepKey="EnablePhoneNumberValidation" />
+            <actionGroup ref="SetSmsConsentOptions" stepKey="SetSmsConsentOptions">
+                <argument name="configSelector" value="{{AdminSmsConsentSection.consentEnabledCheckout}}"/>
+            </actionGroup>
+            <actionGroup ref="SetTransactionalSmsConsentOptions" stepKey="SetTransactionalSmsConsentOptions">
+                <argument name="enabled" value="Yes"/>
+                <argument name="consentText" value="I agree to receive transactional SMS messages for US phone numbers"/>
+            </actionGroup>
+
+            <!-- Create the category -->
+            <comment userInput="Create the category" stepKey="createCategoryComment"/>
+            <createData entity="ApiCategory" stepKey="createCategory"/>
+            <!-- Create Simple Product -->
+            <comment userInput="Create Simple Product" stepKey="createSimpleProductComment"/>
+            <createData entity="simpleProductDefault" stepKey="simpleProduct">
+                <requiredEntity createDataKey="createCategory"/>
+            </createData>
+
+            <!-- Assign default source to simple product -->
+            <actionGroup ref="DotAdminAssignDefaultSourceToSimpleProductsActionGroup" stepKey="bulkAssignSourcesToAllProducts">
+                <argument name="product1Sku" value="$$simpleProduct.sku$$"/>
+                <argument name="source1_code" value="default"/>
+            </actionGroup>
+
+            <actionGroup ref="CliIndexerReindexActionGroup" stepKey="performReindex">
+                <argument name="indices" value="cataloginventory_stock inventory"/>
+            </actionGroup>
+
+        </before>
+
+        <after>
+
+            <deleteData createDataKey="simpleProduct" stepKey="deleteSimpleProduct"/>
+            <deleteData createDataKey="createCategory" stepKey="deleteCategory"/>
+
+            <actionGroup ref="ResetTransactionalSmsConsentOptions" stepKey="ResetTransactionalSmsConsentOptions"/>
+            <actionGroup ref="SetPhoneNumberValidation" stepKey="DisablePhoneNumberValidation">
+                <argument name="enabled" value="No"/>
+            </actionGroup>
+            <actionGroup ref="SetSmsConsentOptions" stepKey="DisableSmsConsent">
+                <argument name="enabled" value="No"/>
+                <argument name="configSelector" value="{{AdminSmsConsentSection.consentEnabledCheckout}}"/>
+            </actionGroup>
+            <actionGroup ref="ResetDotmailerAccountData" stepKey="resetAccountData"/>
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="logout"/>
+        </after>
+
+        <actionGroup ref="DotAdminAssignDefaultSourceToSimpleProductsActionGroup" stepKey="bulkAssignSourcesToAllProducts">
+            <argument name="product1Sku" value="$$simpleProduct.sku$$"/>
+            <argument name="source1_code" value="default"/>
+        </actionGroup>
+
+
+        <amOnPage url="{{StorefrontProductPage.url($$simpleProduct.custom_attributes[url_key]$$)}}" stepKey="navigateToProductPage"/>
+        <waitForPageLoad stepKey="waitForProductPageLoad"/>
+        <actionGroup ref="AddToCartFromStorefrontProductPageActionGroup" stepKey="addToCartFromStorefrontProductPage">
+            <argument name="productName" value="$$simpleProduct.name$$"/>
+        </actionGroup>
+
+        <actionGroup ref="GoToCheckoutFromMinicartActionGroup" stepKey="goToCheckoutFromMinicart"/>
+        <waitForPageLoad stepKey="waitForCheckoutPageLoad"/>
+
+        <actionGroup ref="FillGuestCheckoutShippingAddressWithoutNumber" stepKey="fillNonUSShippingAddress">
+            <argument name="customer" value="CustomerEntityOne"/>
+            <argument name="customerAddress" value="CustomerAddressSimple"/>
+        </actionGroup>
+
+        <!-- FillField action does not work for input after transformed by JS -->
+        <actionGroup ref="SelectPhoneCountryActionGroup" stepKey="fillUKPhoneNumber">
+            <argument name="countryCode" value="gb"/>
+            <argument name="phoneNumber" value="{{UK_Not_Default_Address.telephone}}"/>
+        </actionGroup>
+
+        <scrollTo selector="{{CheckoutConsentFormSection.consentForm}}" stepKey="scrollToConsentForm"/>
+        <waitForElementVisible selector="{{CheckoutConsentFormSection.consentCheckbox}}" stepKey="waitForMarketingConsentCheckbox"/>
+        <seeElement selector="{{CheckoutConsentFormSection.consentCheckbox}}" stepKey="seeMarketingConsentCheckbox"/>
+        <dontSeeElement selector="{{CheckoutConsentFormSection.transactionalConsentCheckbox}}" stepKey="dontSeeTransactionalConsentForUK"/>
+
+        <!-- Now change to US phone number to trigger transactional consent -->
+        <actionGroup ref="SelectPhoneCountryActionGroup" stepKey="fillUSPhoneNumber">
+            <argument name="countryCode" value="us"/>
+            <argument name="phoneNumber" value="{{US_Address_TX.telephone}}"/>
+        </actionGroup>
+
+        <waitForElementVisible selector="{{CheckoutConsentFormSection.transactionalConsentCheckbox}}" stepKey="waitForTransactionalConsentCheckbox"/>
+        <seeElement selector="{{CheckoutConsentFormSection.consentCheckbox}}" stepKey="seeMarketingConsentForUS"/>
+        <seeElement selector="{{CheckoutConsentFormSection.transactionalConsentCheckbox}}" stepKey="seeTransactionalConsentForUS"/>
+
+        <see userInput="I agree to receive transactional SMS messages for US phone numbers" stepKey="seeTransactionalConsentText"/>
+
+        <actionGroup ref="CheckoutSelectFlatRateShippingMethodActionGroup" stepKey="selectFlatRateShippingMethod"/>
+        <waitForElement selector="{{CheckoutShippingSection.next}}" time="30" stepKey="waitForNextButton"/>
+        <click selector="{{CheckoutShippingSection.next}}" stepKey="clickNext"/>
+
+        <waitForElement selector="{{CheckoutPaymentSection.paymentSectionTitle}}" time="30" stepKey="waitForPaymentSectionLoaded"/>
+
+        <actionGroup ref="ClickPlaceOrderActionGroup" stepKey="placeOrder"/>
+        <waitForPageLoad stepKey="waitForOrderSuccessPage"/>
+        <see userInput="Your order # is:" stepKey="seeOrderNumber"/>
+    </test>
+</tests>

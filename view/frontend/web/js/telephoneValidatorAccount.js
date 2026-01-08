@@ -40,7 +40,7 @@ define([
                     countryCode,
                     isValid,
                     errorCode,
-                    hasProvidedConsent = $('#dd_sms_consent_checkbox').is(':checked');
+                    hasProvidedConsent = $('#dd_sms_marketing_consent_checkbox').is(':checked');
 
                 if (!hasProvidedConsent && !value) {
                     return true;

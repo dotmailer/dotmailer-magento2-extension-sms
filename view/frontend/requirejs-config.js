@@ -36,7 +36,8 @@ var config = {
                 'Dotdigitalgroup_Sms/js/telephoneValidatorShipping': true
             },
             'Magento_Checkout/js/model/shipping-save-processor/payload-extender': {
-                'Dotdigitalgroup_Sms/js/model/shipping-save-processor/setConsentMixin': true
+                'Dotdigitalgroup_Sms/js/model/shipping-save-processor/setMarketingConsentMixin': true,
+                'Dotdigitalgroup_Sms/js/model/shipping-save-processor/setTransactionalConsentMixin': true
             },
             'Magento_Checkout/js/view/shipping': {
                 'Dotdigitalgroup_Sms/js/view/telephoneValidatorConsent': true

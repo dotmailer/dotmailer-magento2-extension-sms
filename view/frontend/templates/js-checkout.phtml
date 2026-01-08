@@ -9,16 +9,16 @@ $view = $block->getData('config');
     {
         "*": {
             "Dotdigitalgroup_Sms/js/internationalTelephoneInputCheckout": <?= /* @noEscape */ $view->getConfig(); ?>
-    },
+        },
 
-    ".form-address-edit": {
-        "validation": {
-            "rules": {
-                "telephone": {
-                    "validate-phone-number":true
+        ".form-address-edit": {
+            "validation": {
+                "rules": {
+                    "telephone": {
+                        "validate-phone-number":true
+                    }
                 }
             }
         }
     }
-}
 </script>

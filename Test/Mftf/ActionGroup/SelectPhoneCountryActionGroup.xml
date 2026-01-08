@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="SelectPhoneCountryActionGroup">
+        <annotations>
+            <description>Selects a country from the intl-tel-input phone field dropdown using jQuery</description>
+        </annotations>
+        <arguments>
+            <argument name="countryCode" type="string" defaultValue="us"/>
+            <argument name="phoneNumber" type="string"/>
+        </arguments>
+
+        <!-- Wait for initialization -->
+        <wait time="2" stepKey="waitForIntlTelInputInit"/>
+
+        <!-- Scroll to phone input -->
+        <executeJS function="
+            var phoneInput = jQuery('input[name=telephone]')[0];
+            if (phoneInput) {
+                phoneInput.scrollIntoView({behavior: 'smooth', block: 'center'});
+            }
+            return true;
+        " stepKey="scrollToPhoneInput"/>
+        <wait time="1" stepKey="waitAfterScroll"/>
+
+        <!-- Set country using intl-tel-input API -->
+        <executeJS function="
+            var phoneInput = jQuery('input[name=telephone]')[0];
+            if (phoneInput &amp;&amp; window.intlTelInputGlobals) {
+                var iti = window.intlTelInputGlobals.getInstance(phoneInput);
+                if (iti) {
+                    iti.setCountry('{{countryCode}}');
+                    return 'Country set to {{countryCode}}';
+                }
+            }
+            return 'intl-tel-input not found';
+        " stepKey="setCountry"/>
+        <wait time="1" stepKey="waitForCountrySet"/>
+        <executeJS function="return (jQuery('input[name=telephone]').val('{{phoneNumber}}').trigger('change'));" stepKey="fillPhoneNumber"/>
+        <wait time="1" stepKey="waitForPhoneNumberProcessing"/>
+    </actionGroup>
+</actionGroups>

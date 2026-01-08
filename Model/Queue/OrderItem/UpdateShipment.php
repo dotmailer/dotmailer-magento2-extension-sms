@@ -5,6 +5,13 @@ namespace Dotdigitalgroup\Sms\Model\Queue\OrderItem;
 use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 
+/**
+ * Class UpdateShipment
+ *
+ * @deprecated This class is deprecated and will be removed in a future version.
+ * @see \Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\UpdateShipment
+ * See the SmsMessage\Types namespace for all current message types.
+ */
 class UpdateShipment extends AbstractOrderItem
 {
     /**

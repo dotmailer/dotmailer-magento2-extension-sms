@@ -3,16 +3,19 @@
 namespace Dotdigitalgroup\Sms\Model\Apiconnector;
 
 use Dotdigitalgroup\Email\Logger\Logger;
-use Dotdigitalgroup\Email\Model\Apiconnector\Rest;
+use Dotdigitalgroup\Email\Model\Apiconnector\Client as EmailApiClient;
 use Exception;
 use stdClass;
 
-class Client extends Rest
+class Client extends EmailApiClient
 {
-    public const REST_CPAAS_MESSAGES_API_URL = 'https://api-cpaas.dotdigital.com/cpaas/messages';
-    public const REST_CPAAS_DEDICATED_NUMBERS = 'https://api-cpaas.dotdigital.com/cpaas/sms/dedicatedNumbers';
-    public const REST_CPAAS_KEYWORDS = 'https://api-cpaas.dotdigital.com/cpaas/sms/keywords';
-    public const REST_CPAAS_SHORTCODES = 'https://api-cpaas.dotdigital.com/cpaas/sms/shortcodes';
+    public const REST_CPAAS_MESSAGES_API_URL = '/cpaas/messages';
+    public const REST_CPAAS_DEDICATED_NUMBERS = '/cpaas/sms/dedicatedNumbers';
+    public const REST_CPAAS_KEYWORDS = '/cpaas/sms/keywords';
+    public const REST_CPAAS_SHORTCODES = '/cpaas/sms/shortcodes';
+    public const REST_CPAAS_OPTOUT_RULES = '/cpaas/automation/inboundrules/optout';
+    public const REST_CPAAS_PROFILES = '/cpaas/profiles';
+    public const REST_CPAAS_PROFILES_OPTIN = '/cpaas/profiles/optin';
 
     /**
      * Send a single SMS message request.
@@ -23,7 +26,8 @@ class Client extends Rest
      */
     public function sendSmsSingle($data)
     {
-        $this->setUrl(self::REST_CPAAS_MESSAGES_API_URL)
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_MESSAGES_API_URL;
+        $this->setUrl($url)
             ->setVerb('POST')
             ->buildPostBody($data);
 
@@ -34,6 +38,7 @@ class Client extends Rest
                 ->addClientLog('Validation failures', [
                     'data' => $response->validationFailures,
                 ], Logger::DEBUG);
+            throw new \Magento\Framework\Exception\LocalizedException('SMS send failed');
         }
 
         return $response;
@@ -49,7 +54,8 @@ class Client extends Rest
      */
     public function getMessageByMessageId($messageId)
     {
-        $this->setUrl(self::REST_CPAAS_MESSAGES_API_URL . '/' . $messageId)
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_MESSAGES_API_URL . '/' . $messageId;
+        $this->setUrl($url)
             ->setVerb('GET');
 
         $response = $this->execute();
@@ -79,7 +85,8 @@ class Client extends Rest
      */
     public function sendSmsBatch($data)
     {
-        $this->setUrl(self::REST_CPAAS_MESSAGES_API_URL . '/batch')
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_MESSAGES_API_URL . '/batch';
+        $this->setUrl($url)
             ->setVerb('POST')
             ->buildPostBody($data);
 
@@ -107,7 +114,7 @@ class Client extends Rest
      */
     public function getDedicatedNumbers()
     {
-        $url = self::REST_CPAAS_DEDICATED_NUMBERS;
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_DEDICATED_NUMBERS;
         $this->setUrl($url)
             ->setVerb('GET');
 
@@ -128,7 +135,7 @@ class Client extends Rest
      */
     public function getKeywords()
     {
-        $url = self::REST_CPAAS_KEYWORDS;
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_KEYWORDS;
         $this->setUrl($url)
             ->setVerb('GET');
 
@@ -149,7 +156,7 @@ class Client extends Rest
      */
     public function getShortCodes()
     {
-        $url = self::REST_CPAAS_SHORTCODES;
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_SHORTCODES;
         $this->setUrl($url)
             ->setVerb('GET');
 
@@ -157,6 +164,179 @@ class Client extends Rest
         if (isset($response->message)) {
             $this->addClientLog('Error getting account shortcodes');
             return [];
+        }
+
+        return $response;
+    }
+
+    /**
+     * Retrieves a CPaaS opt-out rules configuration list.
+     *
+     * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getInboundRules()
+    {
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_OPTOUT_RULES;
+        $this->setUrl($url)
+            ->setVerb('GET');
+
+        $response = $this->execute();
+
+        return $this->validateResponse($response);
+    }
+
+    /**
+     * Create a CPaaS inbound message rule configuration.
+     *
+     * @param string $keyword
+     * @param string $action
+     *
+     * @return stdClass
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function postInboundRule(string $keyword, string $action)
+    {
+        $rule = [
+            "channel" => "sms",
+            "inbound" => "*",
+            "keyword" => $keyword,
+            "action" => "optOutChange",
+            "actionData" => [
+                "opt" => $action
+            ]
+        ];
+
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_OPTOUT_RULES;
+        $this->setUrl($url)
+            ->setVerb('POST')
+            ->buildPostBody($rule);
+
+        $response = $this->execute();
+
+        return $this->validateResponse($response);
+    }
+
+    /**
+     * Delete single CPaaS inbound message rule configuration.
+     *
+     * @param string $inboundRuleId
+     *
+     * @return void
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function deleteInboundRule(string $inboundRuleId)
+    {
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_OPTOUT_RULES . '/' . $inboundRuleId;
+        $this->setUrl($url)
+            ->setVerb('DELETE');
+
+        $response = $this->execute();
+
+        $this->validateResponse($response, [404]);
+    }
+
+    /**
+     * Retrieves CPaaS profiles with optional filter.
+     *
+     * @param string $filter
+     *
+     * @return stdClass
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getProfiles(string $filter = '')
+    {
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_PROFILES;
+        $this->setUrl($url . $filter)
+        ->setVerb('GET');
+
+        $response = $this->execute();
+
+        return $this->validateResponse($response);
+    }
+
+    /**
+     * Updates a CPaaS profile opt-in settings by profile ID.
+     *
+     * @param string $profileId
+     * @param array $payload
+     *
+     * @return stdClass
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function updateProfileOptIn(string $profileId, array $payload)
+    {
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_PROFILES.'/' . $profileId . '/optin';
+
+        $this->setUrl($url)
+            ->setVerb('PUT')
+            ->buildPostBody($payload);
+
+        $response = $this->execute();
+
+        return $this->validateResponse($response);
+    }
+
+    /**
+     * Updates CPaaS profiles default opt-in settings.
+     *
+     * @param array $payload
+     *
+     * @return stdClass
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function updateProfilesOptInDefaults(array $payload)
+    {
+        $url = $this->getApiEndpoint() . self::REST_CPAAS_PROFILES_OPTIN;
+
+        $this->setUrl($url)
+            ->setVerb('PUT')
+            ->buildPostBody($payload);
+
+        $response = $this->execute();
+
+        return $this->validateResponse($response);
+    }
+
+    /**
+     * Check response for defined API errors and http error codes.
+     *
+     * @param string|array|stdClass $response
+     * @param array $allowedHttpCodes
+     *
+     * @return string|array|stdClass
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    private function validateResponse($response, $allowedHttpCodes = [])
+    {
+        if (isset($response->message)) {
+            $errorMessage = sprintf(
+                'API Error: %s',
+                $response->message
+            );
+            $this->addClientLog($errorMessage, [], Logger::ERROR);
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __($errorMessage)
+            );
+        }
+
+        $clientProperties = $this->expose();
+        if (isset($clientProperties['responseInfo']['http_code'])) {
+            $httpCode = $clientProperties['responseInfo']['http_code'];
+
+            if ($httpCode < 200 || $httpCode >= 300) {
+                if (count($allowedHttpCodes) > 0 && in_array($httpCode, $allowedHttpCodes)) {
+                    return $response;
+                }
+                $errorMessage = sprintf(
+                    'API Error: Request returned HTTP code %s',
+                    $httpCode
+                );
+                $this->addClientLog($errorMessage, ['apiEndpoint' => $this->getApiEndpoint()], Logger::ERROR);
+                throw new \Magento\Framework\Exception\LocalizedException(
+                    __($errorMessage)
+                );
+            }
         }
 
         return $response;

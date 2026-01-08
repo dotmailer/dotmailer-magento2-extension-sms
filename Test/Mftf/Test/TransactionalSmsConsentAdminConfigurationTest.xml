@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="TransactionalSmsConsentAdminConfigurationTest">
+        <annotations>
+            <features value="Dotdigital module"/>
+            <stories value="Dotdigital SMS"/>
+            <title value="Transactional SMS consent admin configuration validation"/>
+            <description value="Verify that transactional SMS consent configuration requires phone validation to be enabled and shows appropriate warnings"/>
+            <severity value="MINOR"/>
+            <group value="transactionalSmsConsent"/>
+            <group value="dotdigitalSms"/>
+            <group value="adminConfiguration"/>
+        </annotations>
+
+        <before>
+            <actionGroup ref="AdminLoginActionGroup" stepKey="AdminLoginActionGroup1"/>
+            <actionGroup ref="SetDotmailerAccountData" stepKey="SetDotmailerAccountData"/>
+        </before>
+
+        <after>
+            <actionGroup ref="SetPhoneNumberValidation" stepKey="DisablePhoneNumberValidation">
+                <argument name="enabled" value="No"/>
+            </actionGroup>
+            <actionGroup ref="ResetDotmailerAccountData" stepKey="resetAccountData"/>
+            <actionGroup ref="AdminLogoutActionGroup" stepKey="logout"/>
+        </after>
+
+        <amOnPage url="{{AdminTransactionalSmsPage.url}}" stepKey="amOnDotdigitalConsentPage1"/>
+        <waitForPageLoad stepKey="waitForPageLoad1"/>
+
+        <conditionalClick stepKey="expandTransactionalConsentTab1"
+                         selector="{{AdminTransactionalSmsSection.transactionalConsentFieldsetToggle}}"
+                         dependentSelector="{{AdminTransactionalSmsSection.transactionalConsentFieldset}}"
+                         visible="false"/>
+
+        <seeElement selector="{{AdminTransactionalSmsSection.transactionalConsentValidationNotice}}" stepKey="seeValidationWarning"/>
+        <see userInput="SMS Phone Number Validation Required" stepKey="seeValidationWarningTitle"/>
+        <see userInput="Phone number validation must be enabled to use the transactional SMS feature for US numbers" stepKey="seeValidationWarningText"/>
+
+        <dontSeeElement selector="{{AdminTransactionalSmsSection.transactionalConsentEnabled}}" stepKey="dontSeeTransactionalConsentEnabledField"/>
+
+        <actionGroup ref="SetPhoneNumberValidation" stepKey="EnablePhoneNumberValidation" />
+
+        <dontSeeElement selector="{{AdminTransactionalSmsSection.transactionalConsentValidationNotice}}" stepKey="dontSeeValidationWarning"/>
+
+        <seeElement selector="{{AdminTransactionalSmsSection.transactionalConsentEnabled}}" stepKey="seeTransactionalConsentEnabledField"/>
+        <seeElement selector="{{AdminTransactionalSmsSection.transactionalConsentText}}" stepKey="seeTransactionalConsentTextField"/>
+
+        <selectOption selector="{{AdminTransactionalSmsSection.transactionalConsentEnabled}}"
+                     userInput="Yes"
+                     stepKey="enableTransactionalConsent"/>
+
+        <fillField selector="{{AdminTransactionalSmsSection.transactionalConsentText}}"
+                  userInput="Test transactional SMS consent text for MFTF"
+                  stepKey="fillTransactionalConsentText"/>
+
+        <click selector="{{AdminMainActionsSection.save}}" stepKey="saveConfig"/>
+        <waitForPageLoad stepKey="waitForConfigSave"/>
+        <see selector="{{AdminMessagesSection.success}}" userInput="You saved the configuration." stepKey="seeSuccessMessage"/>
+
+        <seeInField selector="{{AdminTransactionalSmsSection.transactionalConsentEnabled}}" userInput="Yes" stepKey="verifyTransactionalConsentEnabled"/>
+        <seeInField selector="{{AdminTransactionalSmsSection.transactionalConsentText}}" userInput="Test transactional SMS consent text for MFTF" stepKey="verifyTransactionalConsentText"/>
+    </test>
+</tests>

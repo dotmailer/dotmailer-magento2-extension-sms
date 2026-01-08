@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Api/etc/extension_attributes.xsd">
     <extension_attributes for="Magento\Checkout\Api\Data\ShippingInformationInterface">
-        <attribute code="dd_sms_consent_checkbox" type="boolean" />
-        <attribute code="dd_sms_consent_telephone" type="string" />
+        <attribute code="dd_sms_marketing_consent_checkbox" type="boolean" />
+        <attribute code="dd_sms_marketing_consent_text" type="string" />
+        <attribute code="dd_sms_marketing_consent_telephone" type="string" />
+        <attribute code="dd_sms_transactional_consent_checkbox" type="string" />
     </extension_attributes>
 </config>

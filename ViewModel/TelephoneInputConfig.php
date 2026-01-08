@@ -6,6 +6,7 @@ use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Magento\Eav\Model\Config as EavConfig;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Escaper;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\View\Asset\Repository as AssetRepository;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
@@ -80,6 +81,7 @@ class TelephoneInputConfig implements ArgumentInterface
      * Get config block for frontend.
      *
      * @return bool|string
+     * @throws NoSuchEntityException
      */
     public function getConfig()
     {
@@ -87,6 +89,7 @@ class TelephoneInputConfig implements ArgumentInterface
 
         $config  = [
             "nationalMode" => false,
+            "strictMode" => true,
             "utilsScript"  => $this->getViewFileUrl('Dotdigitalgroup_Sms::js/utils.js'),
             "preferredCountries" => [$this->moduleConfig->getPreferredCountry($websiteId)]
         ];

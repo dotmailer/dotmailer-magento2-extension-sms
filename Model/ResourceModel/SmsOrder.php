@@ -7,6 +7,15 @@ use Dotdigitalgroup\Sms\Model\Queue\OrderQueueManager;
 use Dotdigitalgroup\Sms\Setup\SchemaInterface;
 use Magento\Framework\Model\ResourceModel\Db\Context;
 
+/**
+ * Class SmsOrder
+ *
+ * @deprecated This class has been renamed to SmsMessage
+ * @see \Dotdigitalgroup\Sms\Model\ResourceModel\SmsMessage
+ *
+ * Class renamed for functionality clarity.
+ */
+
 class SmsOrder extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 {
     /**

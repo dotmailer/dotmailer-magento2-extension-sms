@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Dotdigitalgroup\Sms\Plugin\Order\Shipment;
 
 use Dotdigitalgroup\Email\Logger\Logger;
+use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
-use Dotdigitalgroup\Sms\Model\Queue\OrderItem\NewShipment;
+use Dotdigitalgroup\Sms\Model\Queue\Publisher\SmsMessagePublisher;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\ResultInterface;
@@ -33,9 +34,9 @@ class NewShipmentPlugin
     private $orderRepository;
 
     /**
-     * @var NewShipment
+     * @var SmsMessagePublisher
      */
-    private $newShipment;
+    private $smsMessagePublisher;
 
     /**
      * @var RequestInterface
@@ -43,25 +44,23 @@ class NewShipmentPlugin
     private $request;
 
     /**
-     * NewShipmentPlugin constructor.
-     *
      * @param Logger $logger
      * @param Configuration $moduleConfig
      * @param OrderRepositoryInterface $orderRepository
-     * @param NewShipment $newShipment
+     * @param SmsMessagePublisher $smsMessagePublisher
      * @param Context $context
      */
     public function __construct(
         Logger $logger,
         Configuration $moduleConfig,
         OrderRepositoryInterface $orderRepository,
-        NewShipment $newShipment,
+        SmsMessagePublisher $smsMessagePublisher,
         Context $context
     ) {
         $this->logger = $logger;
         $this->moduleConfig = $moduleConfig;
         $this->orderRepository = $orderRepository;
-        $this->newShipment = $newShipment;
+        $this->smsMessagePublisher = $smsMessagePublisher;
         $this->request = $context->getRequest();
     }
 
@@ -98,12 +97,14 @@ class NewShipmentPlugin
 
         if (is_array($trackings)) {
             foreach ($trackings as $tracking) {
-                $this->newShipment
-                    ->buildAdditionalData(
-                        $order,
-                        $tracking['number'],
-                        $tracking['title']
-                    )->queue();
+                $this->smsMessagePublisher->publish(
+                    ConfigInterface::SMS_TYPE_NEW_SHIPMENT,
+                    [
+                        'order' => $order,
+                        'trackingNumber' => $tracking['number'],
+                        'trackingCarrier' => $tracking['title']
+                    ]
+                );
             }
         }
 

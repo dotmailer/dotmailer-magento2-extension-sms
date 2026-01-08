@@ -59,6 +59,5 @@
 
         <!-- Observes success message -->
         <seeElement selector="//div[@class='messages']//div[contains(@class, 'message-success') and contains(., 'We have updated your subscription.')]" stepKey="seeUpdatedSubscriptionMessage"/>
-        <seeElement selector="//div[@class='messages']//div[contains(@class, 'message-success') and contains(., 'Your subscription preferences have been saved.')]" stepKey="seeSavedSubscriptionPreferencesMessage"/>
     </test>
 </tests>

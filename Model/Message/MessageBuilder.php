@@ -2,7 +2,7 @@
 
 namespace Dotdigitalgroup\Sms\Model\Message;
 
-use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterface;
+use Dotdigitalgroup\Sms\Api\Data\SmsMessageInterface;
 use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
 use Dotdigitalgroup\Sms\Model\Config\Source\FromName;
 use Dotdigitalgroup\Sms\Model\Message\Text\Compiler;
@@ -41,9 +41,53 @@ class MessageBuilder
     }
 
     /**
+     * Build message text.
+     *
+     * @param SmsMessageInterface $item
+     * @param bool $requireOptIn
+     * @return array
+     */
+    public function buildMessage(SmsMessageInterface $item, bool $requireOptIn = false)
+    {
+        $message = [
+            'to' => [
+                'phoneNumber' => $item->getPhoneNumber()
+            ],
+            'rules' => [
+                'sms'
+            ],
+            'channelOptions' => [
+                'sms' => [
+                    'allowUnicode' => true,
+                    'unicodeConversion' => [
+                        'convertUnicodeToGsm' => false
+                    ]
+                ]
+            ],
+            'body' => $this->getCompiledMessageText($item)
+        ];
+
+        $originator = $this->getOriginator($item->getStoreId());
+
+        if ($originator) {
+            $message['channelOptions']['sms']['from'] = $originator;
+        }
+
+        if ($requireOptIn) {
+            $message['requireOptIn'] = true;
+            $optOutText = $this->getOptOutText($item->getStoreId());
+            if (!empty($optOutText)) {
+                $message['body'] .= "\n\n" . $optOutText;
+            }
+        }
+
+        return $message;
+    }
+
+    /**
      * Batch message text.
      *
-     * @param SmsOrderInterface[] $items
+     * @param SmsMessageInterface[] $items
      * @return array
      */
     public function makeBatch(array $items)
@@ -51,31 +95,7 @@ class MessageBuilder
         $batch = [];
 
         foreach ($items as $item) {
-            $buildMessage = [
-                'to' => [
-                    'phoneNumber' => $item->getPhoneNumber()
-                ],
-                'rules' => [
-                    'sms'
-                ],
-                'channelOptions' => [
-                    'sms' => [
-                        'allowUnicode' => true,
-                        'unicodeConversion' => [
-                            'convertUnicodeToGsm' => false
-                        ]
-                    ]
-                ],
-                'body' => $this->getCompiledMessageText($item)
-            ];
-
-            $originator = $this->getOriginator($item->getStoreId());
-
-            if ($originator) {
-                $buildMessage['channelOptions']['sms']['from'] = $originator;
-            }
-
-            $batch[] = $buildMessage;
+            $batch[] = $this->buildMessage($item);
         }
 
         return $batch;
@@ -84,7 +104,7 @@ class MessageBuilder
     /**
      * Get compiled message text.
      *
-     * @param SmsOrderInterface $item
+     * @param SmsMessageInterface $item
      * @return string
      */
     private function getCompiledMessageText($item)
@@ -99,6 +119,21 @@ class MessageBuilder
     }
 
     /**
+     * Get opt-out text.
+     *
+     * @param string|int $storeId
+     * @return string|null
+     */
+    private function getOptOutText($storeId)
+    {
+        return $this->scopeConfig->getValue(
+            ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_OPTOUT_TEXT,
+            ScopeInterface::SCOPE_STORES,
+            $storeId
+        );
+    }
+
+    /**
      * Set raw message text.
      *
      * @param string|int $storeId
@@ -107,7 +142,7 @@ class MessageBuilder
     private function setRawMessageText($storeId, $typeId)
     {
         $this->smsTemplates[$storeId][$typeId] = $this->scopeConfig->getValue(
-            ConfigInterface::TRANSACTIONAL_SMS_MESSAGE_TYPES_MAP[$typeId],
+            ConfigInterface::TRANSACTIONAL_SMS_MESSAGE_TYPES_MAP[$typeId]['message_path'],
             ScopeInterface::SCOPE_STORES,
             $storeId
         );

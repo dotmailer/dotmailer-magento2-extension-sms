@@ -57,4 +57,8 @@
         <column xsi:type="timestamp" name="sms_change_status_at" on_update="false" nullable="true" comment="SMS subscriber status last changed date"/>
         <column xsi:type="smallint" name="sms_subscriber_imported" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="SMS subscriber imported"/>
     </table>
+    <table name="email_order">
+        <column xsi:type="smallint" name="sms_transactional_requires_opt_in" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Transactional SMS requires opt-in"/>
+        <column xsi:type="smallint" name="sms_transactional_opt_in" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Transactional SMS opt-in"/>
+    </table>
 </schema>

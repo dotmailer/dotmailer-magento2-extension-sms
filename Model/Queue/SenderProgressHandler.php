@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Dotdigitalgroup\Sms\Model\Queue;
 
 use Dotdigitalgroup\Sms\Model\Apiconnector\Client;
-use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterface;
-use Dotdigitalgroup\Sms\Api\SmsOrderRepositoryInterface;
+use Dotdigitalgroup\Sms\Api\Data\SmsMessageInterface;
+use Dotdigitalgroup\Sms\Api\SmsMessageRepositoryInterface;
 use Magento\Framework\DataObject;
 use Magento\Framework\Stdlib\DateTime;
 
@@ -16,14 +18,14 @@ class SenderProgressHandler extends DataObject
     private $client;
 
     /**
-     * @var SmsOrderRepositoryInterface
+     * @var SmsMessageRepositoryInterface
      */
-    private $smsOrderRepository;
+    private $smsMessageRepository;
 
     /**
-     * @var OrderQueueManager
+     * @var SmsMessageQueueManager
      */
-    private $orderQueueManager;
+    private $smsMessageQueueManager;
 
     /**
      * @var DateTime
@@ -33,19 +35,19 @@ class SenderProgressHandler extends DataObject
     /**
      * SenderProgressHandler constructor.
      *
-     * @param SmsOrderRepositoryInterface $smsOrderRepository
-     * @param OrderQueueManager $orderQueueManager
+     * @param SmsMessageRepositoryInterface $smsMessageRepository
+     * @param SmsMessageQueueManager $smsMessageQueueManager
      * @param DateTime $dateTime
      * @param array $data
      */
     public function __construct(
-        SmsOrderRepositoryInterface $smsOrderRepository,
-        OrderQueueManager $orderQueueManager,
+        SmsMessageRepositoryInterface $smsMessageRepository,
+        SmsMessageQueueManager $smsMessageQueueManager,
         DateTime $dateTime,
         array $data = []
     ) {
-        $this->smsOrderRepository = $smsOrderRepository;
-        $this->orderQueueManager = $orderQueueManager;
+        $this->smsMessageRepository = $smsMessageRepository;
+        $this->smsMessageQueueManager = $smsMessageQueueManager;
         $this->dateTime = $dateTime;
         parent::__construct($data);
     }
@@ -58,7 +60,7 @@ class SenderProgressHandler extends DataObject
      */
     public function updateSendsInProgress(array $storeIds)
     {
-        $inProgressQueue = $this->orderQueueManager->getInProgressQueue(
+        $inProgressQueue = $this->smsMessageQueueManager->getInProgressQueue(
             $storeIds
         );
         if ($inProgressQueue->getTotalCount() === 0) {
@@ -67,24 +69,24 @@ class SenderProgressHandler extends DataObject
 
         $this->client = $this->getClient();
 
-        /** @var SmsOrderInterface $item */
+        /** @var SmsMessageInterface $item */
         foreach ($inProgressQueue->getItems() as $item) {
             $messageState = $this->client->getMessageByMessageId($item->getMessageId());
 
             if (!isset($messageState->messageId)) {
-                $item->setStatus(OrderQueueManager::SMS_STATUS_UNKNOWN);
+                $item->setStatus(SmsMessageQueueManager::SMS_STATUS_UNKNOWN);
             } elseif (isset($messageState->status)) {
                 if ($messageState->status === 'delivered') {
-                    $item->setStatus(OrderQueueManager::SMS_STATUS_DELIVERED);
+                    $item->setStatus(SmsMessageQueueManager::SMS_STATUS_DELIVERED);
                     $item->setMessage($messageState->statusDetails->channelStatus->statusdescription);
                     $item->setSentAt($this->dateTime->formatDate($messageState->sentOn));
                 } elseif ($messageState->status === 'failed') {
-                    $item->setStatus(OrderQueueManager::SMS_STATUS_FAILED);
+                    $item->setStatus(SmsMessageQueueManager::SMS_STATUS_FAILED);
                     $item->setMessage($messageState->statusDetails->reason);
                 }
             }
 
-            $this->smsOrderRepository->save($item);
+            $this->smsMessageRepository->save($item);
         }
     }
 

@@ -3,8 +3,8 @@
 namespace Dotdigitalgroup\Sms\Controller\Adminhtml\Report;
 
 use Dotdigitalgroup\Email\Controller\Adminhtml\MassDeleteCsrf;
-use Dotdigitalgroup\Sms\Model\ResourceModel\SmsOrder;
-use Dotdigitalgroup\Sms\Model\ResourceModel\SmsOrder\CollectionFactory;
+use Dotdigitalgroup\Sms\Model\ResourceModel\SmsMessage;
+use Dotdigitalgroup\Sms\Model\ResourceModel\SmsMessage\CollectionFactory;
 use Magento\Backend\App\Action\Context;
 use Magento\Ui\Component\MassAction\Filter;
 
@@ -17,13 +17,13 @@ class MassDelete extends MassDeleteCsrf
 
     /**
      * MassDelete constructor.
-     * @param SmsOrder $collectionResource
+     * @param SmsMessage $collectionResource
      * @param Context $context
      * @param Filter $filter
      * @param CollectionFactory $collectionFactory
      */
     public function __construct(
-        SmsOrder $collectionResource,
+        SmsMessage $collectionResource,
         Context $context,
         Filter $filter,
         CollectionFactory $collectionFactory

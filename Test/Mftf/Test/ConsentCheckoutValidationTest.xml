@@ -23,7 +23,7 @@
 
             <!-- Create Simple Product -->
             <comment userInput="Create Simple Product" stepKey="createSimpleProductComment"/>
-            <createData entity="SimpleProductPrice10Qty1" stepKey="simpleProduct">
+            <createData entity="simpleProductDefault" stepKey="simpleProduct">
                 <requiredEntity createDataKey="createCategory"/>
             </createData>
 
@@ -50,6 +50,17 @@
             <actionGroup ref="ResetDotmailerAccountData" stepKey="resetAccountData"/>
             <actionGroup ref="AdminLogoutActionGroup" stepKey="logout"/>
         </after>
+
+        <!-- Assign default source to simple product -->
+        <actionGroup ref="DotAdminAssignDefaultSourceToSimpleProductsActionGroup" stepKey="bulkAssignSourcesToAllProducts">
+            <argument name="product1Sku" value="$$simpleProduct.sku$$"/>
+            <argument name="source1_code" value="default"/>
+        </actionGroup>
+
+        <!-- Reindex data -->
+        <actionGroup ref="CliIndexerReindexActionGroup" stepKey="performReindex">
+            <argument name="indices" value="cataloginventory_stock inventory"/>
+        </actionGroup>
 
         <!-- Go to Checkout Shipping Page for Customer -->
         <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginAsStoreFront">

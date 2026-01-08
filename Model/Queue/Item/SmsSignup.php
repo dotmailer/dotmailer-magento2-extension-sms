@@ -7,6 +7,14 @@ namespace Dotdigitalgroup\Sms\Model\Queue\Item;
 use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
 use Magento\Framework\DataObject;
 
+/**
+ * Class SmsSignup
+ *
+ * @deprecated This class is deprecated and will be removed in a future version.
+ * @see \Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\SmsSignup
+ * See the SmsMessage\Types namespace for all current message types.
+ */
+
 class SmsSignup extends DataObject implements QueueItemInterface
 {
     /**

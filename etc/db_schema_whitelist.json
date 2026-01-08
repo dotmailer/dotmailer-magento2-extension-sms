@@ -56,5 +56,11 @@
             "sms_change_status_at": true,
             "sms_subscriber_imported": true
         }
+    },
+    "email_order": {
+        "column": {
+            "sms_transactional_requires_opt_in": true,
+            "sms_transactional_opt_in": true
+        }
     }
 }

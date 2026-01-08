@@ -41,10 +41,15 @@ class SmsClientFactory
     {
         $apiUsername = $this->emailHelper->getApiUsername($websiteId);
         $apiPassword = $this->emailHelper->getApiPassword($websiteId);
+        $apiEndpoint = $this->emailHelper->getApiEndPointFromConfig($websiteId);
 
         $client = $this->clientFactory->create();
         $client->setApiUsername($apiUsername)
             ->setApiPassword($apiPassword);
+
+        if ($apiEndpoint) {
+            $client->setApiEndpoint($apiEndpoint);
+        }
 
         return $client;
     }

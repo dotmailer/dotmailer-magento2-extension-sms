@@ -1,178 +1,238 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Dotdigitalgroup\Sms\Test\Unit\Plugin\Order\Shipment;
 
 use Dotdigitalgroup\Email\Logger\Logger;
+use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
-use Dotdigitalgroup\Sms\Model\Queue\OrderItem\NewShipment;
+use Dotdigitalgroup\Sms\Model\Queue\Publisher\SmsMessagePublisher;
 use Dotdigitalgroup\Sms\Plugin\Order\Shipment\NewShipmentPlugin;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Controller\ResultInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Shipping\Controller\Adminhtml\Order\Shipment\Save as NewShipmentAction;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class NewShipmentPluginTest extends TestCase
 {
     /**
-     * @var Logger|\PHPUnit\Framework\MockObject\MockObject
+     * @var Logger|MockObject
      */
     private $loggerMock;
 
     /**
-     * @var Configuration|\PHPUnit\Framework\MockObject\MockObject
+     * @var Configuration|MockObject
      */
     private $moduleConfigMock;
 
     /**
-     * @var OrderRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var OrderRepositoryInterface|MockObject
      */
-    private $orderRepositoryInterfaceMock;
+    private $orderRepositoryMock;
 
     /**
-     * @var NewShipmentAction|\PHPUnit\Framework\MockObject\MockObject
+     * @var SmsMessagePublisher|MockObject
      */
-    private $newShipmentActionMock;
+    private $smsMessagePublisherMock;
 
     /**
-     * @var NewShipment|\PHPUnit\Framework\MockObject\MockObject
+     * @var RequestInterface|MockObject
      */
-    private $newShipmentMock;
-
-    /**
-     * @var RequestInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $requestInterfaceMock;
+    private $requestMock;
 
     /**
      * @var NewShipmentPlugin
      */
     private $plugin;
 
-    /**
-     * @var OrderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $orderInterfaceMock;
-
     protected function setUp(): void
     {
         $this->loggerMock = $this->createMock(Logger::class);
         $this->moduleConfigMock = $this->createMock(Configuration::class);
-        $this->orderRepositoryInterfaceMock = $this->createMock(OrderRepositoryInterface::class);
-        $this->newShipmentActionMock = $this->createMock(NewShipmentAction::class);
-        $this->newShipmentMock = $this->createMock(NewShipment::class);
-        $this->requestInterfaceMock = $this->createMock(RequestInterface::class);
-        $this->orderInterfaceMock = $this->createMock(OrderInterface::class);
-        $contextMock = $this->createMock(Context::class);
+        $this->orderRepositoryMock = $this->createMock(OrderRepositoryInterface::class);
+        $this->smsMessagePublisherMock = $this->createMock(SmsMessagePublisher::class);
+        $this->requestMock = $this->createMock(RequestInterface::class);
 
-        $contextMock->expects($this->any())
-            ->method('getRequest')
-            ->willReturn($this->requestInterfaceMock);
+        $contextMock = $this->createMock(Context::class);
+        $contextMock->method('getRequest')->willReturn($this->requestMock);
 
         $this->plugin = new NewShipmentPlugin(
             $this->loggerMock,
             $this->moduleConfigMock,
-            $this->orderRepositoryInterfaceMock,
-            $this->newShipmentMock,
+            $this->orderRepositoryMock,
+            $this->smsMessagePublisherMock,
             $contextMock
         );
     }
 
-    public function testAfterExecuteMethodIfTrackingDefined()
+    public function testAfterExecutePublishesShipmentMessages(): void
     {
-        $orderId = 1;
-        $tracking = [[
-            'number' => 35589,
-            'carrier_code' => 'chaz',
-            'title' => 'Chaz Express'
-        ]];
+        $orderId = 123;
+        $storeId = 1;
+        $trackings = [
+            ['number' => 'TRACK001', 'title' => 'UPS'],
+            ['number' => 'TRACK002', 'title' => 'FedEx']
+        ];
 
-        $this->requestInterfaceMock
-            ->expects($this->exactly(2))
+        $subjectMock = $this->createMock(NewShipmentAction::class);
+        $resultMock = $this->createMock(ResultInterface::class);
+        $orderMock = $this->createMock(OrderInterface::class);
+
+        $this->requestMock->expects($this->exactly(2))
             ->method('getParam')
-            ->with($this->logicalOr(
-                $this->equalTo('order_id'),
-                $this->equalTo('tracking')
-            ))
-            ->willReturnCallback(function ($param) use ($orderId, $tracking) {
+            ->willReturnCallback(function ($param) use ($orderId, $trackings) {
                 return match ($param) {
                     'order_id' => $orderId,
-                    'tracking' => $tracking,
+                    'tracking' => $trackings,
+                    default => null,
                 };
             });
 
-        $this->checkEnabled($orderId);
-
-        $this->newShipmentMock
-            ->expects($this->once())
-            ->method('buildAdditionalData')
-            ->with(
-                $this->orderInterfaceMock,
-                $tracking[0]['number'],
-                $tracking[0]['title']
-            )
-            ->willReturn($this->newShipmentMock);
-
-        $this->newShipmentMock
-            ->expects($this->once())
-            ->method('queue');
-
-        $this->plugin->afterExecute($this->newShipmentActionMock, []);
-    }
-
-    public function testAfterExecuteMethodIfTrackingNotDefined()
-    {
-        $orderId = 1;
-        $tracking = null;
-
-        $this->requestInterfaceMock
-            ->expects($this->exactly(2))
-            ->method('getParam')
-            ->with($this->logicalOr(
-                $this->equalTo('order_id'),
-                $this->equalTo('tracking')
-            ))
-            ->willReturnCallback(function ($param) use ($orderId, $tracking) {
-                return match ($param) {
-                    'order_id' => $orderId,
-                    'tracking' => $tracking,
-                };
-            });
-
-        $this->checkEnabled($orderId);
-
-        $this->orderRepositoryInterfaceMock
-            ->expects($this->once())
+        $this->orderRepositoryMock->expects($this->once())
             ->method('get')
             ->with($orderId)
-            ->willReturn($this->orderInterfaceMock);
+            ->willReturn($orderMock);
 
-        $this->newShipmentMock
-            ->expects($this->never())
-            ->method('buildAdditionalData');
-
-        $this->newShipmentMock
-            ->expects($this->never())
-            ->method('queue');
-
-        $this->plugin->afterExecute($this->newShipmentActionMock, []);
-    }
-
-    private function checkEnabled($orderId)
-    {
-        $this->orderRepositoryInterfaceMock
-            ->expects($this->once())
-            ->method('get')
-            ->with($orderId)
-            ->willReturn($this->orderInterfaceMock);
-
-        $this->orderInterfaceMock->expects($this->once())
+        $orderMock->expects($this->once())
             ->method('getStoreId')
-            ->willReturn(1);
+            ->willReturn($storeId);
 
         $this->moduleConfigMock->expects($this->once())
             ->method('isTransactionalSmsEnabled')
-            ->willReturn(1);
+            ->with($storeId)
+            ->willReturn(true);
+
+        $publishCalls = [];
+        $this->smsMessagePublisherMock->expects($this->exactly(2))
+            ->method('publish')
+            ->willReturnCallback(function ($typeId, $data) use (&$publishCalls) {
+                $publishCalls[] = [$typeId, $data];
+                return true;
+            });
+
+        $result = $this->plugin->afterExecute($subjectMock, $resultMock);
+
+        $this->assertSame($resultMock, $result);
+        $this->assertCount(2, $publishCalls);
+        $this->assertEquals(ConfigInterface::SMS_TYPE_NEW_SHIPMENT, $publishCalls[0][0]);
+        $this->assertEquals('TRACK001', $publishCalls[0][1]['trackingNumber']);
+        $this->assertEquals('UPS', $publishCalls[0][1]['trackingCarrier']);
+        $this->assertEquals(ConfigInterface::SMS_TYPE_NEW_SHIPMENT, $publishCalls[1][0]);
+        $this->assertEquals('TRACK002', $publishCalls[1][1]['trackingNumber']);
+        $this->assertEquals('FedEx', $publishCalls[1][1]['trackingCarrier']);
+    }
+
+    public function testAfterExecuteReturnsEarlyWhenOrderCannotBeLoaded(): void
+    {
+        $orderId = 123;
+
+        $subjectMock = $this->createMock(NewShipmentAction::class);
+        $resultMock = $this->createMock(ResultInterface::class);
+
+        $this->requestMock->expects($this->once())
+            ->method('getParam')
+            ->with('order_id')
+            ->willReturn($orderId);
+
+        $this->orderRepositoryMock->expects($this->once())
+            ->method('get')
+            ->with($orderId)
+            ->willThrowException(new \Exception('Order not found'));
+
+        $this->loggerMock->expects($this->once())
+            ->method('debug')
+            ->with('Could not load order for shipment', $this->anything());
+
+        $this->moduleConfigMock->expects($this->never())
+            ->method('isTransactionalSmsEnabled');
+
+        $this->smsMessagePublisherMock->expects($this->never())
+            ->method('publish');
+
+        $result = $this->plugin->afterExecute($subjectMock, $resultMock);
+
+        $this->assertSame($resultMock, $result);
+    }
+
+    public function testAfterExecuteReturnsEarlyWhenTransactionalSmsDisabled(): void
+    {
+        $orderId = 123;
+        $storeId = 1;
+
+        $subjectMock = $this->createMock(NewShipmentAction::class);
+        $resultMock = $this->createMock(ResultInterface::class);
+        $orderMock = $this->createMock(OrderInterface::class);
+
+        $this->requestMock->expects($this->once())
+            ->method('getParam')
+            ->with('order_id')
+            ->willReturn($orderId);
+
+        $this->orderRepositoryMock->expects($this->once())
+            ->method('get')
+            ->with($orderId)
+            ->willReturn($orderMock);
+
+        $orderMock->expects($this->once())
+            ->method('getStoreId')
+            ->willReturn($storeId);
+
+        $this->moduleConfigMock->expects($this->once())
+            ->method('isTransactionalSmsEnabled')
+            ->with($storeId)
+            ->willReturn(false);
+
+        $this->smsMessagePublisherMock->expects($this->never())
+            ->method('publish');
+
+        $result = $this->plugin->afterExecute($subjectMock, $resultMock);
+
+        $this->assertSame($resultMock, $result);
+    }
+
+    public function testAfterExecuteHandlesNoTrackingData(): void
+    {
+        $orderId = 123;
+        $storeId = 1;
+
+        $subjectMock = $this->createMock(NewShipmentAction::class);
+        $resultMock = $this->createMock(ResultInterface::class);
+        $orderMock = $this->createMock(OrderInterface::class);
+
+        $this->requestMock->expects($this->exactly(2))
+            ->method('getParam')
+            ->willReturnCallback(function ($param) use ($orderId) {
+                return match ($param) {
+                    'order_id' => $orderId,
+                    'tracking' => null,
+                    default => null,
+                };
+            });
+
+        $this->orderRepositoryMock->expects($this->once())
+            ->method('get')
+            ->with($orderId)
+            ->willReturn($orderMock);
+
+        $orderMock->expects($this->once())
+            ->method('getStoreId')
+            ->willReturn($storeId);
+
+        $this->moduleConfigMock->expects($this->once())
+            ->method('isTransactionalSmsEnabled')
+            ->with($storeId)
+            ->willReturn(true);
+
+        $this->smsMessagePublisherMock->expects($this->never())
+            ->method('publish');
+
+        $result = $this->plugin->afterExecute($subjectMock, $resultMock);
+
+        $this->assertSame($resultMock, $result);
     }
 }

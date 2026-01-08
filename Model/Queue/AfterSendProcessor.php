@@ -2,25 +2,33 @@
 
 namespace Dotdigitalgroup\Sms\Model\Queue;
 
-use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterface;
-use Dotdigitalgroup\Sms\Api\SmsOrderRepositoryInterface;
+use Dotdigitalgroup\Sms\Api\Data\SmsMessageInterface;
+use Dotdigitalgroup\Sms\Api\SmsMessageRepositoryInterface;
 use Dotdigitalgroup\Sms\Model\Message\MessageBuilder;
+
+/**
+ * Class AfterSendProcessor
+ *
+ * @deprecated This class is deprecated and will be removed in a future version.
+ * The queue system now uses a publisher and consumer.
+ * @see \Dotdigitalgroup\Sms\Model\Queue\Consumer\SmsMessageConsumer
+ */
 
 class AfterSendProcessor
 {
     /**
-     * @var SmsOrderRepositoryInterface
+     * @var SmsMessageRepositoryInterface
      */
-    private $smsOrderRepository;
+    private $smsMessageRepository;
 
     /**
      * AfterSendProcessor constructor.
-     * @param SmsOrderRepositoryInterface $smsOrderRepository
+     * @param SmsMessageRepositoryInterface $smsMessageRepository
      */
     public function __construct(
-        SmsOrderRepositoryInterface  $smsOrderRepository
+        SmsMessageRepositoryInterface  $smsMessageRepository
     ) {
-        $this->smsOrderRepository = $smsOrderRepository;
+        $this->smsMessageRepository = $smsMessageRepository;
     }
 
     /**
@@ -28,7 +36,7 @@ class AfterSendProcessor
      * plus the message content from the cached $batchedContent.
      * The results will always be keyed according to the posted batch.
      *
-     * @param SmsOrderInterface[] $itemsToProcess
+     * @param SmsMessageInterface[] $itemsToProcess
      * @param array $results
      * @param array $messageBatch
      */
@@ -40,10 +48,10 @@ class AfterSendProcessor
             $item = $itemsToProcess[$rowId];
 
             $item->setMessageId($results[$i]->messageId)
-                ->setStatus(OrderQueueManager::SMS_STATUS_IN_PROGRESS)
+                ->setStatus(SmsMessageQueueManager::SMS_STATUS_IN_PROGRESS)
                 ->setContent($messageBatch[$i]['body']);
 
-            $this->smsOrderRepository->save($item);
+            $this->smsMessageRepository->save($item);
         }
     }
 }

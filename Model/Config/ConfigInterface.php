@@ -10,6 +10,15 @@ interface ConfigInterface
     public const XML_PATH_SMS_PHONE_NUMBER_VALIDATION = 'transactional_sms/sms_settings/phone_number_validation';
     public const XML_PATH_TRANSACTIONAL_SMS_BATCH_SIZE = 'transactional_sms/sms_settings/batch_size';
 
+    public const XML_PATH_TRANSACTIONAL_SMS_CONSENT_ENABLED = 'transactional_sms/consent/enabled';
+    public const XML_PATH_TRANSACTIONAL_SMS_CONSENT_TEXT = 'transactional_sms/consent/text';
+    public const XML_PATH_TRANSACTIONAL_SMS_OPTOUT_TEXT = 'transactional_sms/consent/opt_out_text';
+    public const XML_PATH_CPAAS_OPTOUT_ID = 'transactional_sms/consent/cpaas_optout_id';
+    public const XML_PATH_CPAAS_OPTOUT_GENERATED = 'transactional_sms/consent/cpaas_optout_generated';
+    public const XML_PATH_CPAAS_OPTIN_ID = 'transactional_sms/consent/cpaas_optin_id';
+    public const XML_PATH_CPAAS_OPTIN_GENERATED = 'transactional_sms/consent/cpaas_optin_generated';
+    public const XML_PATH_CPAAS_PROFILES_STATUS = 'transactional_sms/consent/cpaas_profiles_status';
+
     public const XML_PATH_SMS_NEW_ORDER_ENABLED = 'transactional_sms/sms_templates/new_order_confirmation_enabled';
     public const XML_PATH_SMS_NEW_ORDER_MESSAGE = 'transactional_sms/sms_templates/new_order_confirmation_message';
 
@@ -56,12 +65,42 @@ interface ConfigInterface
     public const SMS_TYPE_NEW_ACCOUNT_SIGN_UP = 7;
 
     public const TRANSACTIONAL_SMS_MESSAGE_TYPES_MAP = [
-        self::SMS_TYPE_NEW_ORDER => self::XML_PATH_SMS_NEW_ORDER_MESSAGE,
-        self::SMS_TYPE_UPDATE_ORDER => self::XML_PATH_SMS_ORDER_UPDATE_MESSAGE,
-        self::SMS_TYPE_NEW_SHIPMENT => self::XML_PATH_SMS_NEW_SHIPMENT_MESSAGE,
-        self::SMS_TYPE_UPDATE_SHIPMENT => self::XML_PATH_SMS_SHIPMENT_UPDATE_MESSAGE,
-        self::SMS_TYPE_NEW_CREDIT_MEMO => self::XML_PATH_SMS_NEW_CREDIT_MEMO_MESSAGE,
-        self::SMS_TYPE_SIGN_UP => self::XML_PATH_SMS_SIGNUP_MESSAGE,
-        self::SMS_TYPE_NEW_ACCOUNT_SIGN_UP => self::XML_PATH_SMS_NEW_ACCOUNT_SIGNUP_MESSAGE
+        self::SMS_TYPE_NEW_ORDER => [
+            'enabled_path' => self::XML_PATH_SMS_NEW_ORDER_ENABLED,
+            'message_path' => self::XML_PATH_SMS_NEW_ORDER_MESSAGE,
+            'class' => \Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\NewOrder::class,
+        ],
+        self::SMS_TYPE_UPDATE_ORDER => [
+            'enabled_path' => self::XML_PATH_SMS_ORDER_UPDATE_ENABLED,
+            'message_path' => self::XML_PATH_SMS_ORDER_UPDATE_MESSAGE,
+            'class' => \Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\UpdateOrder::class,
+        ],
+        self::SMS_TYPE_NEW_SHIPMENT => [
+            'enabled_path' => self::XML_PATH_SMS_NEW_SHIPMENT_ENABLED,
+            'message_path' => self::XML_PATH_SMS_NEW_SHIPMENT_MESSAGE,
+            'class' => \Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\NewShipment::class,
+        ],
+        self::SMS_TYPE_UPDATE_SHIPMENT => [
+            'enabled_path' => self::XML_PATH_SMS_SHIPMENT_UPDATE_ENABLED,
+            'message_path' => self::XML_PATH_SMS_SHIPMENT_UPDATE_MESSAGE,
+            'class' => \Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\UpdateShipment::class,
+        ],
+        self::SMS_TYPE_NEW_CREDIT_MEMO => [
+            'enabled_path' => self::XML_PATH_SMS_NEW_CREDIT_MEMO_ENABLED,
+            'message_path' => self::XML_PATH_SMS_NEW_CREDIT_MEMO_MESSAGE,
+            'class' => \Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\NewCreditMemo::class,
+        ],
+        self::SMS_TYPE_SIGN_UP => [
+            'enabled_path' => self::XML_PATH_SMS_SIGNUP_ENABLED,
+            'message_path' => self::XML_PATH_SMS_SIGNUP_MESSAGE,
+            'class' => \Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\SmsSignup::class,
+        ],
+        self::SMS_TYPE_NEW_ACCOUNT_SIGN_UP => [
+            'enabled_path' => self::XML_PATH_SMS_NEW_ACCOUNT_SIGNUP_ENABLED,
+            'message_path' => self::XML_PATH_SMS_NEW_ACCOUNT_SIGNUP_MESSAGE,
+            'class' => \Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\NewAccountSignup::class,
+        ],
     ];
+
+    public const SMS_ISO_COUNTRY_CODES_WITH_TRANSACTIONAL_CONSENT = ['us'];
 }

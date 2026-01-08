@@ -29,28 +29,59 @@ define([
             ]
         },
 
+        events: {
+
+            country_change_event: (element) => {
+                /** @type Dotdigitalgroup_Sms/js/intlTelInput*/
+                const intlTelInput = window.intlTelInputGlobals.getInstance(element);
+                return new CustomEvent('addressPhoneCountryChange', {
+                    detail: {
+                        inputId: element.id,
+                        iso2: intlTelInput.getSelectedCountryData().iso2,
+                        countryData: intlTelInput.getSelectedCountryData()
+                    }
+                })
+            }
+        },
+
         /**
          * Attaches the international telephone input library to a DOM node.
          *
          * @param {HTMLElement} node - The DOM node to attach the library to.
          */
         attachIntlTelInput: function(node) {
-            let telephoneInput = $(node)[0],
-                iti = window.intlTelInput(telephoneInput, this._configData);
+            const element = $(node)[0];
 
-            // Update the telephone input field with the formatted number when it loses focus.
-            telephoneInput.addEventListener('blur', function() {
-                telephoneInput.value = iti.getNumber();
-                telephoneInput.dispatchEvent(new Event('change'));
+            window.intlTelInput(element, this._configData);
+            const intlTelInput = window.intlTelInputGlobals.getInstance(element);
+
+            element.addEventListener('blur', () => {
+                element.value = intlTelInput.getNumber();
             });
 
-            // Update the telephone input field with the formatted number when the 'numberIsInvalid' event is dispatched.
-            document.addEventListener('numberIsInvalid', function(event) {
-                telephoneInput.value = event.detail.number;
-                telephoneInput.value = iti.getNumber();
-                telephoneInput.dispatchEvent(new Event('change'));
+            element.addEventListener('countrychange', (event) => {
+                document.dispatchEvent(this.events.country_change_event(event.target));
             });
+
+            document.addEventListener('numberIsValid', (event) => {
+                intlTelInput.setNumber(event.detail.number) ;
+                intlTelInput.telInput.blur()
+            });
+
+            document.addEventListener('numberIsInvalid', (event) => {
+                intlTelInput.setNumber(event.detail.number);
+                intlTelInput.telInput.blur()
+            });
+
+            window.addEventListener('hashchange', () => {
+                if($(element).is(":visible")){
+                    document.dispatchEvent(this.events.country_change_event(element));
+                }
+            });
+
+            document.dispatchEvent(this.events.country_change_event(element));
         },
+
 
         /**
          * Initializes the component.
@@ -60,13 +91,9 @@ define([
         initialize: function (configData) {
             this._super();
             this._configData = configData;
-            // Attach the international telephone input library to each telephone input field.
             this.selectors.forEach((selector) =>  {
-                $.async(selector, (node) => {
-                    this.attachIntlTelInput(node);
-                });
+                $.async(selector, (node) => this.attachIntlTelInput(node));
             });
-
             return this;
         }
     });

@@ -55,7 +55,7 @@ class Account
     {
         if (isset($accountInfo->properties)) {
             foreach ($accountInfo->properties as $property) {
-                if ($this->IsUsingSMSPAYG($property) || $this->isDDGAdmin($property)) {
+                if ($this->IsUsingSMSPAYG($property)) {
                     return true;
                 }
             }
@@ -73,16 +73,5 @@ class Account
     private function isUsingSMSPAYG($property)
     {
         return $property->name === 'IsUsingSMSPAYG' && $property->value === 'True';
-    }
-
-    /**
-     * Is DDG admin.
-     *
-     * @param \StdClass $property
-     * @return bool
-     */
-    private function isDDGAdmin($property)
-    {
-        return $property->name === 'MainEmail' && (strpos($property->value, 'dotdigital.com') !== false);
     }
 }

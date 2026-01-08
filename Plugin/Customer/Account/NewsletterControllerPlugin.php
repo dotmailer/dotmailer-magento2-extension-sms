@@ -9,12 +9,12 @@ use Dotdigitalgroup\Email\Helper\Data;
 use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Email\Model\Contact;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
-use Dotdigitalgroup\Sms\Model\Queue\Item\SmsSignup;
-use Dotdigitalgroup\Sms\Model\Queue\Item\TransactionalMessageEnqueuer;
+use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
+use Dotdigitalgroup\Sms\Model\Consent\ConsentManager;
 use Dotdigitalgroup\Sms\Model\Queue\Message\SmsSubscriptionDataFactory;
+use Dotdigitalgroup\Sms\Model\Queue\Publisher\SmsMessagePublisher;
 use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory;
 use Dotdigitalgroup\Sms\Model\Subscriber;
-use Dotdigitalgroup\Sms\Model\Consent\ConsentManager;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
@@ -22,8 +22,8 @@ use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Data\Form\FormKey\Validator as FormKeyValidator;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\MessageQueue\PublisherInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 class NewsletterControllerPlugin
 {
@@ -41,16 +41,6 @@ class NewsletterControllerPlugin
      * @var ContactResource
      */
     private $contactResource;
-
-    /**
-     * @var SmsSignup
-     */
-    private $smsSignupQueueItem;
-
-    /**
-     * @var TransactionalMessageEnqueuer
-     */
-    private $transactionalMessageEnqueuer;
 
     /**
      * @var CollectionFactory
@@ -93,13 +83,14 @@ class NewsletterControllerPlugin
     private $smsSubscriptionDataFactory;
 
     /**
-     * NewsletterControllerPlugin constructor.
-     *
+     * @var SmsMessagePublisher
+     */
+    private $smsMessagePublisher;
+
+    /**
      * @param Data $dataHelper
      * @param Logger $logger
      * @param ContactResource $contactResource
-     * @param SmsSignup $smsSignupQueueItem
-     * @param TransactionalMessageEnqueuer $transactionalMessageEnqueuer
      * @param CollectionFactory $contactCollectionFactory
      * @param Session $customerSession
      * @param FormKeyValidator $formKeyValidator
@@ -107,14 +98,13 @@ class NewsletterControllerPlugin
      * @param ConsentManager $consentManager
      * @param SmsSubscriptionDataFactory $smsSubscriptionDataFactory
      * @param PublisherInterface $publisher
+     * @param SmsMessagePublisher $smsMessagePublisher
      * @param Context $context
      */
     public function __construct(
         Data $dataHelper,
         Logger $logger,
         ContactResource $contactResource,
-        SmsSignup $smsSignupQueueItem,
-        TransactionalMessageEnqueuer $transactionalMessageEnqueuer,
         CollectionFactory $contactCollectionFactory,
         Session $customerSession,
         FormKeyValidator $formKeyValidator,
@@ -122,13 +112,12 @@ class NewsletterControllerPlugin
         ConsentManager $consentManager,
         SmsSubscriptionDataFactory $smsSubscriptionDataFactory,
         PublisherInterface $publisher,
+        SmsMessagePublisher $smsMessagePublisher,
         Context $context
     ) {
         $this->dataHelper = $dataHelper;
         $this->logger = $logger;
         $this->contactResource = $contactResource;
-        $this->smsSignupQueueItem = $smsSignupQueueItem;
-        $this->transactionalMessageEnqueuer = $transactionalMessageEnqueuer;
         $this->contactCollectionFactory = $contactCollectionFactory;
         $this->customerSession = $customerSession;
         $this->formKeyValidator = $formKeyValidator;
@@ -136,6 +125,7 @@ class NewsletterControllerPlugin
         $this->consentManager = $consentManager;
         $this->smsSubscriptionDataFactory = $smsSubscriptionDataFactory;
         $this->publisher = $publisher;
+        $this->smsMessagePublisher = $smsMessagePublisher;
         $this->request = $context->getRequest();
     }
 
@@ -189,6 +179,8 @@ class NewsletterControllerPlugin
 
                     $this->contactResource->save($contactModel);
                     $this->consentManager->createConsentRecord($contactModel->getId(), $storeId);
+
+                    // Publish SMS subscription message
                     $this->publisher->publish(
                         Subscriber::TOPIC_SMS_SUBSCRIPTION,
                         $this->smsSubscriptionDataFactory->create()
@@ -197,19 +189,18 @@ class NewsletterControllerPlugin
                             ->setType('subscribe')
                     );
 
-                    if ($this->transactionalMessageEnqueuer->canQueue($this->smsSignupQueueItem, (int) $storeId)) {
-                        $this->smsSignupQueueItem->prepare(
-                            $consentMobileNumber,
-                            $customer->getEmail(),
-                            (int) $websiteId,
-                            (int) $storeId,
-                            $customer->getData('firstname'),
-                            $customer->getData('lastname')
-                        );
-                        $this->transactionalMessageEnqueuer->queue(
-                            $this->smsSignupQueueItem
-                        );
-                    }
+                    // Publish SMS signup message
+                    $this->smsMessagePublisher->publish(
+                        ConfigInterface::SMS_TYPE_SIGN_UP,
+                        [
+                            'websiteId' => (int) $websiteId,
+                            'storeId' => (int) $storeId,
+                            'mobileNumber' => $consentMobileNumber,
+                            'email' => $customer->getEmail(),
+                            'firstName' => $customer->getData('firstname'),
+                            'lastName' => $customer->getData('lastname')
+                        ]
+                    );
 
                 } elseif ($this->contactHasJustOptedOut(
                     $contactModel,

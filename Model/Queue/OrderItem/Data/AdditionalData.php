@@ -4,6 +4,14 @@ declare(strict_types=1);
 
 namespace Dotdigitalgroup\Sms\Model\Queue\OrderItem\Data;
 
+/**
+ * Class AdditionalData
+ *
+ * @deprecated This class is deprecated and will be removed in a future version.
+ * @see \Dotdigitalgroup\Sms\Model\Queue\SmsMessage\AbstractMessageType
+ * See the SmsMessage\Types namespace for all current message types.
+ */
+
 class AdditionalData
 {
     /**

@@ -13,6 +13,17 @@ use Dotdigitalgroup\Sms\Model\Queue\SenderProgressHandlerFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
+/**
+ * Class SmsSenderManager
+ *
+ * @deprecated renamed to SmsStatusManager with modified functionality
+ * @see \Dotdigitalgroup\Sms\Model\SmsStatusManager
+ *
+ * This class has been deprecated. The new SmsStatusManager class focuses on
+ * SMS status updates only. SMS sending functionality has been moved to separate
+ * components.
+ */
+
 class SmsSenderManager implements TaskRunInterface
 {
     /**

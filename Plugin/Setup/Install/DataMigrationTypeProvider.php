@@ -5,6 +5,7 @@ namespace Dotdigitalgroup\Sms\Plugin\Setup\Install;
 use Dotdigitalgroup\Email\Setup\Install\DataMigrationTypeProvider as EmailDataMigrationTypeProvider;
 use Dotdigitalgroup\Email\Setup\SchemaInterface;
 use Dotdigitalgroup\Sms\Setup\Install\Type\RestoreEmailContactTableSmsSubscribers;
+use Dotdigitalgroup\Sms\Setup\Install\Type\RestoreEmailOrderTableSmsOptIn;
 
 class DataMigrationTypeProvider
 {
@@ -14,12 +15,20 @@ class DataMigrationTypeProvider
     private $restoreEmailContactTableSmsSubscribers;
 
     /**
+     * @var RestoreEmailOrderTableSmsOptIn
+     */
+    private $restoreEmailOrderTableSmsOptIn;
+
+    /**
      * @param RestoreEmailContactTableSmsSubscribers $restoreEmailContactTableSmsSubscribers
+     * @param RestoreEmailOrderTableSmsOptIn $restoreEmailOrderTableSmsOptIn
      */
     public function __construct(
-        RestoreEmailContactTableSmsSubscribers $restoreEmailContactTableSmsSubscribers
+        RestoreEmailContactTableSmsSubscribers $restoreEmailContactTableSmsSubscribers,
+        RestoreEmailOrderTableSmsOptIn $restoreEmailOrderTableSmsOptIn
     ) {
         $this->restoreEmailContactTableSmsSubscribers = $restoreEmailContactTableSmsSubscribers;
+        $this->restoreEmailOrderTableSmsOptIn = $restoreEmailOrderTableSmsOptIn;
     }
 
     /**
@@ -36,8 +45,14 @@ class DataMigrationTypeProvider
         $result,
         ?string $table = null
     ) {
-        return empty($table) || $table === SchemaInterface::EMAIL_CONTACT_TABLE ?
-            $result + [$this->restoreEmailContactTableSmsSubscribers] :
-            $result;
+        if (empty($table) || $table === SchemaInterface::EMAIL_CONTACT_TABLE) {
+            $result[] = $this->restoreEmailContactTableSmsSubscribers;
+        }
+
+        if (empty($table) || $table === SchemaInterface::EMAIL_ORDER_TABLE) {
+            $result[] = $this->restoreEmailOrderTableSmsOptIn;
+        }
+
+        return $result;
     }
 }

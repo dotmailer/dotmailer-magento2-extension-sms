@@ -4,6 +4,13 @@ declare(strict_types=1);
 
 namespace Dotdigitalgroup\Sms\Model\Queue\Item;
 
+/**
+ * Class QueueItemInterface
+ *
+ * @deprecated This class is deprecated and will be removed in a future version.
+ * @see \Dotdigitalgroup\Sms\Api\Data\SmsMessageTypeInterface
+ */
+
 interface QueueItemInterface
 {
     /**

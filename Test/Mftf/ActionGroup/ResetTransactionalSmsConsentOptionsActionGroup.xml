@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="ResetTransactionalSmsConsentOptions">
+        <amOnPage url="{{AdminTransactionalSmsPage.url}}" stepKey="amOnDotdigitalConsentPage"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+
+        <conditionalClick stepKey="expandTransactionalConsentTab"
+                         selector="{{AdminTransactionalSmsSection.transactionalConsentFieldsetToggle}}"
+                         dependentSelector="{{AdminTransactionalSmsSection.transactionalConsentFieldset}}"
+                         visible="false"/>
+
+        <selectOption selector="{{AdminTransactionalSmsSection.transactionalConsentEnabled}}"
+                     userInput="No"
+                     stepKey="setTransactionalConsentDisabled"/>
+
+        <fillField selector="{{AdminTransactionalSmsSection.transactionalConsentText}}"
+                  userInput=""
+                  stepKey="clearTransactionalConsentText"/>
+
+        <click selector="{{AdminMainActionsSection.save}}" stepKey="saveConfig"/>
+        <waitForPageLoad stepKey="waitForConfigSave"/>
+        <see selector="{{AdminMessagesSection.success}}" userInput="You saved the configuration." stepKey="seeSuccessMessage"/>
+    </actionGroup>
+</actionGroups>
+

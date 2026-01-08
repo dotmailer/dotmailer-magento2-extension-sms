@@ -5,11 +5,19 @@ declare(strict_types=1);
 namespace Dotdigitalgroup\Sms\Model\Queue\Item;
 
 use Dotdigitalgroup\Email\Logger\Logger;
-use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterfaceFactory;
-use Dotdigitalgroup\Sms\Api\SmsOrderRepositoryInterface;
+use Dotdigitalgroup\Sms\Api\Data\SmsMessageInterfaceFactory;
+use Dotdigitalgroup\Sms\Api\SmsMessageRepositoryInterface;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use InvalidArgumentException;
 use Magento\Framework\Serialize\SerializerInterface;
+
+/**
+ * Class TransactionalMessageEnqueuer
+ *
+ * @deprecated This class is deprecated and will be removed in a future version.
+ * The queue system now uses a publisher and consumer.
+ * @see \Dotdigitalgroup\Sms\Model\Queue\Publisher\SmsMessagePublisher
+ */
 
 class TransactionalMessageEnqueuer
 {
@@ -19,14 +27,14 @@ class TransactionalMessageEnqueuer
     private $logger;
 
     /**
-     * @var SmsOrderInterfaceFactory
+     * @var SmsMessageInterfaceFactory
      */
-    private $smsOrderInterfaceFactory;
+    private $smsMessageInterfaceFactory;
 
     /**
-     * @var SmsOrderRepositoryInterface
+     * @var SmsMessageRepositoryInterface
      */
-    private $smsOrderRepositoryInterface;
+    private $smsMessageRepositoryInterface;
 
     /**
      * @var Configuration
@@ -42,21 +50,21 @@ class TransactionalMessageEnqueuer
      * TransactionalMessageEnqueuer constructor.
      *
      * @param Logger $logger
-     * @param SmsOrderInterfaceFactory $smsOrderInterfaceFactory
-     * @param SmsOrderRepositoryInterface $smsOrderRepositoryInterface
+     * @param SmsMessageInterfaceFactory $smsMessageInterfaceFactory
+     * @param SmsMessageRepositoryInterface $smsMessageRepositoryInterface
      * @param Configuration $moduleConfig
      * @param SerializerInterface $serializer
      */
     public function __construct(
         Logger $logger,
-        SmsOrderInterfaceFactory $smsOrderInterfaceFactory,
-        SmsOrderRepositoryInterface $smsOrderRepositoryInterface,
+        SmsMessageInterfaceFactory $smsMessageInterfaceFactory,
+        SmsMessageRepositoryInterface $smsMessageRepositoryInterface,
         Configuration $moduleConfig,
         SerializerInterface $serializer
     ) {
         $this->logger = $logger;
-        $this->smsOrderInterfaceFactory = $smsOrderInterfaceFactory;
-        $this->smsOrderRepositoryInterface = $smsOrderRepositoryInterface;
+        $this->smsMessageInterfaceFactory = $smsMessageInterfaceFactory;
+        $this->smsMessageRepositoryInterface = $smsMessageRepositoryInterface;
         $this->moduleConfig = $moduleConfig;
         $this->serializer = $serializer;
     }
@@ -68,7 +76,7 @@ class TransactionalMessageEnqueuer
      */
     public function queue(QueueItemInterface $item)
     {
-        $smsOrder = $this->smsOrderInterfaceFactory
+        $smsMessage = $this->smsMessageInterfaceFactory
             ->create()
             ->setStoreId($item->getStoreId())
             ->setWebsiteId($item->getWebsiteId())
@@ -80,8 +88,8 @@ class TransactionalMessageEnqueuer
                 $this->serialiseData($item->getAdditionalData())
             );
 
-        $this->smsOrderRepositoryInterface
-            ->save($smsOrder);
+        $this->smsMessageRepositoryInterface
+            ->save($smsMessage);
     }
 
     /**

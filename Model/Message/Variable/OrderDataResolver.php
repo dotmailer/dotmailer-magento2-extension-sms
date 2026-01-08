@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Dotdigitalgroup\Sms\Model\Message\Variable;
 
-use Dotdigitalgroup\Sms\Api\Data\SmsOrderInterface;
+use Dotdigitalgroup\Sms\Api\Data\SmsMessageInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -62,7 +62,7 @@ class OrderDataResolver implements ResolverInterface
     /**
      * @inheritDoc
      */
-    public function resolve(string $variable, SmsOrderInterface $sms)
+    public function resolve(string $variable, SmsMessageInterface $sms)
     {
         if (!in_array($variable, $this->templateVariables)) {
             return '';
@@ -75,7 +75,7 @@ class OrderDataResolver implements ResolverInterface
     /**
      * Get first name.
      *
-     * @param SmsOrderInterface $sms
+     * @param SmsMessageInterface $sms
      * @return string|null
      */
     private function getFirstName($sms)
@@ -93,7 +93,7 @@ class OrderDataResolver implements ResolverInterface
     /**
      * Get last name.
      *
-     * @param SmsOrderInterface $sms
+     * @param SmsMessageInterface $sms
      * @return string|null
      */
     private function getLastName($sms)
@@ -111,7 +111,7 @@ class OrderDataResolver implements ResolverInterface
     /**
      * Get email.
      *
-     * @param SmsOrderInterface $sms
+     * @param SmsMessageInterface $sms
      */
     private function getEmail($sms)
     {
@@ -123,7 +123,7 @@ class OrderDataResolver implements ResolverInterface
     /**
      * Get store name.
      *
-     * @param SmsOrderInterface $sms
+     * @param SmsMessageInterface $sms
      * @return string
      * @throws NoSuchEntityException
      */
@@ -136,7 +136,7 @@ class OrderDataResolver implements ResolverInterface
     /**
      * Get true order id.
      *
-     * @param SmsOrderInterface $sms
+     * @param SmsMessageInterface $sms
      * @return int|null
      */
     private function getEntityId($sms)
@@ -148,7 +148,7 @@ class OrderDataResolver implements ResolverInterface
     /**
      * Get order id.
      *
-     * @param SmsOrderInterface $sms
+     * @param SmsMessageInterface $sms
      * @return float|string|null
      */
     private function getOrderId($sms)
@@ -161,7 +161,7 @@ class OrderDataResolver implements ResolverInterface
     /**
      * Get order status.
      *
-     * @param SmsOrderInterface $sms
+     * @param SmsMessageInterface $sms
      * @return string
      */
     private function getOrderStatus($sms)
@@ -172,7 +172,7 @@ class OrderDataResolver implements ResolverInterface
     /**
      * Get tracking number.
      *
-     * @param SmsOrderInterface $sms
+     * @param SmsMessageInterface $sms
      * @return string
      */
     private function getTrackingNumber($sms)
@@ -183,7 +183,7 @@ class OrderDataResolver implements ResolverInterface
     /**
      * Get tracking carrier.
      *
-     * @param SmsOrderInterface $sms
+     * @param SmsMessageInterface $sms
      * @return string
      */
     private function getTrackingCarrier($sms)
@@ -194,7 +194,7 @@ class OrderDataResolver implements ResolverInterface
     /**
      * Get refund amount.
      *
-     * @param SmsOrderInterface $sms
+     * @param SmsMessageInterface $sms
      * @return string
      */
     private function getRefundAmount($sms)

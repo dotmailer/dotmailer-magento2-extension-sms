@@ -9,9 +9,9 @@ use Magento\Framework\Exception\NoSuchEntityException;
 class Cron
 {
     /**
-     * @var SmsSenderManagerFactory
+     * @var SmsStatusManagerFactory
      */
-    private $senderManagerFactory;
+    private $smsStatusManagerFactory;
 
     /**
      * @var SmsSubscriberFactory
@@ -21,25 +21,25 @@ class Cron
     /**
      * Cron constructor.
      *
-     * @param SmsSenderManagerFactory $senderManagerFactory
+     * @param SmsStatusManagerFactory $smsStatusManagerFactory
      * @param SmsSubscriberFactory $smsSubscriberFactory
      */
     public function __construct(
-        SmsSenderManagerFactory $senderManagerFactory,
+        SmsStatusManagerFactory $smsStatusManagerFactory,
         SmsSubscriberFactory $smsSubscriberFactory
     ) {
-        $this->senderManagerFactory = $senderManagerFactory;
+        $this->smsStatusManagerFactory = $smsStatusManagerFactory;
         $this->smsSubscriberFactory = $smsSubscriberFactory;
     }
 
     /**
-     * Send sms order messages.
+     * Update SMS message statuses.
      *
      * @return void
      */
-    public function sendSmsOrderMessages()
+    public function updateSmsStatuses()
     {
-        $this->senderManagerFactory->create()
+        $this->smsStatusManagerFactory->create()
             ->run();
     }
 }

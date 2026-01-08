@@ -2,13 +2,13 @@
 
 namespace Dotdigitalgroup\Sms\Model\Config;
 
+use Dotdigitalgroup\Sms\Model\Config\ConfigInterface;
 use Magento\Directory\Model\AllowedCountries;
 use Magento\Config\Model\Config\Backend\Admin\Custom;
 use Magento\Framework\App\Config\ReinitableConfigInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\RequestInterface;
-use Magento\Store\Api\Data\WebsiteInterface;
 use Magento\Store\Api\StoreWebsiteRelationInterface;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -194,6 +194,21 @@ class Configuration
     }
 
     /**
+     * Get Transactional SMS consent text.
+     *
+     * @param string|int $storeId
+     * @return string
+     */
+    public function getSmsTransactionalConsentText($storeId): string
+    {
+        return (string) $this->scopeConfig->getValue(
+            ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_CONSENT_TEXT,
+            ScopeInterface::SCOPE_STORES,
+            $storeId
+        );
+    }
+
+    /**
      * Switch off at store level.
      *
      * @param string|int $storeId
@@ -337,22 +352,22 @@ class Configuration
      */
     public function getResubmissionForm(): array
     {
-         return [
-             'component' => 'Dotdigitalgroup_Sms/js/view/telephoneResubmission',
-             'provider' => 'checkoutProvider',
-             'config' => [
-                 'template' => 'Dotdigitalgroup_Sms/telephone-resubmission'
-             ],
-             'children' => [
-                 'telephone-resubmission-fieldset' => [
-                     'component' => 'uiComponent',
-                     'displayArea' => 'telephone-resubmission-fields',
-                     'children' => [
-                         'telephone' => $this->telephoneFieldConfig('telephone', 'Resubmission')
-                     ]
-                 ]
-             ]
-         ];
+        return [
+            'component' => 'Dotdigitalgroup_Sms/js/view/telephoneResubmission',
+            'provider' => 'checkoutProvider',
+            'config' => [
+                'template' => 'Dotdigitalgroup_Sms/telephone-resubmission'
+            ],
+            'children' => [
+                'telephone-resubmission-fieldset' => [
+                    'component' => 'uiComponent',
+                    'displayArea' => 'telephone-resubmission-fields',
+                    'children' => [
+                        'telephone' => $this->telephoneFieldConfig('telephone', 'Resubmission')
+                    ]
+                ]
+            ]
+        ];
     }
 
     /**
@@ -410,5 +425,46 @@ class Configuration
             ScopeInterface::SCOPE_WEBSITE,
             $websiteId
         );
+    }
+
+    /**
+     * Is transactional consent enabled.
+     *
+     * @param string $storeId
+     * @return bool
+     */
+    public function isTransactionalConsentEnabled(string $storeId): bool
+    {
+        return $this->scopeConfig->isSetFlag(
+            ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_CONSENT_ENABLED,
+            ScopeInterface::SCOPE_STORES,
+            $storeId
+        );
+    }
+
+    /**
+     * Get transactional consent text.
+     *
+     * @param string $storeId
+     * @return string
+     */
+    public function getTransactionalConsentText(string $storeId): string
+    {
+        return (string) $this->scopeConfig->getValue(
+            ConfigInterface::XML_PATH_TRANSACTIONAL_SMS_CONSENT_TEXT,
+            ScopeInterface::SCOPE_STORES,
+            $storeId
+        );
+    }
+
+    /**
+     * Get transactional consent applicable country codes.
+     *
+     * @param string $storeId
+     * @return array
+     */
+    public function transactionalConsentApplicableCodes(string $storeId): array
+    {
+        return ConfigInterface::SMS_ISO_COUNTRY_CODES_WITH_TRANSACTIONAL_CONSENT;
     }
 }

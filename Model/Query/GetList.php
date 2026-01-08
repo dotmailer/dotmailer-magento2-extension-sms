@@ -2,7 +2,7 @@
 
 namespace Dotdigitalgroup\Sms\Model\Query;
 
-use Dotdigitalgroup\Sms\Model\ResourceModel\SmsOrder\CollectionFactory;
+use Dotdigitalgroup\Sms\Model\ResourceModel\SmsMessage\CollectionFactory;
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SearchResultsInterface;
