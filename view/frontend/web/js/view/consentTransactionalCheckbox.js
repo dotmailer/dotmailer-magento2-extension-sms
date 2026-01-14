@@ -1,7 +1,8 @@
 define([
     'Magento_Ui/js/form/element/boolean',
-    'Magento_Checkout/js/model/quote'
-], function (Boolean, quote) {
+    'Magento_Checkout/js/model/quote',
+    'Magento_Customer/js/model/customer'
+], function (Boolean, quote, customer) {
     'use strict';
 
     return Boolean.extend({
@@ -27,9 +28,11 @@ define([
         listenForCountryChange: function () {
             const self = this;
 
-            jQuery.async(`input[name="${self.inputName}"]`, element => {
-                quote.shippingAddress.subscribe( (newAddress) => element.checked = false, this);
-            });
+            if (customer.isLoggedIn()) {
+                jQuery.async(`input[name="${self.inputName}"]`, element => {
+                    quote.shippingAddress.subscribe((newAddress) => element.checked = false, this);
+                });
+            }
 
             document.addEventListener('addressPhoneCountryChange', (event) =>  {
                 jQuery.async(`input[name="${self.inputName}"]`, element => element.checked = false );
