@@ -27,8 +27,9 @@ define([
          */
         listenForCountryChange: function () {
             const self = this;
+            const address = quote.shippingAddress();
 
-            if (customer.isLoggedIn()) {
+            if (customer.isLoggedIn() && address?.customerAddressId) {
                 jQuery.async(`input[name="${self.inputName}"]`, element => {
                     quote.shippingAddress.subscribe((newAddress) => element.checked = false, this);
                 });
