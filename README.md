@@ -10,8 +10,9 @@ This module provides support for Transactional SMS notifications to Magento merc
 - Dotdigital extension versions:
   - `Dotdigitalgroup_Email` 4.23.2+
 - PHP 7.4+
-- Magento 2.3.7+
+- Magento 2.4.2+
   - Magento 2.3.0-2.3.6 are compatible up to version 1.5.x
+  - Magento 2.3.7, 2.4.0 and 2.4.1 are compatible up to version 2.7.x
 
 ## Version history
 Please see our [Changelog](CHANGELOG.md) or the [Releases](https://github.com/dotmailer/dotmailer-magento2-extension-sms/releases) page.
