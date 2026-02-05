@@ -15,7 +15,7 @@
 
         <!-- Scroll to phone input -->
         <executeJS function="
-            var phoneInput = jQuery('input[name=telephone]')[0];
+            var phoneInput = jQuery('input[name=telephone]:visible').first()[0];
             if (phoneInput) {
                 phoneInput.scrollIntoView({behavior: 'smooth', block: 'center'});
             }
@@ -25,7 +25,7 @@
 
         <!-- Set country using intl-tel-input API -->
         <executeJS function="
-            var phoneInput = jQuery('input[name=telephone]')[0];
+            var phoneInput = jQuery('input[name=telephone]:visible').first()[0];
             if (phoneInput &amp;&amp; window.intlTelInputGlobals) {
                 var iti = window.intlTelInputGlobals.getInstance(phoneInput);
                 if (iti) {
@@ -36,7 +36,7 @@
             return 'intl-tel-input not found';
         " stepKey="setCountry"/>
         <wait time="1" stepKey="waitForCountrySet"/>
-        <executeJS function="return (jQuery('input[name=telephone]').val('{{phoneNumber}}').trigger('change'));" stepKey="fillPhoneNumber"/>
+        <executeJS function="return (jQuery('input[name=telephone]:visible').first().val('{{phoneNumber}}').trigger('change'));" stepKey="fillPhoneNumber"/>
         <wait time="1" stepKey="waitForPhoneNumberProcessing"/>
     </actionGroup>
 </actionGroups>
