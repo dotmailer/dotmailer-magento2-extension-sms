@@ -3,6 +3,7 @@
 namespace Dotdigitalgroup\Sms\Component\Consent;
 
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
+use Dotdigitalgroup\Sms\ViewModel\TelephoneInputConfig;
 
 class ConsentTransactionalCheckbox
 {
@@ -12,12 +13,20 @@ class ConsentTransactionalCheckbox
     private $moduleConfig;
 
     /**
+     * @var TelephoneInputConfig
+     */
+    private $telephoneInputConfig;
+
+    /**
      * @param Configuration $moduleConfig
+     * @param TelephoneInputConfig $telephoneInputConfig
      */
     public function __construct(
-        Configuration $moduleConfig
+        Configuration $moduleConfig,
+        TelephoneInputConfig $telephoneInputConfig
     ) {
         $this->moduleConfig = $moduleConfig;
+        $this->telephoneInputConfig = $telephoneInputConfig;
     }
 
     /**
@@ -32,6 +41,10 @@ class ConsentTransactionalCheckbox
             return [];
         }
 
+        if (!$this->moduleConfig->isTransactionalConsentEnabled($storeId)) {
+            return [];
+        }
+
         return [
             'component' => 'Dotdigitalgroup_Sms/js/view/consentTransactionalCheckbox',
             'config' => [
@@ -39,15 +52,14 @@ class ConsentTransactionalCheckbox
                 'template' => 'ui/form/field',
                 'elementTmpl' => 'ui/form/element/checkbox',
                 'customConfig' => [
-                    'isEnabled' => $this->moduleConfig->isTransactionalConsentEnabled($storeId),
                     'isoCodes' => $this->moduleConfig->transactionalConsentApplicableCodes($storeId),
+                    'intlTelInputConfig' => $this->telephoneInputConfig->getConfig()
                 ],
             ],
             'dataScope' => 'shippingAddress.dd_consent.dd_sms_transactional_consent_checkbox',
             'description' => __($this->moduleConfig->getTransactionalConsentText($storeId)),
             'label' => '',
             'provider' => 'checkoutProvider',
-            'visible' => false,
             'checked' => false,
             'validation' => [],
             'sortOrder' => 180,

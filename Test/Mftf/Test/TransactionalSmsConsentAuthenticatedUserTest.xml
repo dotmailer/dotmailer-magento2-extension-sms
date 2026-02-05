@@ -104,6 +104,8 @@
             <argument name="phoneNumber" value="+1 201 555 0123"/>
         </actionGroup>
         <wait time="1" stepKey="waitAfterUSPhoneUpdate"/>
+        <click selector="{{CheckoutConsentFormSection.telephoneUpdateButton}}" stepKey="submitNumberUpdateUs"/>
+        <waitForPageLoad stepKey="waitForCheckoutPageReloadUs"/>
 
         <!-- Scroll to consent form -->
         <scrollTo selector="{{CheckoutConsentFormSection.consentForm}}" stepKey="scrollToConsentFormUS"/>
@@ -128,6 +130,8 @@
             <argument name="phoneNumber" value="+44 20 7946 0958"/>
         </actionGroup>
         <wait time="2" stepKey="waitForConsentUpdate"/>
+        <click selector="{{CheckoutConsentFormSection.telephoneUpdateButton}}" stepKey="submitNumberUpdateUk"/>
+        <waitForPageLoad stepKey="waitForCheckoutPageReloadUk"/>
 
         <!-- Verify UK address is now selected -->
         <see selector="{{CheckoutShippingSection.selectedShippingAddress}}" userInput="{{UK_Not_Default_Address.street[0]}}" stepKey="seeUKAddressSelected"/>

@@ -86,7 +86,7 @@ class LayoutProcessor
         }
 
         if (isset($shippingSelection)) {
-            if ($this->moduleConfig->isPhoneNumberValidationEnabled($storeId)) {
+            if ($this->moduleConfig->isPhoneNumberValidationEnabled($storeId) && $this->currentCustomerHasStoredShippingAddress()) {
                 $shippingSelection['dd-telephone-resubmission-form'] = $this->moduleConfig->getResubmissionForm();
             }
 
@@ -139,10 +139,6 @@ class LayoutProcessor
      */
     private function appendConsentLayout(&$layoutNode, $storeId)
     {
-//        if (!$this->moduleConfig->isSmsConsentCheckoutEnabled($storeId)) {
-//            return;
-//        }
-
         $layoutNode['dd_sms_consent_collapse_group'] = $this->consentCollapseGroup->render($storeId);
     }
 }

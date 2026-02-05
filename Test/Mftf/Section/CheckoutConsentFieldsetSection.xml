@@ -7,5 +7,6 @@
         <element name="consentMobileNumber" type="input" selector="input[name='dd_consent[dd_sms_marketing_consent_telephone]']" />
         <element name="consentMobileNumberMessageContainsText" type="text" selector="//div[contains(@class, 'field-error')]//span[contains(text(), '{{text}}')]" parameterized="true"/>
         <element name="transactionalConsentCheckbox" type="checkbox" selector="input[name='dd_consent[dd_sms_transactional_consent_checkbox]']" />
+        <element name="telephoneUpdateButton" type="button" selector="#ddg-phone-update" />
     </section>
 </sections>

@@ -62,12 +62,6 @@
             <actionGroup ref="AdminLogoutActionGroup" stepKey="logout"/>
         </after>
 
-        <actionGroup ref="DotAdminAssignDefaultSourceToSimpleProductsActionGroup" stepKey="bulkAssignSourcesToAllProducts">
-            <argument name="product1Sku" value="$$simpleProduct.sku$$"/>
-            <argument name="source1_code" value="default"/>
-        </actionGroup>
-
-
         <amOnPage url="{{StorefrontProductPage.url($$simpleProduct.custom_attributes[url_key]$$)}}" stepKey="navigateToProductPage"/>
         <waitForPageLoad stepKey="waitForProductPageLoad"/>
         <actionGroup ref="AddToCartFromStorefrontProductPageActionGroup" stepKey="addToCartFromStorefrontProductPage">
@@ -85,7 +79,7 @@
         <!-- FillField action does not work for input after transformed by JS -->
         <actionGroup ref="SelectPhoneCountryActionGroup" stepKey="fillUKPhoneNumber">
             <argument name="countryCode" value="gb"/>
-            <argument name="phoneNumber" value="{{UK_Not_Default_Address.telephone}}"/>
+            <argument name="phoneNumber" value="+44 20 3953 3072"/>
         </actionGroup>
 
         <scrollTo selector="{{CheckoutConsentFormSection.consentForm}}" stepKey="scrollToConsentForm"/>
@@ -96,7 +90,7 @@
         <!-- Now change to US phone number to trigger transactional consent -->
         <actionGroup ref="SelectPhoneCountryActionGroup" stepKey="fillUSPhoneNumber">
             <argument name="countryCode" value="us"/>
-            <argument name="phoneNumber" value="{{US_Address_TX.telephone}}"/>
+            <argument name="phoneNumber" value="+1 20 3953 3072"/>
         </actionGroup>
 
         <waitForElementVisible selector="{{CheckoutConsentFormSection.transactionalConsentCheckbox}}" stepKey="waitForTransactionalConsentCheckbox"/>

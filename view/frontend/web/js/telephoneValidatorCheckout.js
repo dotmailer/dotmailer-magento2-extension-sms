@@ -32,12 +32,12 @@ define([
                         countryCodeClass = countryCodeClass.split(' ')[1];
                         countryCode = countryCodeClass.split('__')[1];
                         errorCode = phoneErrorHandler.getErrorCode(value, countryCode);
-                        this.message = typeof errorMap[errorCode] === 'undefined' ?
+                        validatorObj.message = typeof errorMap[errorCode] === 'undefined' ?
                             errorMap[0] :
                             errorMap[errorCode];
                     }
                 } catch (e) {
-                    this.message = errorMap[1];
+                    validatorObj.message = errorMap[1];
                     isValid = false;
                 }
 
@@ -53,7 +53,9 @@ define([
             validator.addRule(
                 'validate-phone-number',
                 validatorObj.validate,
-                $.mage.__(validatorObj.message)
+                function() {
+                    return $.mage.__(validatorObj.message);
+                }
             );
         })();
 

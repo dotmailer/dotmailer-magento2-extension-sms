@@ -19,33 +19,43 @@ define([
             originalSelectShippingAddress(config, element);
 
             const validateQuotePhone = (element) => {
-                const ddgContainerSelector= $('#telephone-resubmission')
-                const shippingAddress = quote.shippingAddress()
-                const ValidatePhoneNumber = new Promise((resolve,reject) => {
-                    return setTimeout(() => {
-                        let intlInput = window.intlTelInputGlobals.getInstance(element)
-                        intlInput.setNumber(shippingAddress.telephone);
-                        return (intlInput.isValidNumber()) ? resolve(intlInput) : reject(intlInput);
-                    }, 500); //wait for intlTelInput to initialize
-                });
-
-                //This is required for UI issue in magento2 v2.4.4
-                //https://github.com/magento/magento2/issues/35651
+                const ddgContainerSelector = $('#telephone-resubmission');
+                const shippingAddress = quote.shippingAddress();
+                const hasSavedAddress = customer.getShippingAddressList().length > 0;
+                if(!hasSavedAddress){
+                    return false;
+                }
                 messageList.clear();
                 ddgContainerSelector.hide();
 
+                const ValidatePhoneNumber = element.itiPromise.then(() => {
+                    const intlInput = window.intlTelInputGlobals.getInstance(element);
+                    intlInput.setNumber(shippingAddress.telephone);
+
+                    return intlInput.isValidNumber()
+                        ? Promise.resolve(intlInput)
+                        : Promise.reject(intlInput);
+                });
+
                 ValidatePhoneNumber
-                    .then((intlInput) => document.dispatchEvent(new CustomEvent('numberIsValid', {'detail': {'number': shippingAddress.telephone}})))
+                    .then((intlInput) => {
+                        document.dispatchEvent(new CustomEvent('numberIsValid', {
+                            'detail': {'number': shippingAddress.telephone}
+                        }));
+                    })
                     .catch((intlInput) => {
                         ddgContainerSelector.show();
-                        document.dispatchEvent(new CustomEvent('numberIsInvalid', {'detail': {'number': shippingAddress.telephone}}));
+                        document.dispatchEvent(new CustomEvent('numberIsInvalid', {
+                            'detail': {'number': shippingAddress.telephone}
+                        }));
                         if (!messageList.hasMessages()) {
                             messageList.addErrorMessage({
                                 message: $t('Enter a valid phone number to receive SMS order notifications.')
                             });
                         }
-                    })
+                    });
             }
+
 
             (async () => {
                 if(!customer.isLoggedIn()) return;
