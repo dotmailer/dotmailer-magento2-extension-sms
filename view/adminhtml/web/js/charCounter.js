@@ -1,8 +1,8 @@
+/* global require, document, clearTimeout, setTimeout */
 require([
     'jquery',
     'Dotdigitalgroup_Sms/js/counter/smsCounter'
 ], function ($) {
-    'use strict';
 
     let selectors = [],
      unicodeMessageSelector = '#ddg-unicode';
@@ -101,7 +101,7 @@ require([
         });
     });
 
-    // eslint-disable-next-line no-use-before-define
+
     $(document).on('keyup', selectors.join(', '), delay(function (event) {
         const message = $(event.target).val();
         let counterSelector = '#' + event.target.id + '_counter',
@@ -109,9 +109,9 @@ require([
          totalSelector = '#' + event.target.id + '_total';
 
         if (message !== undefined) {
-            // eslint-disable-next-line no-use-before-define
+
             updateNote(counterSelector, commentSelector, totalSelector, message);
-            // eslint-disable-next-line no-use-before-define
+
             updateUnicode(message);
         }
     }, 500));

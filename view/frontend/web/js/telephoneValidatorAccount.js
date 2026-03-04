@@ -1,33 +1,27 @@
+/* global define */
 define([
     'jquery',
     'jquery/validate',
-    'ddTelephoneValidation',
-    'ddTelephoneValidationError'
-], function ($, jqueryValidate, phoneValidate, phoneErrorHandler) {
-    'use strict';
+    'ddTelephoneValidation'
+], function ($, jqueryValidate, phoneValidate) {
 
-    var errorMap = phoneErrorHandler.getErrorMap(),
-         validatorObj = {
-            validate: function (value) {
-                let countryCodeClass = $('.iti__selected-flag .iti__flag').attr('class'),
-                    countryCode,
-                    isValid,
-                    errorCode;
+    const errorMap = phoneValidate.getErrorMap (),
+        validatorObj = {
+            validate: function (value, element) {
+
+                let isValid = false;
 
                 try {
-                    isValid = phoneValidate(value, countryCodeClass);
+                    const elementId = $(element).attr ('id'),
 
+                     result = phoneValidate.validate(elementId);
+
+                    isValid = result.isValid;
                     if (!isValid) {
-                        countryCodeClass = countryCodeClass.split(' ')[1];
-                        countryCode = countryCodeClass.split('__')[1];
-                        errorCode = phoneErrorHandler.getErrorCode(value, countryCode);
-
-                        $.validator.messages['validate-phone-number'] = typeof errorMap[errorCode] === 'undefined' ?
-                            errorMap[0] :
-                            errorMap[errorCode];
+                        $.validator.messages['validate-phone-number'] = result.errorMessage;
                     }
-                } catch (e) {
-                    $.validator.messages['validate-phone-number'] = errorMap[1];
+                } catch {
+                    $.validator.messages['validate-phone-number'] = errorMap[0];
                     isValid = false;
                 }
 
@@ -35,34 +29,27 @@ define([
             }
         },
         withConsentValidator = {
-            validate: function (value) {
-                let countryCodeClass = $('.iti__selected-flag .iti__flag').attr('class'),
-                    countryCode,
-                    isValid,
-                    errorCode,
-                    hasProvidedConsent = $('#dd_sms_marketing_consent_checkbox').is(':checked');
+            validate: function (value, element) {
+
+                let isValid = false;
+
+                const hasProvidedConsent = $('#dd_sms_marketing_consent_checkbox').is (':checked');
 
                 if (!hasProvidedConsent && !value) {
                     return true;
                 }
 
-                if (countryCodeClass === undefined || countryCodeClass.indexOf(' ') === -1) {
-                    $.validator.messages['validate-phone-number-with-checkbox'] = errorMap[1];
+                try {
+                    const elementId = $(element).attr ('id'),
+                     result = phoneValidate.validate(elementId);
 
-                    return false;
-                }
-
-                countryCodeClass = countryCodeClass.split(' ')[1];
-                countryCode = countryCodeClass.split('__')[1];
-                isValid = window.intlTelInputUtils.isValidNumber(value, countryCode);
-
-                if (!isValid) {
-                    errorCode = window.intlTelInputUtils.getValidationError(value, countryCode);
-
-                    // eslint-disable-next-line max-len
-                    $.validator.messages['validate-phone-number-with-checkbox'] = typeof errorMap[errorCode] === 'undefined' ?
-                        errorMap[0] :
-                        errorMap[errorCode];
+                    isValid = result.isValid;
+                    if (!isValid) {
+                        $.validator.messages['validate-phone-number-with-checkbox'] = result.errorMessage;
+                    }
+                } catch {
+                    $.validator.messages['validate-phone-number-with-checkbox'] = errorMap[0];
+                    isValid = false;
                 }
 
                 return isValid;

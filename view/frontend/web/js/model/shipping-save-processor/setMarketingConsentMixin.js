@@ -1,18 +1,18 @@
+/* global define */
 define([
     'jquery',
     'mage/utils/wrapper',
     'underscore'
 ], function ($, wrapper, _) {
-    'use strict';
 
     return function (payloadExtender) {
         return wrapper.wrap(payloadExtender, function (originalAction, payload) {
             payload = originalAction(payload);
 
-            const MarketingConsentCheckbox = $('[name="dd_consent[dd_sms_marketing_consent_checkbox]"]');
-            const MarketingConsentTelephoneInput = $('[name="dd_consent[dd_sms_marketing_consent_telephone]"]');
+            const MarketingConsentCheckbox = $('[name="dd_consent[dd_sms_marketing_consent_checkbox]"]'),
+             MarketingConsentTelephoneInput = $('[name="dd_consent[dd_sms_marketing_consent_telephone]"]');
 
-            if(MarketingConsentCheckbox.is(':disabled')) {
+            if (MarketingConsentCheckbox.is(':disabled')) {
                 return payload;
             }
 
@@ -21,7 +21,7 @@ define([
                 payload.addressInformation.extension_attributes || {},
                 {
                     dd_sms_marketing_consent_checkbox: MarketingConsentCheckbox.is(':checked'),
-                    dd_sms_marketing_consent_telephone: MarketingConsentTelephoneInput.val(),
+                    dd_sms_marketing_consent_telephone: MarketingConsentTelephoneInput.val()
                 }
             );
             /* eslint-enable camelcase */

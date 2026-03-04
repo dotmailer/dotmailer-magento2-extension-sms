@@ -1,3 +1,4 @@
+/* global CustomEvent, define, document, window */
 define([
     'jquery',
     'mage/utils/wrapper',
@@ -6,7 +7,7 @@ define([
     'Magento_Checkout/js/model/quote',
     'Magento_Customer/js/model/customer'
 ], function ($, wrapper, messageList, $t, quote, customer) {
-    'use strict';
+
 
     /**
      * Runs on address selection for logged in users and checks if phone number is valid
@@ -18,35 +19,47 @@ define([
         return wrapper.wrap(selectShippingAddress, function (originalSelectShippingAddress, config, element) {
             originalSelectShippingAddress(config, element);
 
-            const validateQuotePhone = (element) => {
-                const ddgContainerSelector = $('#telephone-resubmission');
-                const shippingAddress = quote.shippingAddress();
-                const hasSavedAddress = customer.getShippingAddressList().length > 0;
-                if(!hasSavedAddress){
+            const validateQuotePhone = (phoneElement) => {
+                if (!customer.getShippingAddressList().length) {
                     return false;
                 }
+
+                const ddgContainerSelector = $('#telephone-resubmission'),
+                    shippingAddress = quote.shippingAddress(),
+                    ValidatePhoneNumber = phoneElement.itiPromise.then(() => {
+                        const intlInput = window.intlTelInput.getInstance(phoneElement),
+                        isInternationalFormat = (
+                            intlInput.setNumber(shippingAddress.telephone),
+                                shippingAddress.telephone.startsWith('+')
+                        ),
+                        isValid = isInternationalFormat ? intlInput.isValidNumberPrecise() : null;
+
+                        if (!isInternationalFormat) {
+                            return Promise.reject(intlInput);
+                        }
+
+                        return isValid
+                            ? Promise.resolve(intlInput)
+                            : Promise.reject(intlInput);
+                    });
+
                 messageList.clear();
                 ddgContainerSelector.hide();
 
-                const ValidatePhoneNumber = element.itiPromise.then(() => {
-                    const intlInput = window.intlTelInputGlobals.getInstance(element);
-                    intlInput.setNumber(shippingAddress.telephone);
-
-                    return intlInput.isValidNumber()
-                        ? Promise.resolve(intlInput)
-                        : Promise.reject(intlInput);
-                });
-
                 ValidatePhoneNumber
-                    .then((intlInput) => {
+                    .then(() => {
+                        const intlInput = window.intlTelInput.getInstance(phoneElement);
+
                         document.dispatchEvent(new CustomEvent('numberIsValid', {
-                            'detail': {'number': shippingAddress.telephone}
+                            'detail': {'number': intlInput.getNumber()}
                         }));
                     })
-                    .catch((intlInput) => {
+                    .catch(() => {
+                        const intlInput = window.intlTelInput.getInstance(phoneElement);
+
                         ddgContainerSelector.show();
                         document.dispatchEvent(new CustomEvent('numberIsInvalid', {
-                            'detail': {'number': shippingAddress.telephone}
+                            'detail': {'number': intlInput.getNumber()}
                         }));
                         if (!messageList.hasMessages()) {
                             messageList.addErrorMessage({
@@ -54,14 +67,14 @@ define([
                             });
                         }
                     });
-            }
+            };
 
 
             (async () => {
-                if(!customer.isLoggedIn()) return;
-                $.async('#telephone-resubmission input[name="telephone"]' , (element)=> {
-                    validateQuotePhone(element);
-                })
+                if (!customer.isLoggedIn()) { return; }
+                $.async('#telephone-resubmission input[name="telephone"]', (el)=> {
+                    validateQuotePhone(el);
+                });
             })();
         });
     };

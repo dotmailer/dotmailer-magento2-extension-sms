@@ -1,10 +1,9 @@
+/* global define, window */
 define([
     'jquery',
     'mage/utils/wrapper',
-    'Dotdigitalgroup_Sms/js/model/telephoneValidation',
     'Dotdigitalgroup_Sms/js/view/consentCheckoutForm'
-], function ($, wrapper, validate, consentFormUiClass) {
-    'use strict';
+], function ($, wrapper, consentFormUiClass) {
 
     var mixins = {
         validateShippingInformation: function () {
@@ -16,15 +15,15 @@ define([
                 return this._super(arguments);
             }
 
-            countryCodeClass = consentForm.find('.iti__selected-flag .iti__flag').attr('class');
+            countryCodeClass = consentForm.find('.iti__selected-country .iti__flag').attr('class');
 
             if (consentFormUiClass().isChecked() && typeof countryCodeClass !== 'undefined') {
                 try {
-                    isValid = validate(
+                    isValid = window.intlTelInput.utils.isValidNumber(
                         consentFormUiClass().consentPhoneInput().value(),
                         countryCodeClass
                     );
-                } catch (e) {
+                } catch {
                     return false;
                 }
             }

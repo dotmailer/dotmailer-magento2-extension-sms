@@ -1,3 +1,4 @@
+/* global define, window, document */
 /**
  * This module defines a Magento UI component for handling the consent form on the checkout page.
  * It uses the Knockout.js library for data binding and event handling.
@@ -14,10 +15,8 @@ define([
     'Magento_Ui/js/form/form',
     'ko',
     'Magento_Checkout/js/model/quote',
-    'Magento_Ui/js/lib/view/utils/async',
-    'Dotdigitalgroup_Sms/js/intlTelInput'
-], function ($, Component, ko, quote, intlTelInput) {
-    'use strict';
+    'Magento_Ui/js/lib/view/utils/async'
+], function ($, Component, ko, quote) {
 
     /**
      * @class
@@ -93,10 +92,16 @@ define([
 
             if (parentTelephoneInput) {
                 parentTelephoneInput.value.subscribe((value) => {
-                    if (typeof window.intlTelInputUtils === 'undefined') {
+                    if (typeof window.intlTelInput === 'undefined') {
                         return true;
                     }
-                    const newValueValid = window.intlTelInputUtils.isValidNumber(value);
+                    const parentIntlInput = window.intlTelInput.getInstance(
+                            document.getElementById(parentTelephoneInput.uid)
+                        ),
+                        newValueValid = window.intlTelInput.utils.isValidNumber(
+                            value,
+                            parentIntlInput.selectedCountryData?.iso2
+                        );
 
                     if (!consentTelephoneInput.value() && newValueValid) {
                         this.isValid(newValueValid);
@@ -108,14 +113,14 @@ define([
 
             quote.shippingAddress.subscribe((address) => {
 
-                if (typeof window.intlTelInputUtils === 'undefined' ||
+                if (typeof window.intlTelInput === 'undefined' ||
                     typeof this.config.intlTelInputConfig === 'undefined'
                 ) {
                     return true;
                 }
 
-                const newValueValid = window.intlTelInputUtils.isValidNumber(address.telephone, address.countryId),
-                 oldValueValid = window.intlTelInputUtils.isValidNumber(consentTelephoneInput.value());
+                const newValueValid = window.intlTelInput.utils.isValidNumber(address.telephone, address.countryId),
+                    oldValueValid = window.intlTelInput.utils.isValidNumber(consentTelephoneInput.value());
 
                 this.isValid(newValueValid);
                 if (
@@ -169,10 +174,30 @@ define([
          */
         attachIntlTelInput: function (uiComponent) {
             $.async(`input[name="${uiComponent.inputName}"]`, (node) => {
-                window.intlTelInput(node, JSON.parse(this.config.intlTelInputConfig))
-                const intlElement = window.intlTelInputGlobals.getInstance(node);
-                intlElement.telInput.addEventListener('blur', (event) => this.updateTelephoneField(uiComponent, intlElement.getNumber()));
-            })
+                const intlElement = window.intlTelInput(node, JSON.parse(this.config.intlTelInputConfig));
+
+                intlElement.promise.then(() => {
+                    intlElement.ui.telInput.addEventListener('blur', () => {
+                        this.updateTelephoneField(uiComponent, intlElement.getNumber(), true);
+                    });
+                });
+            });
+        },
+
+        /**
+         * Applies the intlTelInput value to the given element.
+         * @param {HTMLElement} element - The DOM element.
+         * @param {string} value - The new value.
+         * @param {boolean} triggerDOM - Whether to trigger a DOM change event.
+         */
+        applyIntlTelInputValue: function (element, value, triggerDOM) {
+            const intlElement = window.intlTelInput.getInstance(element);
+
+            intlElement?.setNumber(value);
+            element.value = value;
+            if (intlElement && triggerDOM) {
+                intlElement.setNumber(intlElement.getNumber());
+            }
         },
 
         /**
@@ -183,21 +208,20 @@ define([
          */
         updateTelephoneField: function (UiClass, value, triggerDOM = true) {
             const element = document.getElementById(UiClass.uid);
+
             if (!element) {
                 return;
             }
 
-            if (typeof window.intlTelInputGlobals === 'undefined' ||
+            if (typeof window.intlTelInput === 'undefined' ||
                 typeof this.config.intlTelInputConfig === 'undefined'
             ) {
-                element.value = value
+                element.value = value;
             } else {
                 try {
-                    const intlElement = window.intlTelInputGlobals.getInstance(element);
-                    intlElement?.setNumber(value);
-                    element.value = value
-                } catch (e) {
-                    element.value = value
+                    this.applyIntlTelInputValue(element, value, triggerDOM);
+                } catch {
+                    element.value = value;
                 }
             }
 

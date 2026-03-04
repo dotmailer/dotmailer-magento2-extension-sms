@@ -56,7 +56,7 @@
         <actionGroup ref="StorefrontClickSaveCustomerAccountSubscriptionsFormActionGroup" stepKey="submitCustomerAccountSubscriptionsFormForInvalidNumber"/>
 
         <!-- Observes error message -->
-        <seeElement selector="{{StorefrontCustomerAccountSubscriptionsSection.consentMobileNumberMessageContainsText('Invalid telephone number')}}" stepKey="seeConsentMobileNumberMessageContainsText"/>
+        <seeElement selector="{{StorefrontCustomerAccountSubscriptionsSection.consentMobileNumberMessageContainsText('Telephone number is too short')}}" stepKey="seeConsentMobileNumberMessageContainsText"/>
 
         <!--Fill in valid Mobile number -->
         <waitForElement selector="{{StorefrontCustomerAccountSubscriptionsSection.consentMobileNumber}}" stepKey="waitForConsentMobileNumber1"/>

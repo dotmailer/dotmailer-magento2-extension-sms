@@ -26,8 +26,8 @@
         <!-- Set country using intl-tel-input API -->
         <executeJS function="
             var phoneInput = jQuery('input[name=telephone]:visible').first()[0];
-            if (phoneInput &amp;&amp; window.intlTelInputGlobals) {
-                var iti = window.intlTelInputGlobals.getInstance(phoneInput);
+            if (phoneInput &amp;&amp; window.intlTelInput) {
+                var iti = window.intlTelInput.getInstance(phoneInput);
                 if (iti) {
                     iti.setCountry('{{countryCode}}');
                     return 'Country set to {{countryCode}}';
@@ -35,8 +35,8 @@
             }
             return 'intl-tel-input not found';
         " stepKey="setCountry"/>
-        <wait time="1" stepKey="waitForCountrySet"/>
+        <wait time="2" stepKey="waitForCountrySet"/>
         <executeJS function="return (jQuery('input[name=telephone]:visible').first().val('{{phoneNumber}}').trigger('change'));" stepKey="fillPhoneNumber"/>
-        <wait time="1" stepKey="waitForPhoneNumberProcessing"/>
+        <wait time="2" stepKey="waitForPhoneNumberProcessing"/>
     </actionGroup>
 </actionGroups>
