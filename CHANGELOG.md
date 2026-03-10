@@ -1,3 +1,8 @@
+### 3.0.0
+
+## What's new
+- The version of intl-tel-input this module ships with has been upgraded from v17.0.18 to v26.5.1.
+
 ### 2.8.0
 
 ### What's new
