@@ -1,16 +1,14 @@
+/* global define, setTimeout */
 define([
     'jquery',
     'ko',
-    'ddTelephoneValidation',
-    'ddTelephoneValidationError'
-], function ($, ko, phoneValidate, phoneErrorHandler) {
-    'use strict';
+    'ddTelephoneValidation'
+], function ($, ko, phoneValidate) {
 
     return function (validator) {
 
-        var errorMap = phoneErrorHandler.getErrorMap(),
-
-         validatorObj = {
+        const errorMap = phoneValidate.getErrorMap(),
+        validatorObj = {
             message: '',
 
             /**
@@ -19,25 +17,18 @@ define([
              * @param {Object} additionalParams
              */
             validate: function (value, params, additionalParams) {
-                var target = $('#' + additionalParams.uid),
-                    countryCodeClass = target.parent().find('.iti__selected-flag .iti__flag').attr('class'),
-                    countryCode,
-                    isValid = false,
-                    errorCode;
+                let target = $('#' + additionalParams.uid),
+                    isValid = false;
 
                 try {
-                    isValid = phoneValidate(value, countryCodeClass);
+                    const result = phoneValidate.validate(additionalParams.uid);
 
+                    isValid = result.isValid;
                     if (!isValid) {
-                        countryCodeClass = countryCodeClass.split(' ')[1];
-                        countryCode = countryCodeClass.split('__')[1];
-                        errorCode = phoneErrorHandler.getErrorCode(value, countryCode);
-                        validatorObj.message = typeof errorMap[errorCode] === 'undefined' ?
-                            errorMap[0] :
-                            errorMap[errorCode];
+                        validatorObj.message = result.errorMessage;
                     }
-                } catch (e) {
-                    validatorObj.message = errorMap[1];
+                } catch {
+                    validatorObj.message = errorMap[0];
                     isValid = false;
                 }
 
@@ -53,7 +44,7 @@ define([
             validator.addRule(
                 'validate-phone-number',
                 validatorObj.validate,
-                function() {
+                function () {
                     return $.mage.__(validatorObj.message);
                 }
             );

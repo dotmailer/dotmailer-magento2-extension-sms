@@ -4,8 +4,7 @@ var config = {
             smsCounter: 'Dotdigitalgroup_Sms/js/counter/smsCounter'
         },
         'Dotdigitalgroup_Sms': {
-            ddTelephoneValidation: 'Dotdigitalgroup_Sms/js/model/telephoneValidation',
-            ddTelephoneValidationError: 'Dotdigitalgroup_Sms/js/model/telephoneValidationError'
+            ddTelephoneValidation: 'Dotdigitalgroup_Sms/js/model/telephoneValidation'
         }
     },
 

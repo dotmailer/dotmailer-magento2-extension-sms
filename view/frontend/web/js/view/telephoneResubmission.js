@@ -1,3 +1,4 @@
+/* global define, window */
 define([
     'jquery',
     'Magento_Ui/js/form/form',
@@ -5,7 +6,7 @@ define([
     'mage/url',
     'mage/translate'
 ], function ($, Component, quote, url, $t) {
-    'use strict';
+
     return Component.extend({
         /**
          * Form submit handler

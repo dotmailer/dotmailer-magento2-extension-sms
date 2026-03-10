@@ -1,8 +1,7 @@
 var config = {
     map: {
         'Dotdigitalgroup_Sms': {
-            ddTelephoneValidation: 'Dotdigitalgroup_Sms/js/model/telephoneValidation',
-            ddTelephoneValidationError: 'Dotdigitalgroup_Sms/js/model/telephoneValidationError'
+            ddTelephoneValidation: 'Dotdigitalgroup_Sms/js/model/telephoneValidation'
         }
     },
 

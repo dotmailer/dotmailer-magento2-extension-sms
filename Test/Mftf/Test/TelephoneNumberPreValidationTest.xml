@@ -68,15 +68,14 @@
         <actionGroup ref="StorefrontOpenCheckoutPageActionGroup" stepKey="goToCheckoutPage"/>
 
         <!-- Assert that you see error message and form -->
-        <waitForPageLoad stepKey="waitForUpdate"/>
+        <waitForElement selector="{{StorefrontCustomerSignInPopupFormSection.errorMessage}}" stepKey="seeErrorMessage"/>
         <seeElement selector="{{MobileFormResubmissionFormSection.resubmissionForm}}" stepKey="seeResubmissionForm"/>
-        <seeElement selector="{{StorefrontCustomerSignInPopupFormSection.errorMessage}}" stepKey="seeErrorMessage"/>
 
         <!-- Update form and assert that you don't see errors  -->
         <fillField
-                selector="{{MobileFormResubmissionFormSection.resubmissionFormField}}"
-                userInput="{{US_Address_CA.telephone}}"
-                stepKey="fillPhoneNumber"
+            selector="{{MobileFormResubmissionFormSection.resubmissionFormField}}"
+            userInput="{{US_Address_CA.telephone}}"
+            stepKey="fillPhoneNumber"
         />
         <click selector="{{MobileFormResubmissionFormSection.resubmissionFormUpdateButton}}" stepKey="updatePhoneNumber" />
         <waitForPageLoad stepKey="waitForUpdate2"/>

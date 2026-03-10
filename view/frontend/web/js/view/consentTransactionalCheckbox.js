@@ -1,13 +1,13 @@
+/* global define, document, window, jQuery */
 define([
     'Magento_Ui/js/form/element/boolean',
     'Magento_Checkout/js/model/quote',
     'Magento_Customer/js/model/customer'
 ], function (Boolean, quote, customer) {
-    'use strict';
 
     return Boolean.extend({
 
-        custom_config: {
+        customConfig: {
             isoCodes: [],
             intlTelInputConfig: []
         },
@@ -17,7 +17,7 @@ define([
          */
         initialize: function () {
             this._super();
-            this.custom_config = this.get('customConfig');
+            this.customConfig = this.get('customConfig');
             this.listenForCountryChange();
             return this;
         },
@@ -36,35 +36,35 @@ define([
                     return;
                 }
 
-                const hasSavedAddress = customer.getShippingAddressList().length > 0;
                 // Attach event listener for customer without saved addresses
-                if (!self.guestAddressHandler && customer.isLoggedIn() && !hasSavedAddress) {
-                    self.guestAddressHandler = function(event) {
+                if (!self.guestAddressHandler && customer.isLoggedIn() && !customer.getShippingAddressList().length) {
+                    self.guestAddressHandler = function (event) {
                         const eventData = event.detail;
+
                         if (eventData && eventData.iso2) {
                             self.updateVisibility(eventData.iso2.toLowerCase());
                         }
                     };
 
                     document.addEventListener('addressPhoneCountryChange', self.guestAddressHandler);
-                }else if(customer.isLoggedIn() && hasSavedAddress){
-                    self.getCountryFromPhone(newAddress.telephone).then(countryIso => {
+                } else if (customer.isLoggedIn() && customer.getShippingAddressList().length > 0) {
+                    self.getCountryFromPhone(newAddress.telephone).then(function (countryIso) {
                         self.updateVisibility(countryIso);
                     });
                 }
             });
 
-            const initialAddress = quote.shippingAddress();
-            if (initialAddress && initialAddress.telephone) {
-                self.getCountryFromPhone(initialAddress.telephone).then(countryIso => {
+            if (quote.shippingAddress() && quote.shippingAddress().telephone) {
+                self.getCountryFromPhone(quote.shippingAddress().telephone).then(function (countryIso) {
                     self.updateVisibility(countryIso);
                 });
             }
 
-            const hasSavedAddress = customer.getShippingAddressList().length > 0;
-            if (!customer.isLoggedIn() || (customer.isLoggedIn() && !self.guestAddressHandler && !hasSavedAddress)){
-                self.guestAddressHandler = function(event) {
+            if (!customer.isLoggedIn() || customer.isLoggedIn() &&
+                !self.guestAddressHandler && !customer.getShippingAddressList().length) {
+                self.guestAddressHandler = function (event) {
                     const eventData = event.detail;
+
                     if (eventData && eventData.iso2) {
                         self.updateVisibility(eventData.iso2.toLowerCase());
                     }
@@ -78,8 +78,8 @@ define([
          * Update checkbox visibility based on country ISO
          * @param {string} countryIso
          */
-        updateVisibility: function(countryIso) {
-            if (this.custom_config.isoCodes.includes(countryIso)) {
+        updateVisibility: function (countryIso) {
+            if (this.customConfig.isoCodes.includes(countryIso)) {
                 this.visible(true);
                 this.disabled(false);
             } else {
@@ -87,13 +87,15 @@ define([
                 this.disabled(true);
             }
 
-            jQuery.async(`input[name="${this.inputName}"]`, element => element.checked = false);
+            jQuery.async('input[name="' + this.inputName + '"]', function (element) {
+                element.checked = false;
+            });
         },
 
         /**
          * Cleanup on component destroy
          */
-        destroy: function() {
+        destroy: function () {
             if (this.guestAddressHandler) {
                 document.removeEventListener('addressPhoneCountryChange', this.guestAddressHandler);
             }
@@ -103,25 +105,27 @@ define([
         /**
          * Extract country ISO from phone number
          * @param {string} telephone
-         * @returns {string}
+         * @returns {Promise}
          */
         getCountryFromPhone: function (telephone) {
             if (!telephone || !window.intlTelInput) {
                 return Promise.resolve('');
             }
 
-            const tempInput = document.createElement('input');
-            tempInput.type = 'tel';
-            tempInput.style.display = 'none';
-            document.body.appendChild(tempInput);
+            const tempInput = document.createElement('input'),
+                iti = (
+                    tempInput.type = 'tel',
+                        tempInput.style.display = 'none',
+                        document.body.appendChild(tempInput),
+                        window.intlTelInput(tempInput, JSON.parse(this.customConfig.intlTelInputConfig) || {})
+                );
 
-            const iti = window.intlTelInput(tempInput, JSON.parse(this.custom_config.intlTelInputConfig) || {});
             iti.setNumber(telephone);
 
-            return iti.promise.then(() => {
-                const isValid = iti.isValidNumber();
-                const countryData = iti.getSelectedCountryData();
-                const iso2 = (isValid && countryData.iso2) ? countryData.iso2.toLowerCase() : '';
+            return iti.promise.then(function () {
+                const isValid = iti.isValidNumberPrecise(),
+                    countryData = iti.getSelectedCountryData(),
+                    iso2 = isValid && countryData.iso2 ? countryData.iso2.toLowerCase() : '';
 
                 iti.destroy();
                 document.body.removeChild(tempInput);

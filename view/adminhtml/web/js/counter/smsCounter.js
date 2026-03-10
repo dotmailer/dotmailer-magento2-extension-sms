@@ -1,6 +1,7 @@
+/* global jQuery, window */
 // https://github.com/danxexe/sms-counter
 (function () {
-    'use strict';
+
     let $, SmsCounter;
 
     window.SmsCounter = SmsCounter = (function () {
