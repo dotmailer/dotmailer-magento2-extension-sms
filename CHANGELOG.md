@@ -1,15 +1,21 @@
+### 3.0.1
+
+#### Bug fixes
+- We fixed LESS compilation in static content deployment for merchants on Magento 2.4.2-2.4.7.
+- We removed an unused path for the old utils.js script from requirejs-config.
+
 ### 3.0.0
 
-## What's new
+#### What's new
 - The version of intl-tel-input this module ships with has been upgraded from v17.0.18 to v26.5.1.
 
 ### 2.8.0
 
-### What's new
+#### What's new
 - The module now supports opt-in consent for transactional SMS, for sending to US customers.
 - A new `ddg.sms.cpaas.config` queue has been added to handle configuration for this feature.
 
-### Improvements
+#### Improvements
 - SMS messages are now processed via a new `ddg.sms.message` queue instead of a cron.
 
 ### 2.7.3
