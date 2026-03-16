@@ -7,7 +7,6 @@ var config = {
 
     paths: {
         'intlTelInput': 'Dotdigitalgroup_Sms/js/intlTelInput',
-        'intlTelInputUtils': 'Dotdigitalgroup_Sms/js/utils',
         'internationalTelephoneInput': 'Dotdigitalgroup_Sms/js/internationalTelephoneInput'
     },
 
