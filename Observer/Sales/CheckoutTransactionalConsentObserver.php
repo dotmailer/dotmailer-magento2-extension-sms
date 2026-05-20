@@ -85,7 +85,14 @@ class CheckoutTransactionalConsentObserver implements ObserverInterface
     }
 
     /**
-     * Observer for converting quote data to order
+     * Observer for applying stored session data to the order.
+     *
+     * $hasTransactionalConsent will have one of these 3 states:
+     * null  = checkbox was not shown (e.g. non-applicable phone country, or feature disabled)
+     * true  = checkbox was shown and checked
+     * false = checkbox was shown but not checked
+     *
+     * We infer sms_transactional_requires_opt_in = 1 if checkbox was shown (i.e. value is not null), and sms_transactional_opt_in = true if checkbox was shown and checked.
      *
      * @param Observer $observer
      *
@@ -99,6 +106,8 @@ class CheckoutTransactionalConsentObserver implements ObserverInterface
             if ($hasTransactionalConsent === null) {
                 return $this;
             }
+
+            $hasTransactionalConsent = (bool) $hasTransactionalConsent;
 
             $order = $observer->getEvent()->getOrder();
 
