@@ -1,3 +1,8 @@
+### 3.0.2
+
+#### Bug fixes
+- We added guards against missing generated code for extension attributes in our `ShippingInformationManagementPlugin`.
+
 ### 3.0.1
 
 #### Bug fixes

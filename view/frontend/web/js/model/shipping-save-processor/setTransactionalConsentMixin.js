@@ -8,10 +8,15 @@ define([
     return function (payloadExtender) {
         return wrapper.wrap(payloadExtender, function (originalAction, payload) {
             payload = originalAction(payload);
+
+            if (!window.checkoutConfig.ddSmsTransactionalConsentExtensionAttributeAvailable) {
+                return payload;
+            }
+
             const hasProvidedTransactionalConsentInput =
                 $('[name="dd_consent[dd_sms_transactional_consent_checkbox]"]');
 
-            if (hasProvidedTransactionalConsentInput.is(':disabled')) {
+            if (!hasProvidedTransactionalConsentInput.length || hasProvidedTransactionalConsentInput.is(':disabled')) {
                 return payload;
             }
 

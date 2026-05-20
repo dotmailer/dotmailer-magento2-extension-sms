@@ -9,6 +9,10 @@ define([
         return wrapper.wrap(payloadExtender, function (originalAction, payload) {
             payload = originalAction(payload);
 
+            if (!window.checkoutConfig.ddSmsMarketingConsentExtensionAttributesAvailable) {
+                return payload;
+            }
+
             const MarketingConsentCheckbox = $('[name="dd_consent[dd_sms_marketing_consent_checkbox]"]'),
              MarketingConsentTelephoneInput = $('[name="dd_consent[dd_sms_marketing_consent_telephone]"]');
 
