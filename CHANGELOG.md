@@ -1,3 +1,8 @@
+### 3.0.3
+
+#### Bug fixes
+- The `OrderSaveAfter` observer now listens for the `sales_order_commit_save_after` event to prevent failed nested transactions.
+
 ### 3.0.2
 
 #### Bug fixes
