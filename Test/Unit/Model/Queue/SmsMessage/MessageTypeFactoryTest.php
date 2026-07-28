@@ -9,9 +9,12 @@ use Dotdigitalgroup\Sms\Model\Queue\SmsMessage\MessageTypeFactory;
 use Dotdigitalgroup\Sms\Api\Data\SmsMessageTypeInterface;
 use Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\NewOrder;
 use Magento\Framework\ObjectManagerInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class MessageTypeFactoryTest extends TestCase
 {
     /**
@@ -92,9 +95,7 @@ class MessageTypeFactoryTest extends TestCase
         $this->messageTypeFactory->getMessageConfigPath(999);
     }
 
-    /**
-     * @dataProvider messageTypeDataProvider
-     */
+    #[DataProvider('messageTypeDataProvider')]
     public function testCreateHandlesAllMessageTypes(int $typeId, string $expectedClass): void
     {
         $messageTypeMock = $this->createMock(SmsMessageTypeInterface::class);
@@ -109,7 +110,7 @@ class MessageTypeFactoryTest extends TestCase
         $this->assertInstanceOf(SmsMessageTypeInterface::class, $result);
     }
 
-    public function messageTypeDataProvider(): array
+    public static function messageTypeDataProvider(): array
     {
         return [
             'new_order' => [

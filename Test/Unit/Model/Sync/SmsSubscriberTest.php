@@ -12,17 +12,21 @@ use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber;
 use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\ExporterFactory;
 use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\Retriever;
 use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\RetrieverFactory;
+use Dotdigitalgroup\Email\Test\Unit\Traits\MockBuilderCompatibilityTrait;
 use Dotdigitalgroup\Sms\Test\Unit\Traits\TestInteractsWithV3ApiModels;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\DB\Select;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Api\Data\WebsiteInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class SmsSubscriberTest extends TestCase
 {
+    use MockBuilderCompatibilityTrait;
     use TestInteractsWithV3ApiModels;
 
     public const LIMIT = 2000;
@@ -116,7 +120,9 @@ class SmsSubscriberTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->websiteInterfaceMock = $this->getMockBuilder(WebsiteInterface::class)
+        $this->websiteInterfaceMock = $this->getMockBuilder(
+            $this->classWithAddedMethods(WebsiteInterface::class, ['getStoreIds'])
+        )
             ->onlyMethods([
                 'getId',
                 'setId',
@@ -127,9 +133,9 @@ class SmsSubscriberTest extends TestCase
                 'getDefaultGroupId',
                 'setDefaultGroupId',
                 'getExtensionAttributes',
-                'setExtensionAttributes'
+                'setExtensionAttributes',
+                'getStoreIds'
             ])
-            ->addMethods(['getStoreIds'])
             ->disableOriginalConstructor()
             ->getMock();
 

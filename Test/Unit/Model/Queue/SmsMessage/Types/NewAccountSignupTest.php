@@ -6,9 +6,11 @@ namespace Dotdigitalgroup\Sms\Test\Unit\Model\Queue\SmsMessage\Types;
 
 use Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\NewAccountSignup;
 use Magento\Customer\Api\Data\CustomerInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class NewAccountSignupTest extends TestCase
 {
     /**

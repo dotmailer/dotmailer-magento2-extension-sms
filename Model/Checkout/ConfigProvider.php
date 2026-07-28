@@ -28,7 +28,8 @@ class ConfigProvider implements ConfigProviderInterface
      *
      * These check whether the generated getter methods exist on the ShippingInformationExtension
      * object. If setup:di:compile has not been run, or has not run correctly, the generated extension
-     * attribute classes will be absent and the mixins must not include those attributes in the checkout payload — otherwise Magento's ServiceInputProcessor will throw an InputException.
+     * attribute classes will be absent and the mixins must not include those attributes in the
+     * checkout payload — otherwise Magento's ServiceInputProcessor will throw an InputException.
      *
      * @return array
      */
@@ -37,9 +38,17 @@ class ConfigProvider implements ConfigProviderInterface
         $extensionAttributes = $this->shippingInformationExtensionFactory->create();
 
         return [
-            'ddSmsTransactionalConsentExtensionAttributeAvailable' => method_exists($extensionAttributes, 'getDdSmsTransactionalConsentCheckbox'),
-            'ddSmsMarketingConsentExtensionAttributesAvailable' => method_exists($extensionAttributes, 'getDdSmsMarketingConsentCheckbox') &&
-                method_exists($extensionAttributes, 'getDdSmsMarketingConsentTelephone'),
+            'ddSmsTransactionalConsentExtensionAttributeAvailable' => method_exists(
+                $extensionAttributes,
+                'getDdSmsTransactionalConsentCheckbox'
+            ),
+            'ddSmsMarketingConsentExtensionAttributesAvailable' => method_exists(
+                $extensionAttributes,
+                'getDdSmsMarketingConsentCheckbox'
+            ) && method_exists(
+                $extensionAttributes,
+                'getDdSmsMarketingConsentTelephone'
+            ),
         ];
     }
 }

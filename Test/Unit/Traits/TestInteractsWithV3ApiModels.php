@@ -9,6 +9,11 @@ use Dotdigital\V3\Models\ContactCollection;
 trait TestInteractsWithV3ApiModels
 {
     /**
+     * @var int
+     */
+    private static int $generatedContactCounter = 0;
+
+    /**
      * Generate a collection of SMS contacts
      *
      * @param int $count
@@ -30,26 +35,25 @@ trait TestInteractsWithV3ApiModels
     /**
      * Generate a single SMS contact
      *
-     * @throws \Exception
      * @return Contact
      */
     public function generateSmsContact(): Contact
     {
-        $faker = \Faker\Factory::create();
+        $index = ++self::$generatedContactCounter;
         $contact = new DotdigitalContact([
             'matchIdentifier' => 'email'
         ]);
         $contact->setIdentifiers([
-            'email' => $faker->email,
-            'mobileNumber' => $faker->phoneNumber
+            'email' => sprintf('contact_%d@example.com', $index),
+            'mobileNumber' => sprintf('+447700%06d', $index)
         ]);
         $contact->setLists(['123']);
         $contact->setDataFields([
-                'store_name_additional' => $faker->word,
-                'firstname' => $faker->firstName,
-                'lastname' => $faker->lastName,
-                'store_name' => $faker->word,
-                'website_name' => $faker->word
+                'store_name_additional' => sprintf('store_additional_%d', $index),
+                'firstname' => sprintf('First%d', $index),
+                'lastname' => sprintf('Last%d', $index),
+                'store_name' => sprintf('store_%d', $index),
+                'website_name' => sprintf('website_%d', $index)
         ]);
         return $contact;
     }

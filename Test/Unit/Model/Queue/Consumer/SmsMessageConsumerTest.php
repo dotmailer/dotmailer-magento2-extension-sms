@@ -17,12 +17,17 @@ use Dotdigitalgroup\Sms\Model\Message\MessageBuilder;
 use Dotdigitalgroup\Sms\Model\Queue\Consumer\SmsMessageConsumer;
 use Dotdigitalgroup\Sms\Model\Queue\Message\SmsMessageData;
 use Dotdigitalgroup\Sms\Model\Queue\SmsMessageQueueManager;
+use Dotdigitalgroup\Email\Test\Unit\Traits\MockBuilderCompatibilityTrait;
 use Magento\Framework\Stdlib\DateTime;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class SmsMessageConsumerTest extends TestCase
 {
+    use MockBuilderCompatibilityTrait;
+
     /**
      * @var SmsClientFactory|MockObject
      */
@@ -88,8 +93,8 @@ class SmsMessageConsumerTest extends TestCase
     {
         $messageData = $this->createMessageData(ConfigInterface::SMS_TYPE_NEW_ORDER);
         $message = $this->createMessageMock();
-        $client = $this->getMockBuilder(\stdClass::class)
-            ->addMethods(['sendSmsSingle'])
+        $client = $this->getMockBuilder($this->classWithAddedMethods(\stdClass::class, ['sendSmsSingle']))
+            ->onlyMethods(['sendSmsSingle'])
             ->getMock();
         $messagePayload = ['body' => 'Test SMS message'];
 
@@ -155,8 +160,8 @@ class SmsMessageConsumerTest extends TestCase
     {
         $messageData = $this->createMessageData(ConfigInterface::SMS_TYPE_SIGN_UP);
         $message = $this->createMessageMock();
-        $client = $this->getMockBuilder(\stdClass::class)
-            ->addMethods(['sendSmsSingle'])
+        $client = $this->getMockBuilder($this->classWithAddedMethods(\stdClass::class, ['sendSmsSingle']))
+            ->onlyMethods(['sendSmsSingle'])
             ->getMock();
         $messagePayload = ['body' => 'Test SMS message'];
 
@@ -198,8 +203,8 @@ class SmsMessageConsumerTest extends TestCase
     {
         $messageData = $this->createMessageData(ConfigInterface::SMS_TYPE_SIGN_UP);
         $message = $this->createMessageMock();
-        $client = $this->getMockBuilder(\stdClass::class)
-            ->addMethods(['sendSmsSingle'])
+        $client = $this->getMockBuilder($this->classWithAddedMethods(\stdClass::class, ['sendSmsSingle']))
+            ->onlyMethods(['sendSmsSingle'])
             ->getMock();
         $messagePayload = ['body' => 'Test SMS message'];
 
@@ -232,8 +237,8 @@ class SmsMessageConsumerTest extends TestCase
     {
         $messageData = $this->createMessageData(ConfigInterface::SMS_TYPE_SIGN_UP);
         $message = $this->createMessageMock();
-        $client = $this->getMockBuilder(\stdClass::class)
-            ->addMethods(['sendSmsSingle'])
+        $client = $this->getMockBuilder($this->classWithAddedMethods(\stdClass::class, ['sendSmsSingle']))
+            ->onlyMethods(['sendSmsSingle'])
             ->getMock();
         $messagePayload = ['body' => 'Test SMS message'];
 
@@ -293,8 +298,8 @@ class SmsMessageConsumerTest extends TestCase
     {
         $messageData = $this->createMessageData(ConfigInterface::SMS_TYPE_NEW_ORDER);
         $message = $this->createMessageMock();
-        $client = $this->getMockBuilder(\stdClass::class)
-            ->addMethods(['sendSmsSingle'])
+        $client = $this->getMockBuilder($this->classWithAddedMethods(\stdClass::class, ['sendSmsSingle']))
+            ->onlyMethods(['sendSmsSingle'])
             ->getMock();
 
         $this->setupMessageCreation($messageData, $message);
@@ -354,8 +359,8 @@ class SmsMessageConsumerTest extends TestCase
     {
         $messageData = $this->createMessageData(ConfigInterface::SMS_TYPE_NEW_ACCOUNT_SIGN_UP);
         $message = $this->createMessageMock();
-        $client = $this->getMockBuilder(\stdClass::class)
-            ->addMethods(['sendSmsSingle'])
+        $client = $this->getMockBuilder($this->classWithAddedMethods(\stdClass::class, ['sendSmsSingle']))
+            ->onlyMethods(['sendSmsSingle'])
             ->getMock();
         $messagePayload = ['body' => 'Welcome to our store!'];
 
@@ -425,8 +430,8 @@ class SmsMessageConsumerTest extends TestCase
     {
         $messageData = $this->createMessageData(ConfigInterface::SMS_TYPE_NEW_ORDER);
         $message = $this->createMessageMock();
-        $client = $this->getMockBuilder(\stdClass::class)
-            ->addMethods(['sendSmsSingle'])
+        $client = $this->getMockBuilder($this->classWithAddedMethods(\stdClass::class, ['sendSmsSingle']))
+            ->onlyMethods(['sendSmsSingle'])
             ->getMock();
         $messagePayload = ['body' => 'Your order has been placed'];
 

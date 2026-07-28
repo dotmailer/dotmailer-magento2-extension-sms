@@ -10,9 +10,11 @@ use Dotdigitalgroup\Sms\Model\Config\TransactionalSms\CpaasConfigManager;
 use Dotdigitalgroup\Sms\Model\Config\TransactionalSms\CpaasConfigService;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class CpaasConfigManagerTest extends TestCase
 {
     /**

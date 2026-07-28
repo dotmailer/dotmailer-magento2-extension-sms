@@ -10,6 +10,7 @@ use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContactFactory;
 use Dotdigital\V3\Models\ContactCollection;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Store\Api\Data\WebsiteInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Dotdigitalgroup\Email\Logger\Logger;
@@ -17,6 +18,7 @@ use Dotdigitalgroup\Email\Model\Apiconnector\V3\Client;
 use Dotdigitalgroup\Email\Model\Apiconnector\V3\ClientFactory;
 use Dotdigitalgroup\Sms\Test\Unit\Traits\TestInteractsWithV3ApiModels;
 
+#[AllowMockObjectsWithoutExpectations]
 class SmsSubscriberBatchProcessorTest extends TestCase
 {
     use TestInteractsWithV3ApiModels;

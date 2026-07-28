@@ -9,8 +9,10 @@ use Dotdigitalgroup\Sms\Model\SmsSubscriber\Resubscriber;
 use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact as ContactResource;
 use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\Collection as ContactCollection;
 use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory as ContactCollectionFactory;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class ResubscriberTest extends TestCase
 {
     /**

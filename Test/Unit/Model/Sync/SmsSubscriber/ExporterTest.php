@@ -5,6 +5,7 @@ namespace Dotdigitalgroup\Sms\Test\Unit\Model\Sync\SmsSubscriber;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\Model\SmsContact;
 use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\Exporter;
+use Dotdigitalgroup\Email\Test\Unit\Traits\MockBuilderCompatibilityTrait;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Api\Data\WebsiteInterface;
@@ -14,6 +15,8 @@ use Dotdigital\V3\Models\Contact as DotdigitalContact;
 
 class ExporterTest extends TestCase
 {
+    use MockBuilderCompatibilityTrait;
+
     /**
      * @var Exporter
      */
@@ -54,10 +57,11 @@ class ExporterTest extends TestCase
      */
     public function testExportMethod()
     {
-        $emailContact = $this->getMockBuilder(SmsContact::class)
+        $emailContact = $this->getMockBuilder(
+            $this->classWithAddedMethods(SmsContact::class, ['getEmail', 'getEmailContactId'])
+        )
             ->disableOriginalConstructor()
-            ->addMethods(['getEmail','getEmailContactId'])
-            ->onlyMethods(['getMobileNumber', 'getData'])
+            ->onlyMethods(['getMobileNumber', 'getData', 'getEmail', 'getEmailContactId'])
             ->getMock();
 
         $emailContact->expects($this->once())

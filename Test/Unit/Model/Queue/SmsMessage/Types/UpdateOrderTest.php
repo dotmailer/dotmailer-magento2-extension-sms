@@ -6,14 +6,19 @@ namespace Dotdigitalgroup\Sms\Test\Unit\Model\Queue\SmsMessage\Types;
 
 use Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\Data\OrderPhoneNumberFinder;
 use Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\UpdateOrder;
+use Dotdigitalgroup\Email\Test\Unit\Traits\MockBuilderCompatibilityTrait;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderAddressInterface;
 use Magento\Store\Api\Data\StoreInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class UpdateOrderTest extends TestCase
 {
+    use MockBuilderCompatibilityTrait;
+
     /**
      * @var OrderInterface|MockObject
      */
@@ -46,9 +51,9 @@ class UpdateOrderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->orderMock = $this->getMockBuilder(OrderInterface::class)
-            ->addMethods(['getShippingAddress', 'getStore', 'getId'])
-            ->getMockForAbstractClass();
+        $this->orderMock = $this->createMock(
+            $this->classWithAddedMethods(OrderInterface::class, ['getShippingAddress', 'getStore', 'getId'])
+        );
         $this->billingAddressMock = $this->createMock(OrderAddressInterface::class);
         $this->shippingAddressMock = $this->createMock(OrderAddressInterface::class);
         $this->storeMock = $this->createMock(StoreInterface::class);

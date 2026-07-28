@@ -37,8 +37,5 @@
         "psr-4": {
             "Dotdigitalgroup\\Sms\\": ""
         }
-    },
-    "require-dev": {
-        "fakerphp/faker": "^1.21"
     }
 }

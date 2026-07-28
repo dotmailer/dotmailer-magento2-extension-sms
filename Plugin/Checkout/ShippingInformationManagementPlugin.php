@@ -68,7 +68,10 @@ class ShippingInformationManagementPlugin
                 $shippingExtensionAttributes->getDdSmsMarketingConsentCheckbox()
             );
         } else {
-            $this->logger->warning('ShippingInformationManagementPlugin: getDdSmsMarketingConsentCheckbox is not available on extension attributes. Please run setup:di:compile.');
+            $this->logger->warning(
+                'ShippingInformationManagementPlugin: getDdSmsMarketingConsentCheckbox
+                 is not available on extension attributes. Please run setup:di:compile.'
+            );
         }
 
         if (method_exists($shippingExtensionAttributes, 'getDdSmsMarketingConsentTelephone')) {
@@ -77,7 +80,10 @@ class ShippingInformationManagementPlugin
                 $shippingExtensionAttributes->getDdSmsMarketingConsentTelephone()
             );
         } else {
-            $this->logger->warning('ShippingInformationManagementPlugin: getDdSmsMarketingConsentTelephone is not available on extension attributes. Please run setup:di:compile.');
+            $this->logger->warning(
+                'ShippingInformationManagementPlugin: getDdSmsMarketingConsentTelephone
+                 is not available on extension attributes. Please run setup:di:compile.'
+            );
         }
 
         if (method_exists($shippingExtensionAttributes, 'getDdSmsTransactionalConsentCheckbox')) {
@@ -86,7 +92,10 @@ class ShippingInformationManagementPlugin
                 $shippingExtensionAttributes->getDdSmsTransactionalConsentCheckbox()
             );
         } else {
-            $this->logger->warning('ShippingInformationManagementPlugin: getDdSmsTransactionalConsentCheckbox is not available on extension attributes. Please run setup:di:compile.');
+            $this->logger->warning(
+                'ShippingInformationManagementPlugin: getDdSmsTransactionalConsentCheckbox
+                 is not available on extension attributes. Please run setup:di:compile.'
+            );
         }
 
         return null;

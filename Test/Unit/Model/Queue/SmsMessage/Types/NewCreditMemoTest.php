@@ -6,16 +6,21 @@ namespace Dotdigitalgroup\Sms\Test\Unit\Model\Queue\SmsMessage\Types;
 
 use Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\Data\OrderPhoneNumberFinder;
 use Dotdigitalgroup\Sms\Model\Queue\SmsMessage\Types\NewCreditMemo;
+use Dotdigitalgroup\Email\Test\Unit\Traits\MockBuilderCompatibilityTrait;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderAddressInterface;
 use Magento\Store\Api\Data\StoreInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class NewCreditMemoTest extends TestCase
 {
+    use MockBuilderCompatibilityTrait;
+
     /**
      * @var PriceCurrencyInterface|MockObject
      */
@@ -59,9 +64,9 @@ class NewCreditMemoTest extends TestCase
     protected function setUp(): void
     {
         $this->priceCurrencyMock = $this->createMock(PriceCurrencyInterface::class);
-        $this->orderMock = $this->getMockBuilder(OrderInterface::class)
-            ->addMethods(['getShippingAddress', 'getStore', 'getId'])
-            ->getMockForAbstractClass();
+        $this->orderMock = $this->createMock(
+            $this->classWithAddedMethods(OrderInterface::class, ['getShippingAddress', 'getStore', 'getId'])
+        );
         $this->creditMemoMock = $this->createMock(CreditmemoInterface::class);
         $this->billingAddressMock = $this->createMock(OrderAddressInterface::class);
         $this->shippingAddressMock = $this->createMock(OrderAddressInterface::class);

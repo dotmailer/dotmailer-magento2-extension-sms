@@ -11,6 +11,7 @@ use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Email\Model\Apiconnector\Client as V2Client;
 use Dotdigitalgroup\Email\Model\Apiconnector\V3\ClientFactory as V3ClientFactory;
 use Dotdigitalgroup\Email\Model\Apiconnector\V3\Client as V3Client;
+use Dotdigitalgroup\Email\Test\Unit\Traits\MockBuilderCompatibilityTrait;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\Model\Queue\Consumer\SmsSubscriptionConsumer;
 use Dotdigitalgroup\Sms\Model\SmsContact;
@@ -21,11 +22,15 @@ use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\RetrieverFactory;
 use Dotdigitalgroup\Sms\Model\Queue\Message\SmsSubscriptionData;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 
+#[AllowMockObjectsWithoutExpectations]
 class SmsSubscriptionConsumerTest extends TestCase
 {
+    use MockBuilderCompatibilityTrait;
+
     /**
      * @var Data|MockObject
      */
@@ -92,9 +97,11 @@ class SmsSubscriptionConsumerTest extends TestCase
         $this->retrieverFactoryMock = $this->createMock(RetrieverFactory::class);
         $this->smsSubscribeDataMock = $this->createMock(SmsSubscriptionData::class);
         $this->exporterFactoryMock = $this->createMock(ExporterFactory::class);
-        $this->smsSubscriberMock = $this->getMockBuilder(SmsContact::class)
+        $this->smsSubscriberMock = $this->getMockBuilder(
+            $this->classWithAddedMethods(SmsContact::class, ['getEmail'])
+        )
             ->disableOriginalConstructor()
-            ->addMethods(['getEmail'])
+            ->onlyMethods(['getEmail'])
             ->getMock();
 
         $this->smsSubscriptionConsumer = new SmsSubscriptionConsumer(

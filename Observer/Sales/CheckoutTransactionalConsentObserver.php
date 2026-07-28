@@ -92,7 +92,8 @@ class CheckoutTransactionalConsentObserver implements ObserverInterface
      * true  = checkbox was shown and checked
      * false = checkbox was shown but not checked
      *
-     * We infer sms_transactional_requires_opt_in = 1 if checkbox was shown (i.e. value is not null), and sms_transactional_opt_in = true if checkbox was shown and checked.
+     * We infer sms_transactional_requires_opt_in = 1 if checkbox was shown (i.e. value is not null),
+     * and sms_transactional_opt_in = true if checkbox was shown and checked.
      *
      * @param Observer $observer
      *
