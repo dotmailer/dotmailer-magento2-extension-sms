@@ -23,14 +23,14 @@ class Dotdigital extends Generic implements TabInterface
     private $contactCollectionFactory;
 
     /**
-     * @var \Magento\Store\Model\System\Store
-     */
-    protected $_systemStore;
-
-    /**
      * @var \Magento\Framework\Registry
      */
     protected $_coreRegistry;
+
+    /**
+     * @var \Magento\Store\Model\System\Store
+     */
+    private $_systemStore;
 
     /**
      * @param Context $context
