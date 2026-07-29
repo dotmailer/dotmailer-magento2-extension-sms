@@ -3,6 +3,9 @@
 #### Bug fixes
 - The `OrderSaveAfter` observer now listens for the `sales_order_commit_save_after` event to prevent failed nested transactions.
 
+#### Improvements
+- Replaces protected access to a property in a block class as part of the Adobe assurance program.
+
 ### 3.0.2
 
 #### Bug fixes
