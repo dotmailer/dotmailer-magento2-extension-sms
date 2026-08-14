@@ -1,6 +1,8 @@
 <?php
-/** @var \Dotdigitalgroup\Sms\Block\Adminhtml\AppendNote $block */
-// phpcs:disable Magento2.Legacy.EscapeMethodsOnBlockClass
+/**
+ * @var \Dotdigitalgroup\Sms\Block\Adminhtml\AppendNote $block
+ * @var $escaper \Magento\Framework\Escaper
+ */
 
 $counterSelector = sprintf('%s_counter', $block->getElement()->getId());
 $commentSelector = sprintf('%s_comment', $block->getElement()->getId());
