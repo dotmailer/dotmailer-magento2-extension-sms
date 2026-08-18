@@ -20,7 +20,7 @@ class Bulk extends AbstractItemSyncer
     /**
      * @var SerializerInterface
      */
-    protected $serializer;
+    private $serializer;
 
     /**
      * @var ContactSenderStrategyFactory

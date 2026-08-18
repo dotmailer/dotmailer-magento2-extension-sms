@@ -1,3 +1,9 @@
+### 3.0.4
+
+#### Improvements
+- We moved some protected class properties to private.
+- We removed using escapeJs on $block
+
 ### 3.0.3
 
 #### Bug fixes

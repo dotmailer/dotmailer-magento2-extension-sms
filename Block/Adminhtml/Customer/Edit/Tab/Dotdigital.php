@@ -28,15 +28,9 @@ class Dotdigital extends Generic implements TabInterface
     protected $_coreRegistry;
 
     /**
-     * @var \Magento\Store\Model\System\Store
-     */
-    private $_systemStore;
-
-    /**
      * @param Context $context
      * @param Registry $registry
      * @param FormFactory $formFactory
-     * @param Store $systemStore
      * @param ContactCollectionFactory $contactCollectionFactory
      * @param array $data
      */
@@ -44,12 +38,10 @@ class Dotdigital extends Generic implements TabInterface
         \Magento\Backend\Block\Template\Context $context,
         \Magento\Framework\Registry $registry,
         \Magento\Framework\Data\FormFactory $formFactory,
-        \Magento\Store\Model\System\Store $systemStore,
         ContactCollectionFactory $contactCollectionFactory,
         array $data = []
     ) {
         $this->_coreRegistry = $registry;
-        $this->_systemStore = $systemStore;
         $this->contactCollectionFactory = $contactCollectionFactory;
         parent::__construct($context, $registry, $formFactory, $data);
     }

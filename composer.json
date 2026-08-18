@@ -2,7 +2,7 @@
     "name": "dotdigital/dotdigital-magento2-extension-sms",
     "description": "Dotdigital for Magento 2: SMS module",
     "type": "magento2-module",
-    "version": "3.0.3",
+    "version": "3.0.4",
     "license": "MIT",
     "repositories": [
         {
@@ -15,7 +15,7 @@
     },
     "require": {
         "php": "^7.4||^8.0",
-        "dotdigital/dotdigital-magento2-extension": "^4.29.0",
+        "dotdigital/dotdigital-magento2-extension": "^4.33.0",
         "magento/framework": ">=103.0.2 <104",
         "magento/module-config": ">=101 <102",
         "magento/module-backend": ">=101 <103",
