@@ -8,7 +8,7 @@ This module provides support for Transactional SMS notifications to Magento merc
 ## Requirements
 - An active Dotdigital account with the SMS pay-as-you-go service enabled.
 - Dotdigital extension versions:
-  - `Dotdigitalgroup_Email` 4.33.0+
+  - `Dotdigitalgroup_Email` 4.37.0+
 - PHP 7.4+
 - Magento 2.4.2+
   - Magento 2.3.0-2.3.6 are compatible up to version 1.5.x
