@@ -54,6 +54,13 @@
     <type name="Dotdigitalgroup\Email\Model\Sync\Importer\ImporterProgressHandler">
         <plugin name="dd_sms_importer_progress_handler_plugin" type="Dotdigitalgroup\Sms\Plugin\Importer\ImporterProgressHandlerPlugin"/>
     </type>
+    <type name="Dotdigitalgroup\Email\Model\Sync\Importer\Handler\InProgressImportResponseHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="v3_sms_subscribers" xsi:type="object">Dotdigitalgroup\Email\Model\Sync\Importer\V3InProgressImportResponseHandler</item>
+            </argument>
+        </arguments>
+    </type>
     <type name="Dotdigitalgroup\Email\Model\Contact\ContactUpdaterPool">
         <arguments>
             <argument name="updaters" xsi:type="array">

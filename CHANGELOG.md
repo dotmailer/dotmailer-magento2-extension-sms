@@ -1,3 +1,9 @@
+### 3.1.0
+
+#### What's new
+
+- We added some importer-related code for release alongside the bulk coupon generation feature in the Email module.
+
 ### 3.0.4
 
 #### Improvements
