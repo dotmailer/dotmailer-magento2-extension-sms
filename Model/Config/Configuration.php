@@ -416,14 +416,15 @@ class Configuration
      * Get address book list ID.
      *
      * @param int $websiteId
+     * @param int|null $storeId
      * @return int
      */
-    public function getListId($websiteId): int
+    public function getListId($websiteId, ?int $storeId = null): int
     {
         return (int) $this->scopeConfig->getValue(
             ConfigInterface::XML_PATH_CONNECTOR_SMS_SUBSCRIBER_ADDRESS_BOOK_ID,
-            ScopeInterface::SCOPE_WEBSITE,
-            $websiteId
+            $storeId !== null ? ScopeInterface::SCOPE_STORES : ScopeInterface::SCOPE_WEBSITE,
+            $storeId !== null ? $storeId : $websiteId
         );
     }
 

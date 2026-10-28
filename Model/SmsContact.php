@@ -101,4 +101,21 @@ class SmsContact extends Contact
 
         return $this->numberUtility->returnMobileNumberFromStorage($mobileNumber);
     }
+
+    /**
+     * Get the website-local store resolved by the SMS subscriber retriever.
+     *
+     * @return int
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getSmsSyncStoreId(): int
+    {
+        $storeId = (int) $this->getData('sms_sync_store_id');
+        if (!$storeId) {
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('SMS subscriber store context is missing.')
+            );
+        }
+        return $storeId;
+    }
 }

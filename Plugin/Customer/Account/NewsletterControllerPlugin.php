@@ -15,6 +15,7 @@ use Dotdigitalgroup\Sms\Model\Queue\Message\SmsSubscriptionDataFactory;
 use Dotdigitalgroup\Sms\Model\Queue\Publisher\SmsMessagePublisher;
 use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory;
 use Dotdigitalgroup\Sms\Model\Subscriber;
+use Dotdigitalgroup\Sms\Model\SmsSubscriber\StoreResolver;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
@@ -88,6 +89,11 @@ class NewsletterControllerPlugin
     private $smsMessagePublisher;
 
     /**
+     * @var StoreResolver
+     */
+    private $storeResolver;
+
+    /**
      * @param Data $dataHelper
      * @param Logger $logger
      * @param ContactResource $contactResource
@@ -100,6 +106,7 @@ class NewsletterControllerPlugin
      * @param PublisherInterface $publisher
      * @param SmsMessagePublisher $smsMessagePublisher
      * @param Context $context
+     * @param StoreResolver $storeResolver
      */
     public function __construct(
         Data $dataHelper,
@@ -113,7 +120,8 @@ class NewsletterControllerPlugin
         SmsSubscriptionDataFactory $smsSubscriptionDataFactory,
         PublisherInterface $publisher,
         SmsMessagePublisher $smsMessagePublisher,
-        Context $context
+        Context $context,
+        StoreResolver $storeResolver
     ) {
         $this->dataHelper = $dataHelper;
         $this->logger = $logger;
@@ -127,6 +135,7 @@ class NewsletterControllerPlugin
         $this->publisher = $publisher;
         $this->smsMessagePublisher = $smsMessagePublisher;
         $this->request = $context->getRequest();
+        $this->storeResolver = $storeResolver;
     }
 
     /**
@@ -185,6 +194,7 @@ class NewsletterControllerPlugin
                         Subscriber::TOPIC_SMS_SUBSCRIPTION,
                         $this->smsSubscriptionDataFactory->create()
                             ->setWebsiteId((int) $websiteId)
+                            ->setStoreId($this->storeResolver->resolve($contactModel))
                             ->setContactId((int) $contactModel->getId())
                             ->setType('subscribe')
                     );
@@ -209,6 +219,7 @@ class NewsletterControllerPlugin
 
                     $contactMessage = $this->smsSubscriptionDataFactory->create();
                     $contactMessage->setWebsiteId((int) $websiteId);
+                    $contactMessage->setStoreId($this->storeResolver->resolve($contactModel));
                     $contactMessage->setEmail($customer->getEmail());
                     $contactMessage->setType('unsubscribe');
 
@@ -229,6 +240,7 @@ class NewsletterControllerPlugin
                         Subscriber::TOPIC_SMS_SUBSCRIPTION,
                         $this->smsSubscriptionDataFactory->create()
                             ->setWebsiteId((int) $websiteId)
+                            ->setStoreId($this->storeResolver->resolve($contactModel))
                             ->setContactId((int) $contactModel->getId())
                             ->setType('subscribe')
                     );

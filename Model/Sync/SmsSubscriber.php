@@ -6,6 +6,7 @@ use DateTime;
 use Dotdigitalgroup\Email\Helper\Config;
 use Dotdigitalgroup\Email\Helper\Data;
 use Dotdigitalgroup\Email\Logger\Logger;
+use Dotdigitalgroup\Email\Model\Customer\RegistrationStoreResolver;
 use Dotdigitalgroup\Email\Model\Sync\SyncInterface;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
 use Dotdigitalgroup\Sms\Model\Sync\Batch\SmsSubscriberBatchProcessor;
@@ -61,6 +62,11 @@ class SmsSubscriber implements SyncInterface
     private $retrieverFactory;
 
     /**
+     * @var RegistrationStoreResolver
+     */
+    private $registrationStoreResolver;
+
+    /**
      * @param Logger $logger
      * @param Data $emailHelper
      * @param Configuration $smsConfig
@@ -68,6 +74,7 @@ class SmsSubscriber implements SyncInterface
      * @param SmsSubscriberBatchProcessor $batchProcessor
      * @param ScopeConfigInterface $scopeConfig
      * @param RetrieverFactory $retrieverFactory
+     * @param RegistrationStoreResolver $registrationStoreResolver
      */
     public function __construct(
         Logger $logger,
@@ -76,7 +83,8 @@ class SmsSubscriber implements SyncInterface
         ExporterFactory $exporterFactory,
         SmsSubscriberBatchProcessor $batchProcessor,
         ScopeConfigInterface $scopeConfig,
-        RetrieverFactory $retrieverFactory
+        RetrieverFactory $retrieverFactory,
+        RegistrationStoreResolver $registrationStoreResolver
     ) {
         $this->logger = $logger;
         $this->emailHelper = $emailHelper;
@@ -85,6 +93,7 @@ class SmsSubscriber implements SyncInterface
         $this->batchProcessor = $batchProcessor;
         $this->scopeConfig = $scopeConfig;
         $this->retrieverFactory = $retrieverFactory;
+        $this->registrationStoreResolver = $registrationStoreResolver;
     }
 
     /**
@@ -104,15 +113,16 @@ class SmsSubscriber implements SyncInterface
         );
 
         foreach ($this->fetchWebsitesForSync() as $website) {
-            $smsAddressBookListId = $this->smsConfig->getListId($website->getId());
-            if (empty($smsAddressBookListId)) {
-                continue;
+            $megaBatch = [];
+            foreach ($this->getListCohorts($website) as $storeIds) {
+                $this->loopByListCohort($website, $storeIds, $megaBatchSize, $breakValue, $megaBatch);
+                if ($breakValue && $this->syncedCount >= $breakValue) {
+                    break;
+                }
             }
-            $this->loopByWebsite(
-                $website,
-                $megaBatchSize,
-                $breakValue
-            );
+            if ($megaBatch) {
+                $this->batchProcessor->process($megaBatch, $website->getId());
+            }
         }
 
         $message = '----------- SMS Subscriber sync ----------- : '
@@ -130,28 +140,55 @@ class SmsSubscriber implements SyncInterface
     }
 
     /**
-     * Perform batching loop by website.
+     * Group stores sharing the same inherited or overridden SMS list.
      *
      * @param WebsiteInterface $website
+     * @return array
+     */
+    private function getListCohorts(WebsiteInterface $website): array
+    {
+        $cohorts = [];
+        $websiteId = (int) $website->getId();
+        foreach ($this->registrationStoreResolver->getWebsiteStoreIds($websiteId) as $storeId) {
+            $listId = $this->smsConfig->getListId($websiteId, $storeId);
+            if ($listId) {
+                $cohorts[$listId][] = $storeId;
+            }
+        }
+        return $cohorts;
+    }
+
+    /**
+     * Perform batching loop for one list cohort.
+     *
+     * All cohorts of the website share a mega batch; each contact carries its own list.
+     *
+     * @param WebsiteInterface $website
+     * @param int[] $storeIds
      * @param int $megaBatchSize
      * @param int $breakValue
+     * @param array $megaBatch
      *
      * @return void
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    private function loopByWebsite(WebsiteInterface $website, int $megaBatchSize, int $breakValue): void
-    {
+    private function loopByListCohort(
+        WebsiteInterface $website,
+        array $storeIds,
+        int $megaBatchSize,
+        int $breakValue,
+        array &$megaBatch
+    ): void {
         $limit = $this->smsConfig->getLimit($website->getId());
         $exportKeyFieldMapping = $this->getValuesForMappedFields($website);
         $offset = 0;
-        $megaBatch = [];
 
         do {
             $subscribers = $this->retrieverFactory
                 ->create()
                 ->setWebsite($website->getId())
-                ->getSmsSubscribers($limit, $offset);
+                ->getSmsSubscribers($limit, $offset, $storeIds);
 
             if (!count($subscribers->getItems())) {
                 break;
@@ -178,8 +215,6 @@ class SmsSubscriber implements SyncInterface
                 $offset = 0;
             }
         } while (!$breakValue || $this->syncedCount < $breakValue);
-
-        $this->batchProcessor->process($megaBatch, $website->getId());
     }
 
     /**

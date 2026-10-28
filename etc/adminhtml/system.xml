@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
-        <section id="sync_settings" translate="label" type="text" sortOrder="150" showInWebsite="1" showInStore="0" showInDefault="1">
+        <section id="sync_settings" translate="label" type="text" sortOrder="150" showInWebsite="1" showInStore="1" showInDefault="1">
             <tab>ddg_automation</tab>
-            <group id="addressbook" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
-                <field id="sms_subscribers" translate="label" type="select" sortOrder="35" showInDefault="1" showInStore="0" showInWebsite="1">
+            <group id="addressbook" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="sms_subscribers" translate="label" type="select" sortOrder="35" showInDefault="1" showInStore="1" showInWebsite="1">
                     <label>Add SMS Subscribers To</label>
                     <source_model>Dotdigitalgroup\Email\Model\Config\Source\Sync\Lists</source_model>
                     <backend_model>Dotdigitalgroup\Email\Model\Config\Backend\UniqueList</backend_model>

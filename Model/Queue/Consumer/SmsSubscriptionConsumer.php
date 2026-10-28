@@ -18,6 +18,7 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Store\Model\ScopeInterface;
 use Dotdigitalgroup\Sms\Model\Queue\Message\SmsSubscriptionData;
 use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\RetrieverFactory;
+use Dotdigitalgroup\Sms\Model\SmsSubscriber\StoreResolver;
 
 class SmsSubscriptionConsumer
 {
@@ -57,6 +58,11 @@ class SmsSubscriptionConsumer
     private $retrieverFactory;
 
     /**
+     * @var StoreResolver
+     */
+    private $storeResolver;
+
+    /**
      * MarketingSmsSubscribe constructor.
      *
      * @param Data $helper
@@ -66,6 +72,7 @@ class SmsSubscriptionConsumer
      * @param ExporterFactory $exporterFactory
      * @param ScopeConfigInterface $scopeConfig
      * @param RetrieverFactory $retrieverFactory
+     * @param StoreResolver $storeResolver
      */
     public function __construct(
         Data $helper,
@@ -74,7 +81,8 @@ class SmsSubscriptionConsumer
         Configuration $smsConfig,
         ExporterFactory $exporterFactory,
         ScopeConfigInterface $scopeConfig,
-        RetrieverFactory $retrieverFactory
+        RetrieverFactory $retrieverFactory,
+        StoreResolver $storeResolver
     ) {
         $this->helper = $helper;
         $this->logger = $logger;
@@ -83,6 +91,7 @@ class SmsSubscriptionConsumer
         $this->exporterFactory = $exporterFactory;
         $this->scopeConfig = $scopeConfig;
         $this->retrieverFactory = $retrieverFactory;
+        $this->storeResolver = $storeResolver;
     }
 
     /**
@@ -129,12 +138,21 @@ class SmsSubscriptionConsumer
                 ->setWebsite($smsSubscribeData->getWebsiteId())
                 ->getSmsSubscriber($smsSubscribeData->getContactId());
 
+            $listId = $this->smsConfig->getListId(
+                $smsSubscribeData->getWebsiteId(),
+                $this->storeResolver->validate(
+                    $smsSubscribeData->getStoreId() ?? $smsSubscriber->getSmsSyncStoreId(),
+                    $smsSubscribeData->getWebsiteId()
+                )
+            );
+            if (!$listId) {
+                throw new LocalizedException(__('No SMS subscriber list is configured for this store.'));
+            }
             $contact = $this->exporterFactory
                 ->create()
                 ->setFieldMapping($this->getValuesForMappedFields($smsSubscribeData->getWebsiteId()))
                 ->prepareContact($smsSubscriber);
-
-            $contact->setLists([$this->smsConfig->getListId($smsSubscribeData->getWebsiteId())]);
+            $contact->setLists([$listId]);
 
             $v3Client->contacts->patchByIdentifier(
                 $smsSubscriber->getEmail(),
@@ -179,8 +197,23 @@ class SmsSubscriptionConsumer
 
         if (!empty($contact)) {
             try {
+                $storeId = $unsubscribeData->getStoreId();
+                if ($storeId === null) {
+                    $storeId = $this->retrieverFactory
+                        ->create()
+                        ->setWebsite($unsubscribeData->getWebsiteId())
+                        ->getSmsSubscriberByEmail($unsubscribeData->getEmail())
+                        ->getSmsSyncStoreId();
+                }
+                $listId = $this->smsConfig->getListId(
+                    $unsubscribeData->getWebsiteId(),
+                    $this->storeResolver->validate($storeId, $unsubscribeData->getWebsiteId())
+                );
+                if (!$listId) {
+                    throw new LocalizedException(__('No SMS subscriber list is configured for this store.'));
+                }
                 $v2Client->deleteAddressBookContact(
-                    $this->smsConfig->getListId($unsubscribeData->getWebsiteId()),
+                    $listId,
                     $contact->getContactId()
                 );
                 $this->logger->info(

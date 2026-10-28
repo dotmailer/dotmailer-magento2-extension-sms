@@ -15,6 +15,11 @@ class SmsSubscriptionData
     private $websiteId;
 
     /**
+     * @var int|null
+     */
+    private $storeId;
+
+    /**
      * @var int
      */
     private $contactId;
@@ -50,6 +55,28 @@ class SmsSubscriptionData
     public function getWebsiteId(): int
     {
         return $this->websiteId;
+    }
+
+    /**
+     * Set the resolved SMS subscriber store.
+     *
+     * @param int|null $storeId
+     * @return SmsSubscriptionData
+     */
+    public function setStoreId(?int $storeId): SmsSubscriptionData
+    {
+        $this->storeId = $storeId;
+        return $this;
+    }
+
+    /**
+     * Get the published store, or null for messages queued before store-scoped lists.
+     *
+     * @return int|null
+     */
+    public function getStoreId(): ?int
+    {
+        return $this->storeId;
     }
 
     /**

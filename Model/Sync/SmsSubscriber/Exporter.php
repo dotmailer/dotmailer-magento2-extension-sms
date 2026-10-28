@@ -51,9 +51,11 @@ class Exporter
     public function export(Collection $smsSubscribers, ?WebsiteInterface $website = null): array
     {
         $exportedData = [];
-        $smsAddressBookListId = $this->configuration->getListId($website->getId());
-
         foreach ($smsSubscribers as $smsSubscriber) {
+            $smsAddressBookListId = $this->configuration->getListId(
+                $website->getId(),
+                $smsSubscriber->getSmsSyncStoreId()
+            );
             $contact = $this->prepareContact($smsSubscriber);
             $contact->setLists([$smsAddressBookListId]);
             $exportedData["{$smsSubscriber->getEmailContactId()}"] = $contact;

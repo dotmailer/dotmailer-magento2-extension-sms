@@ -5,8 +5,10 @@ namespace Dotdigitalgroup\Sms\Test\Unit\Model\Sync;
 use Dotdigitalgroup\Email\Model\ResourceModel\Contact\Collection;
 use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\Exporter;
 use Dotdigitalgroup\Email\Helper\Data;
+use Dotdigitalgroup\Email\Model\Customer\RegistrationStoreResolver;
 use Dotdigitalgroup\Email\Logger\Logger;
 use Dotdigitalgroup\Sms\Model\Config\Configuration;
+use Dotdigitalgroup\Sms\Model\SmsContact;
 use Dotdigitalgroup\Sms\Model\Sync\Batch\SmsSubscriberBatchProcessor;
 use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber;
 use Dotdigitalgroup\Sms\Model\Sync\SmsSubscriber\ExporterFactory;
@@ -20,6 +22,7 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Api\Data\WebsiteInterface;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -94,6 +97,11 @@ class SmsSubscriberTest extends TestCase
     private $retrieverMock;
 
     /**
+     * @var RegistrationStoreResolver|MockObject
+     */
+    private $registrationStoreResolver;
+
+    /**
      * @inheritDoc
      */
     protected function setUp(): void
@@ -113,6 +121,8 @@ class SmsSubscriberTest extends TestCase
         $this->smsConfigMock = $this->getMockBuilder(Configuration::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $this->registrationStoreResolver = $this->createMock(RegistrationStoreResolver::class);
+        $this->registrationStoreResolver->method('getWebsiteStoreIds')->willReturn([1, 2, 3]);
 
         $this->subscriberCollectionMock = $this->createMock(Collection::class);
 
@@ -146,7 +156,8 @@ class SmsSubscriberTest extends TestCase
             $this->exporterFactoryMock,
             $this->batchProcessorMock,
             $this->scopeConfigMock,
-            $this->retrieverFactoryMock
+            $this->retrieverFactoryMock,
+            $this->registrationStoreResolver
         );
     }
 
@@ -199,9 +210,9 @@ class SmsSubscriberTest extends TestCase
             ->with($this->websiteInterfaceMock->getId())
             ->willReturn(true);
 
-        $this->smsConfigMock->expects($this->once())
+        $this->smsConfigMock->expects($this->exactly(3))
             ->method('getListId')
-            ->with($this->websiteInterfaceMock->getId())
+            ->with(1, $this->anything())
             ->willReturn(123);
 
         $retrieverMock = $this->createMock(Retriever::class);
@@ -211,6 +222,7 @@ class SmsSubscriberTest extends TestCase
 
         $retrieverMock->expects($this->atLeast($total_loops))
             ->method('getSmsSubscribers')
+            ->with($this->anything(), $this->anything(), [1, 2, 3])
             ->willReturn($this->subscriberCollectionMock);
 
         $retrieverMock->method('setWebsite')
@@ -237,5 +249,98 @@ class SmsSubscriberTest extends TestCase
             ->willReturn(true);
 
         $this->smsSubscriber->sync();
+    }
+
+    #[DataProvider('websiteBatchScenarios')]
+    public function testWebsiteSharesBatchesAcrossListCohorts(
+        int $megaBatchSize,
+        int $breakValue,
+        array $expectedBatches,
+        array $expectedCalls,
+        int $expectedCount
+    ): void {
+        $this->websiteInterfaceMock->method('getId')->willReturn(1);
+        $this->emailHelperMock->method('getWebsites')->willReturn([$this->websiteInterfaceMock]);
+        $this->emailHelperMock->method('isEnabled')->willReturn(true);
+        $this->smsConfigMock->method('isSmsSyncEnabled')->willReturn(true);
+        $this->smsConfigMock->method('getLimit')->willReturn(100);
+        $this->smsConfigMock->method('getListId')->willReturnMap([
+            [1, 1, 100],
+            [1, 2, 200],
+            [1, 3, 100]
+        ]);
+        $this->scopeConfigMock->method('getValue')->willReturnMap([
+            [\Dotdigitalgroup\Email\Helper\Config::XML_PATH_CONNECTOR_SYNC_BREAK_VALUE, 'default', null, $breakValue],
+            [
+                \Dotdigitalgroup\Email\Helper\Config::XML_PATH_CONNECTOR_MEGA_BATCH_SIZE_CONTACT,
+                'default',
+                null,
+                $megaBatchSize
+            ],
+            ['connector_data_mapping/customer_data', 'websites', 1, []]
+        ]);
+
+        $retriever = $this->createMock(Retriever::class);
+        $retriever->method('setWebsite')->with(1)->willReturnSelf();
+        $this->retrieverFactoryMock->method('create')->willReturn($retriever);
+        $calls = [];
+        $retriever->expects($this->exactly(array_sum($expectedCalls)))->method('getSmsSubscribers')
+            ->willReturnCallback(function ($limit, $offset, $storeIds) use (&$calls) {
+                $key = implode(',', $storeIds);
+                $calls[$key] = ($calls[$key] ?? 0) + 1;
+                $items = [];
+                if ($calls[$key] === 1) {
+                    foreach ($storeIds as $storeId) {
+                        $contact = $this->getMockBuilder(
+                            $this->classWithAddedMethods(SmsContact::class, ['getEmail', 'getEmailContactId'])
+                        )->disableOriginalConstructor()
+                            ->onlyMethods(['getEmail', 'getEmailContactId', 'getMobileNumber'])
+                            ->getMock();
+                        $contact->setData('sms_sync_store_id', $storeId);
+                        $contact->method('getEmail')->willReturn("store$storeId@example.com");
+                        $contact->method('getEmailContactId')->willReturn($storeId);
+                        $contact->method('getMobileNumber')->willReturn('447123456789');
+                        $items[] = $contact;
+                    }
+                }
+                $collection = $this->createMock(Collection::class);
+                $collection->method('getItems')->willReturn($items);
+                $collection->method('getIterator')->willReturn(new \ArrayIterator($items));
+                return $collection;
+            });
+        $this->exporterFactoryMock->method('create')->willReturn(new Exporter($this->smsConfigMock));
+        $batches = [];
+        $this->batchProcessorMock->expects($this->exactly(count($expectedBatches)))->method('process')
+            ->willReturnCallback(function ($batch, $websiteId) use (&$batches) {
+                $this->assertSame(1, $websiteId);
+                $batches[] = array_map(function ($contact) {
+                    return $contact->getLists();
+                }, $batch);
+            });
+
+        $result = $this->smsSubscriber->sync();
+
+        $this->assertSame($expectedCalls, $calls);
+        $this->assertSame($expectedBatches, $batches);
+        $this->assertSame($expectedCount, $result['syncedSubscribers']);
+    }
+
+    public static function websiteBatchScenarios(): array
+    {
+        $mixedListBatch = [1 => [100], 3 => [100], 2 => [200]];
+        return [
+            'different lists share the final website batch' => [
+                1000, 0, [$mixedListBatch], ['1,3' => 2, '2' => 2], 3
+            ],
+            'size threshold flush includes different lists' => [
+                3, 0, [$mixedListBatch], ['1,3' => 2, '2' => 2], 3
+            ],
+            'threshold flush followed by website remainder' => [
+                2, 0, [[1 => [100], 3 => [100]], [2 => [200]]], ['1,3' => 2, '2' => 2], 3
+            ],
+            'break limit flushes pending contacts without querying next cohort' => [
+                1000, 2, [[1 => [100], 3 => [100]]], ['1,3' => 1], 2
+            ]
+        ];
     }
 }
