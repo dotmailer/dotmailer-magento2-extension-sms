@@ -61,8 +61,9 @@ class ExporterTest extends TestCase
             $this->classWithAddedMethods(SmsContact::class, ['getEmail', 'getEmailContactId'])
         )
             ->disableOriginalConstructor()
-            ->onlyMethods(['getMobileNumber', 'getData', 'getEmail', 'getEmailContactId'])
+            ->onlyMethods(['getMobileNumber', 'getData', 'getEmail', 'getEmailContactId', 'getSmsSyncStoreId'])
             ->getMock();
+        $emailContact->method('getSmsSyncStoreId')->willReturn(2);
 
         $emailContact->expects($this->once())
             ->method('getEmail')
@@ -89,7 +90,7 @@ class ExporterTest extends TestCase
 
         $this->configurationMock->expects($this->once())
             ->method('getListId')
-            ->with($this->websiteMock->getId())
+            ->with($this->websiteMock->getId(), 2)
             ->willReturn(123);
 
         $expectedContact = new DotdigitalContact(['matchIdentifier' => 'email']);

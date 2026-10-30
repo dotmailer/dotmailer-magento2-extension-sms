@@ -8,6 +8,7 @@ use Dotdigitalgroup\Email\Model\ResourceModel\Contact as ContactResource;
 use Dotdigitalgroup\Sms\Model\Queue\Message\SmsSubscriptionDataFactory;
 use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory as ContactCollectionFactory;
 use Dotdigitalgroup\Sms\Model\Subscriber;
+use Dotdigitalgroup\Sms\Model\SmsSubscriber\StoreResolver;
 use Magento\Backend\Model\View\Result\Redirect;
 use Magento\Customer\Controller\Adminhtml\Index\Save as CustomerAdminSaveController;
 use Magento\Framework\Controller\ResultInterface;
@@ -42,24 +43,32 @@ class Save
     private $smsSubscriptionDataFactory;
 
     /**
+     * @var StoreResolver
+     */
+    private $storeResolver;
+
+    /**
      * @param Logger $logger
      * @param ContactCollectionFactory $contactCollectionFactory
      * @param ContactResource $contactResource
      * @param PublisherInterface $publisher
      * @param SmsSubscriptionDataFactory $smsSubscriptionDataFactory
+     * @param StoreResolver $storeResolver
      */
     public function __construct(
         Logger $logger,
         ContactCollectionFactory $contactCollectionFactory,
         ContactResource $contactResource,
         PublisherInterface $publisher,
-        SmsSubscriptionDataFactory $smsSubscriptionDataFactory
+        SmsSubscriptionDataFactory $smsSubscriptionDataFactory,
+        StoreResolver $storeResolver
     ) {
         $this->logger = $logger;
         $this->contactCollectionFactory = $contactCollectionFactory;
         $this->contactResource = $contactResource;
         $this->publisher = $publisher;
         $this->smsSubscriptionDataFactory = $smsSubscriptionDataFactory;
+        $this->storeResolver = $storeResolver;
     }
 
     /**
@@ -89,6 +98,7 @@ class Save
             if (!$hasSubscribed && $contactModel->getSmsSubscriberStatus() == Subscriber::STATUS_SUBSCRIBED) {
                 $contactMessage = $this->smsSubscriptionDataFactory->create();
                 $contactMessage->setWebsiteId((int) $contactModel->getWebsiteId());
+                $contactMessage->setStoreId($this->storeResolver->resolve($contactModel));
                 $contactMessage->setEmail((string) $contactModel->getEmail());
                 $contactMessage->setType('unsubscribe');
 
@@ -111,6 +121,7 @@ class Save
                     Subscriber::TOPIC_SMS_SUBSCRIPTION,
                     $this->smsSubscriptionDataFactory->create()
                         ->setWebsiteId((int) $contactModel->getData('website_id'))
+                        ->setStoreId($this->storeResolver->resolve($contactModel))
                         ->setContactId((int) $contactModel->getId())
                         ->setType('subscribe')
                 );

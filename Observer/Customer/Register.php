@@ -12,6 +12,7 @@ use Dotdigitalgroup\Sms\Model\Queue\Message\SmsSubscriptionDataFactory;
 use Dotdigitalgroup\Sms\Model\Queue\Publisher\SmsMessagePublisher;
 use Dotdigitalgroup\Sms\Model\ResourceModel\SmsContact\CollectionFactory as ContactCollectionFactory;
 use Dotdigitalgroup\Sms\Model\Subscriber;
+use Dotdigitalgroup\Sms\Model\SmsSubscriber\StoreResolver;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\Event\Observer;
@@ -61,6 +62,11 @@ class Register implements ObserverInterface
     private $smsMessagePublisher;
 
     /**
+     * @var StoreResolver
+     */
+    private $storeResolver;
+
+    /**
      * @param Logger $logger
      * @param ContactCollectionFactory $contactCollectionFactory
      * @param ContactResource $contactResource
@@ -69,6 +75,7 @@ class Register implements ObserverInterface
      * @param PublisherInterface $publisher
      * @param SmsSubscriptionDataFactory $smsSubscriptionDataFactory
      * @param SmsMessagePublisher $smsMessagePublisher
+     * @param StoreResolver $storeResolver
      */
     public function __construct(
         Logger $logger,
@@ -78,7 +85,8 @@ class Register implements ObserverInterface
         Context $context,
         PublisherInterface $publisher,
         SmsSubscriptionDataFactory $smsSubscriptionDataFactory,
-        SmsMessagePublisher $smsMessagePublisher
+        SmsMessagePublisher $smsMessagePublisher,
+        StoreResolver $storeResolver
     ) {
         $this->logger = $logger;
         $this->consentManager = $consentManager;
@@ -88,6 +96,7 @@ class Register implements ObserverInterface
         $this->smsSubscriptionDataFactory = $smsSubscriptionDataFactory;
         $this->context = $context;
         $this->smsMessagePublisher = $smsMessagePublisher;
+        $this->storeResolver = $storeResolver;
     }
 
     /**
@@ -147,6 +156,7 @@ class Register implements ObserverInterface
                 Subscriber::TOPIC_SMS_SUBSCRIPTION,
                 $this->smsSubscriptionDataFactory->create()
                     ->setWebsiteId((int) $contactModel->getData('website_id'))
+                    ->setStoreId($this->storeResolver->resolve($contactModel))
                     ->setContactId((int) $contactModel->getId())
                     ->setType('subscribe')
             );
