@@ -1,3 +1,8 @@
+### 3.2.0
+
+### What's new
+- The list for SMS subscribers can now be configured in store scope.
+
 ### 3.1.0
 
 #### What's new
