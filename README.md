@@ -29,3 +29,10 @@ Please see our [Changelog](CHANGELOG.md) or the [Releases](https://github.com/do
 
 ## Credits
 This module features an option to enable international telephone number validation. Our supporting code uses a version of the [International Telephone Input](https://github.com/jackocnr/intl-tel-input) JavaScript plugin. We've also borrowed some components from this [MaxMage Magento module](https://github.com/MaxMage/international-telephone-input). Kudos and thanks!
+
+## Contribution
+You are welcome to contribute to Dotdigital for Magento! You can either:
+- Report a bug: create a [GitHub issue](https://github.com/dotmailer/dotmailer-magento2-extension-sms/issues/new) including description, repro steps, Magento and extension version numbers
+- Request a feature on our [roadmap](https://roadmap.dotdigital.com)
+
+You are also welcome to submit a pull request, if this helps illustrate a change or fix, but please note we are unable to merge commits from external authors (i.e. who are not Dotdigital employees) owing to an organization-level ruleset in GitHub. We will always try to give some kind of credit for adopted contributions in our CHANGELOG.md.
